@@ -77,7 +77,7 @@ impl Optimizer<'_> {
             if ref_count == 0 {
                 self.mode.store(ident.to_id(), &*init);
 
-                if init.may_have_side_effects(&self.expr_ctx) {
+                if init.may_have_side_effects(&self.ctx.expr_ctx) {
                     // TODO: Inline partially
                     return;
                 }
@@ -494,7 +494,7 @@ impl Optimizer<'_> {
                     }
                 }
 
-                if init.may_have_side_effects(&self.expr_ctx) {
+                if init.may_have_side_effects(&self.ctx.expr_ctx) {
                     return;
                 }
 
@@ -531,13 +531,13 @@ impl Optimizer<'_> {
         if body.stmts.len() == 1 {
             match &body.stmts[0] {
                 Stmt::Expr(ExprStmt { expr, .. })
-                    if expr.size(self.expr_ctx.unresolved_ctxt) < cost_limit =>
+                    if expr.size(self.ctx.expr_ctx.unresolved_ctxt) < cost_limit =>
                 {
                     return true
                 }
 
                 Stmt::Return(ReturnStmt { arg: Some(arg), .. })
-                    if arg.size(self.expr_ctx.unresolved_ctxt) < cost_limit =>
+                    if arg.size(self.ctx.expr_ctx.unresolved_ctxt) < cost_limit =>
                 {
                     return true
                 }
@@ -646,57 +646,55 @@ impl Optimizer<'_> {
                 Decl::Fn(f) if self.options.inline >= 2 && f.ident.sym != *"arguments" => {
                     self.vars.inline_with_multi_replacer(&mut f.function.body);
 
-                    match &f.function.body {
-                        Some(body) => {
-                            if !usage.used_recursively
-                                // only callees can be inlined multiple times
-                                && usage.callee_count > 0
-                                // prefer single inline
-                                && usage.ref_count > 1
-                                && self.is_fn_body_simple_enough_to_inline(
-                                    body,
-                                    f.function.params.len(),
-                                    usage,
-                                )
+                    if let Some(body) = &f.function.body {
+                        if !usage.used_recursively
+                            // only callees can be inlined multiple times
+                            && usage.callee_count > 0
+                            // prefer single inline
+                            && usage.ref_count > 1
+                            && self.is_fn_body_simple_enough_to_inline(
+                                body,
+                                f.function.params.len(),
+                                usage,
+                            )
+                        {
+                            if f.function
+                                .params
+                                .iter()
+                                .any(|param| matches!(param.pat, Pat::Rest(..) | Pat::Assign(..)))
                             {
-                                if f.function.params.iter().any(|param| {
-                                    matches!(param.pat, Pat::Rest(..) | Pat::Assign(..))
-                                }) {
-                                    return;
-                                }
-                                trace_op!(
-                                    "inline: Decided to inline function '{}{:?}' as it's very \
-                                     simple",
-                                    f.ident.sym,
-                                    f.ident.ctxt
-                                );
-
-                                for i in collect_infects_from(
-                                    &f.function,
-                                    AliasConfig {
-                                        marks: Some(self.marks),
-                                        ignore_nested: false,
-                                        need_all: true,
-                                    },
-                                ) {
-                                    if let Some(usage) = self.data.vars.get_mut(&i.0) {
-                                        usage.ref_count += 1;
-                                    }
-                                }
-
-                                self.vars.simple_functions.insert(
-                                    i.to_id(),
-                                    FnExpr {
-                                        ident: None,
-                                        function: f.function.clone(),
-                                    }
-                                    .into(),
-                                );
-
                                 return;
                             }
+                            trace_op!(
+                                "inline: Decided to inline function '{}{:?}' as it's very simple",
+                                f.ident.sym,
+                                f.ident.ctxt
+                            );
+
+                            for i in collect_infects_from(
+                                &f.function,
+                                AliasConfig {
+                                    marks: Some(self.marks),
+                                    ignore_nested: false,
+                                    need_all: true,
+                                },
+                            ) {
+                                if let Some(usage) = self.data.vars.get_mut(&i.0) {
+                                    usage.ref_count += 1;
+                                }
+                            }
+
+                            self.vars.simple_functions.insert(
+                                i.to_id(),
+                                FnExpr {
+                                    ident: None,
+                                    function: f.function.clone(),
+                                }
+                                .into(),
+                            );
+
+                            return;
                         }
-                        None => {}
                     }
                 }
                 _ => {}
@@ -721,7 +719,7 @@ impl Optimizer<'_> {
                 })
             {
                 if let Decl::Class(ClassDecl { class, .. }) = decl {
-                    if class_has_side_effect(&self.expr_ctx, class) {
+                    if class_has_side_effect(&self.ctx.expr_ctx, class) {
                         return;
                     }
                 }
@@ -791,6 +789,10 @@ impl Optimizer<'_> {
 
     /// Actually inlines variables.
     pub(super) fn inline(&mut self, e: &mut Expr) {
+        if self.ctx.is_exact_lhs_of_assign {
+            return;
+        }
+
         match e {
             Expr::Member(me) => {
                 if let MemberProp::Computed(prop) = &mut me.prop {

@@ -1,18 +1,18 @@
 use swc_common::{
-    collections::AHashMap, errors::HANDLER, source_map::PURE_SP, util::take::Take, Mark, Spanned,
-    SyntaxContext, DUMMY_SP,
+    collections::AHashMap, errors::HANDLER, source_map::PURE_SP, util::take::Take, Mark, Span,
+    Spanned, SyntaxContext, DUMMY_SP,
 };
 use swc_ecma_ast::*;
 use swc_ecma_transforms_base::{helper, perf::Check};
 use swc_ecma_transforms_classes::super_field::SuperFieldAccessFolder;
 use swc_ecma_transforms_macros::fast_path;
 use swc_ecma_utils::{
-    alias_ident_for, alias_if_required, constructor::inject_after_super, default_constructor,
-    is_literal, prepend_stmt, private_ident, quote_ident, replace_ident, ExprFactory,
-    ModuleItemLike, StmtLike,
+    alias_ident_for, alias_if_required, constructor::inject_after_super,
+    default_constructor_with_span, is_literal, prepend_stmt, private_ident, quote_ident,
+    replace_ident, ExprFactory, ModuleItemLike, StmtLike,
 };
 use swc_ecma_visit::{
-    as_folder, noop_visit_mut_type, noop_visit_type, Fold, Visit, VisitMut, VisitMutWith, VisitWith,
+    noop_visit_mut_type, noop_visit_type, visit_mut_pass, Visit, VisitMut, VisitMutWith, VisitWith,
 };
 use swc_trace_macro::swc_trace;
 
@@ -40,8 +40,8 @@ mod used_name;
 /// # Impl note
 ///
 /// We use custom helper to handle export default class
-pub fn class_properties(config: Config, unresolved_mark: Mark) -> impl Fold + VisitMut {
-    as_folder(ClassProperties {
+pub fn class_properties(config: Config, unresolved_mark: Mark) -> impl Pass {
+    visit_mut_pass(ClassProperties {
         c: config,
         private: PrivateRecord::new(),
         extra: ClassExtra::default(),
@@ -49,27 +49,13 @@ pub fn class_properties(config: Config, unresolved_mark: Mark) -> impl Fold + Vi
     })
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Config {
     pub private_as_properties: bool,
     pub set_public_fields: bool,
     pub constant_super: bool,
     pub no_document_all: bool,
     pub pure_getter: bool,
-    pub static_blocks_mark: Mark,
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            private_as_properties: false,
-            set_public_fields: false,
-            constant_super: false,
-            no_document_all: false,
-            pure_getter: false,
-            static_blocks_mark: Mark::new(),
-        }
-    }
 }
 
 struct ClassProperties {
@@ -734,7 +720,7 @@ impl ClassProperties {
 
                     let value = prop.value.unwrap_or_else(|| Expr::undefined(prop_span));
 
-                    if prop.is_static && prop.ctxt.has_mark(self.c.static_blocks_mark) {
+                    if prop.is_static && prop.key.span.is_placeholder() {
                         let init = MemberInit::StaticBlock(value);
                         extra_inits.push(init);
                         continue;
@@ -952,7 +938,8 @@ impl ClassProperties {
             }
         }
 
-        let constructor = self.process_constructor(constructor, has_super, constructor_inits);
+        let constructor =
+            self.process_constructor(class.span, constructor, has_super, constructor_inits);
         if let Some(c) = constructor {
             members.push(ClassMember::Constructor(c));
         }
@@ -1029,6 +1016,7 @@ impl ClassProperties {
     #[allow(clippy::vec_box)]
     fn process_constructor(
         &mut self,
+        class_span: Span,
         constructor: Option<Constructor>,
         has_super: bool,
         constructor_exprs: MemberInitRecord,
@@ -1037,7 +1025,7 @@ impl ClassProperties {
             if constructor_exprs.record.is_empty() {
                 None
             } else {
-                Some(default_constructor(has_super))
+                Some(default_constructor_with_span(has_super, class_span))
             }
         });
 

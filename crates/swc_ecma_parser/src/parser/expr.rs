@@ -1245,7 +1245,7 @@ impl<I: Tokens> Parser<I> {
                         )
                         .map(|expr| (expr.into(), true))
                         .map(Some)
-                    } else if is_one_of!(p, '=', "as") {
+                    } else if is_one_of!(p, '=', "as", "satisfies") {
                         Ok(Some((
                             TsInstantiation {
                                 span: span!(p, start),
@@ -1988,7 +1988,6 @@ pub(in crate::parser) enum AssignTargetOrSpread {
 }
 
 /// simple leaf methods.
-
 impl<I: Tokens> Parser<I> {
     fn parse_yield_expr(&mut self) -> PResult<Box<Expr>> {
         let start = cur_pos!(self);

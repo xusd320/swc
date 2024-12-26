@@ -49,6 +49,10 @@ pub trait Tokens: Clone + Iterator<Item = TokenAndSpan> {
     fn end_pos(&self) -> BytePos;
 
     fn take_errors(&mut self) -> Vec<Error>;
+
+    /// If the program was parsed as a script, this contains the module
+    /// errors should the program be identified as a module in the future.
+    fn take_script_module_errors(&mut self) -> Vec<Error>;
 }
 
 #[derive(Clone)]
@@ -143,6 +147,10 @@ impl Tokens for TokensInput {
 
     fn take_errors(&mut self) -> Vec<Error> {
         take(&mut self.errors.borrow_mut())
+    }
+
+    fn take_script_module_errors(&mut self) -> Vec<Error> {
+        take(&mut self.module_errors.borrow_mut())
     }
 
     fn end_pos(&self) -> BytePos {
@@ -267,6 +275,10 @@ impl<I: Tokens> Tokens for Capturing<I> {
 
     fn take_errors(&mut self) -> Vec<Error> {
         self.inner.take_errors()
+    }
+
+    fn take_script_module_errors(&mut self) -> Vec<Error> {
+        self.inner.take_script_module_errors()
     }
 
     fn end_pos(&self) -> BytePos {
@@ -411,6 +423,52 @@ impl<I: Tokens> Buffer<I> {
             token: tok!('<'),
             span: self.cur_span().with_lo(self.cur_span().lo + BytePos(1)),
             had_line_break: false,
+        });
+    }
+
+    pub fn merge_lt_gt(&mut self) {
+        debug_assert!(
+            self.is(&tok!('<')) || self.is(&tok!('>')),
+            "parser should only call merge_lt_gt when encountering '<' or '>' token"
+        );
+
+        let span = self.cur_span();
+
+        if self.peek().is_none() {
+            return;
+        }
+
+        let next = self.next.as_ref().unwrap();
+
+        if span.hi != next.span.lo {
+            return;
+        }
+
+        let cur = self.cur.take().unwrap();
+        let next = self.next.take().unwrap();
+
+        let token = match (&cur.token, &next.token) {
+            (tok!('>'), tok!('>')) => tok!(">>"),
+            (tok!('>'), tok!('=')) => tok!(">="),
+            (tok!('>'), tok!(">>")) => tok!(">>>"),
+            (tok!('>'), tok!(">=")) => tok!(">>="),
+            (tok!('>'), tok!(">>=")) => tok!(">>>="),
+            (tok!('<'), tok!('<')) => tok!("<<"),
+            (tok!('<'), tok!('=')) => tok!("<="),
+            (tok!('<'), tok!("<=")) => tok!("<<="),
+
+            _ => {
+                self.cur = Some(cur);
+                self.next = Some(next);
+                return;
+            }
+        };
+        let span = span.with_hi(next.span.hi);
+
+        self.cur = Some(TokenAndSpan {
+            token,
+            span,
+            had_line_break: cur.had_line_break,
         });
     }
 

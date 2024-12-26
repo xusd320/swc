@@ -5,10 +5,10 @@ use swc_common::{
     util::take::Take,
 };
 use swc_ecma_ast::*;
-use swc_ecma_transforms_base::{pass::RepeatedJsPass, scope::IdentType};
+use swc_ecma_transforms_base::scope::IdentType;
 use swc_ecma_utils::{contains_this_expr, find_pat_ids};
 use swc_ecma_visit::{
-    as_folder, noop_visit_mut_type, noop_visit_type, visit_obj_and_computed, Visit, VisitMut,
+    noop_visit_mut_type, noop_visit_type, visit_mut_pass, visit_obj_and_computed, Visit, VisitMut,
     VisitMutWith, VisitWith,
 };
 use tracing::{span, Level};
@@ -33,8 +33,8 @@ pub struct Config {}
 ///
 /// Currently all functions are treated as a black box, and all the pass gives
 /// up inlining variables across a function call or a constructor call.
-pub fn inlining(_: Config) -> impl 'static + RepeatedJsPass + VisitMut {
-    as_folder(Inlining {
+pub fn inlining(_: Config) -> impl 'static + Repeated + CompilerPass + Pass + VisitMut {
+    visit_mut_pass(Inlining {
         phase: Phase::Analysis,
         is_first_run: true,
         changed: false,
@@ -54,7 +54,7 @@ enum Phase {
 }
 
 impl CompilerPass for Inlining<'_> {
-    fn name() -> Cow<'static, str> {
+    fn name(&self) -> Cow<'static, str> {
         Cow::Borrowed("inlining")
     }
 }
@@ -468,19 +468,19 @@ impl VisitMut for Inlining<'_> {
         self.visit_with_child(ScopeKind::Cond, &mut stmt.alt);
     }
 
-    fn visit_mut_module_items(&mut self, items: &mut Vec<ModuleItem>) {
+    fn visit_mut_program(&mut self, program: &mut Program) {
         let _tracing = span!(Level::ERROR, "inlining", pass = self.pass).entered();
 
         let old_phase = self.phase;
 
         self.phase = Phase::Analysis;
-        items.visit_mut_children_with(self);
+        program.visit_mut_children_with(self);
 
         tracing::trace!("Switching to Inlining phase");
 
         // Inline
         self.phase = Phase::Inlining;
-        items.visit_mut_children_with(self);
+        program.visit_mut_children_with(self);
 
         self.phase = old_phase;
     }

@@ -4,6 +4,7 @@ use std::{
     hash::{Hash, Hasher},
 };
 
+use is_macro::Is;
 use num_bigint::BigInt as BigIntValue;
 use swc_atoms::{js_word, Atom};
 use swc_common::{ast_node, util::take::Take, EqIgnoreSpan, Span, DUMMY_SP};
@@ -11,7 +12,7 @@ use swc_common::{ast_node, util::take::Take, EqIgnoreSpan, Span, DUMMY_SP};
 use crate::jsx::JSXText;
 
 #[ast_node]
-#[derive(Eq, Hash, EqIgnoreSpan)]
+#[derive(Eq, Hash, EqIgnoreSpan, Is)]
 #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
 pub enum Lit {
     #[tag("StringLiteral")]
@@ -78,7 +79,7 @@ impl Lit {
 #[derive(Eq, Hash)]
 pub struct BigInt {
     pub span: Span,
-    #[cfg_attr(any(feature = "rkyv-impl"), with(EncodeBigInt))]
+    #[cfg_attr(any(feature = "rkyv-impl"), rkyv(with = EncodeBigInt))]
     pub value: Box<BigIntValue>,
 
     /// Use `None` value only for transformations to avoid recalculate
@@ -94,7 +95,7 @@ impl EqIgnoreSpan for BigInt {
 
 #[cfg(feature = "rkyv-impl")]
 #[derive(Debug, Clone, Copy)]
-#[cfg_attr(feature = "rkyv-impl", derive(rkyv::bytecheck::CheckBytes))]
+#[cfg_attr(feature = "rkyv-impl", derive(bytecheck::CheckBytes))]
 #[cfg_attr(feature = "rkyv-impl", repr(C))]
 pub struct EncodeBigInt;
 
@@ -103,23 +104,23 @@ impl rkyv::with::ArchiveWith<Box<BigIntValue>> for EncodeBigInt {
     type Archived = rkyv::Archived<String>;
     type Resolver = rkyv::Resolver<String>;
 
-    unsafe fn resolve_with(
+    fn resolve_with(
         field: &Box<BigIntValue>,
-        pos: usize,
         resolver: Self::Resolver,
-        out: *mut Self::Archived,
+        out: rkyv::Place<Self::Archived>,
     ) {
         use rkyv::Archive;
 
         let s = field.to_string();
-        s.resolve(pos, resolver, out);
+        s.resolve(resolver, out);
     }
 }
 
 #[cfg(feature = "rkyv-impl")]
 impl<S> rkyv::with::SerializeWith<Box<BigIntValue>, S> for EncodeBigInt
 where
-    S: ?Sized + rkyv::ser::Serializer,
+    S: ?Sized + rancor::Fallible + rkyv::ser::Writer,
+    S::Error: rancor::Source,
 {
     fn serialize_with(
         field: &Box<BigIntValue>,
@@ -133,7 +134,7 @@ where
 #[cfg(feature = "rkyv-impl")]
 impl<D> rkyv::with::DeserializeWith<rkyv::Archived<String>, Box<BigIntValue>, D> for EncodeBigInt
 where
-    D: ?Sized + rkyv::Fallible,
+    D: ?Sized + rancor::Fallible,
 {
     fn deserialize_with(
         field: &rkyv::Archived<String>,

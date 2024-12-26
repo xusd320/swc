@@ -1,7 +1,7 @@
 use swc_common::{util::take::Take, Spanned, DUMMY_SP};
 use swc_ecma_ast::*;
 use swc_ecma_transforms_optimization::debug_assert_valid;
-use swc_ecma_utils::{StmtExt, StmtLike};
+use swc_ecma_utils::StmtLike;
 use swc_ecma_visit::{noop_visit_type, Visit, VisitWith};
 
 use super::Optimizer;
@@ -116,7 +116,7 @@ impl Optimizer<'_> {
         // for stmt in stmts.iter_mut() {
         //     let ctx = Ctx {
         //         is_nested_if_return_merging: true,
-        //         ..self.ctx
+        //         ..self.ctx.clone()
         //     };
         //     self.with_ctx(ctx).merge_nested_if_returns(stmt, terminate);
         // }
@@ -218,6 +218,16 @@ impl Optimizer<'_> {
                             return;
                         }
                     },
+
+                    (
+                        Some(Stmt::Block(BlockStmt { stmts: s1, .. })),
+                        Some(Stmt::Block(BlockStmt { stmts: s2, .. })),
+                    ) if s1.iter().any(|s| matches!(s, Stmt::Return(..)))
+                        && s2.iter().any(|s| matches!(s, Stmt::Return(..))) =>
+                    {
+                        log_abort!("if_return: [x] Aborting because early return is observed");
+                        return;
+                    }
 
                     _ => {}
                 }
@@ -386,7 +396,7 @@ impl Optimizer<'_> {
                         && seq
                             .exprs
                             .last()
-                            .map(|v| is_pure_undefined(&self.expr_ctx, v))
+                            .map(|v| is_pure_undefined(&self.ctx.expr_ctx, v))
                             .unwrap_or(true) =>
                 {
                     let expr = self.ignore_return_value(&mut cur);
@@ -484,16 +494,16 @@ impl Optimizer<'_> {
         }
     }
 
-    fn can_merge_stmt_as_if_return(&self, s: &Stmt, _is_last: bool) -> bool {
+    fn can_merge_stmt_as_if_return(&self, s: &Stmt, is_last: bool) -> bool {
         // if !res {
         //     trace!("Cannot merge: {}", dump(s));
         // }
 
         match s {
             Stmt::Expr(..) => true,
-            Stmt::Return(..) => true,
+            Stmt::Return(..) => is_last,
             Stmt::Block(s) => {
-                s.stmts.len() == 1 && self.can_merge_stmt_as_if_return(&s.stmts[0], false)
+                s.stmts.len() == 1 && self.can_merge_stmt_as_if_return(&s.stmts[0], is_last)
             }
             Stmt::If(stmt) => {
                 matches!(&*stmt.cons, Stmt::Return(..))
@@ -560,7 +570,7 @@ fn always_terminates_with_return_arg(s: &Stmt) -> bool {
 fn can_merge_as_if_return(s: &Stmt) -> bool {
     fn cost(s: &Stmt) -> Option<isize> {
         if let Stmt::Block(..) = s {
-            if !s.terminates() {
+            if !swc_ecma_utils::StmtExt::terminates(s) {
                 return None;
             }
         }

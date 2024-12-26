@@ -16,10 +16,10 @@ export type Options = {
         | "only-metadata";
     removeEmptyMetadataElements?: boolean;
     removeComments?: boolean;
-    preserveComments: string[];
+    preserveComments?: string[];
     minifyConditionalComments?: boolean;
     removeEmptyAttributes?: boolean;
-    removeRedundantAttributes?: boolean;
+    removeRedundantAttributes?: "none" | "all" | "smart";
     collapseBooleanAttributes?: boolean;
     normalizeAttributes?: boolean;
     minifyJson?: boolean | { pretty?: boolean };
@@ -45,28 +45,28 @@ export type FragmentOptions = Options & {
 };
 
 export async function minify(
-    content: Buffer,
+    content: string | Buffer,
     options?: Options
 ): Promise<binding.TransformOutput> {
     return binding.minify(content, toBuffer(options ?? {}));
 }
 
 export async function minifyFragment(
-    content: Buffer,
+    content: string | Buffer,
     options?: FragmentOptions
 ): Promise<binding.TransformOutput> {
     return binding.minifyFragment(content, toBuffer(options ?? {}));
 }
 
 export function minifySync(
-    content: Buffer,
+    content: string | Buffer,
     options?: Options
 ): binding.TransformOutput {
     return binding.minifySync(content, toBuffer(options ?? {}));
 }
 
 export async function minifyFragmentSync(
-    content: Buffer,
+    content: string | Buffer,
     options?: FragmentOptions
 ): Promise<binding.TransformOutput> {
     return binding.minifyFragmentSync(content, toBuffer(options ?? {}));

@@ -192,6 +192,10 @@ impl Tokens for Lexer<'_> {
         take(&mut self.errors.borrow_mut())
     }
 
+    fn take_script_module_errors(&mut self) -> Vec<Error> {
+        take(&mut self.module_errors.borrow_mut())
+    }
+
     fn end_pos(&self) -> BytePos {
         self.input.end_pos()
     }
@@ -342,7 +346,7 @@ impl Lexer<'_> {
     }
 }
 
-impl<'a> Iterator for Lexer<'a> {
+impl Iterator for Lexer<'_> {
     type Item = TokenAndSpan;
 
     fn next(&mut self) -> Option<Self::Item> {

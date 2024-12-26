@@ -8,14 +8,17 @@
 // option. This file may not be copied, modified, or distributed
 // except according to those terms.
 
-//! The SourceMap tracks all the source code used within a single crate, mapping
-//! from integer byte positions to the original source code location. Each bit
-//! of source parsed during crate parsing (typically files, in-memory strings,
-//! or various bits of macro expansion) cover a continuous range of bytes in the
-//! SourceMap and are represented by SourceFiles. Byte positions are stored in
-//! `spans` and used pervasively in the compiler. They are absolute positions
-//! within the SourceMap, which upon request can be converted to line and column
-//! information, source code snippets, etc.
+//! The SourceMap tracks all the source code used within a single crate.
+//!
+//! The mapping from integer byte positions to the original source code location
+//! is stored in `spans`.
+//!
+//! Each bit of source parsed during crate parsing (typically files, in-memory
+//! strings, or various bits of macro expansion) cover a continuous range of
+//! bytes in the SourceMap and are represented by SourceFiles. Byte positions
+//! are stored in `spans` and used pervasively in the compiler. They are
+//! absolute positions within the SourceMap, which upon request can be converted
+//! to line and column information, source code snippets, etc.
 use std::{
     cmp, env, fs,
     hash::Hash,
@@ -313,10 +316,11 @@ impl SourceMap {
         let line_info = self.lookup_line_with(fm, pos);
         match line_info {
             Ok(SourceFileAndLine { sf: f, line: a }) => {
+                let analysis = f.analyze();
                 let chpos = self.bytepos_to_file_charpos_with(&f, pos);
 
                 let line = a + 1; // Line numbers start at 1
-                let linebpos = f.lines[a];
+                let linebpos = f.analyze().lines[a];
                 assert!(
                     pos >= linebpos,
                     "{}: bpos = {:?}; linebpos = {:?};",
@@ -329,16 +333,17 @@ impl SourceMap {
                 let col = chpos - linechpos;
 
                 let col_display = {
-                    let start_width_idx = f
+                    let start_width_idx = analysis
                         .non_narrow_chars
                         .binary_search_by_key(&linebpos, |x| x.pos())
                         .unwrap_or_else(|x| x);
-                    let end_width_idx = f
+                    let end_width_idx = analysis
                         .non_narrow_chars
                         .binary_search_by_key(&pos, |x| x.pos())
                         .unwrap_or_else(|x| x);
                     let special_chars = end_width_idx - start_width_idx;
-                    let non_narrow: usize = f.non_narrow_chars[start_width_idx..end_width_idx]
+                    let non_narrow: usize = analysis.non_narrow_chars
+                        [start_width_idx..end_width_idx]
                         .iter()
                         .map(|x| x.width())
                         .sum();
@@ -364,14 +369,15 @@ impl SourceMap {
                 })
             }
             Err(f) => {
+                let analysis = f.analyze();
                 let chpos = self.bytepos_to_file_charpos(pos)?;
 
                 let col_display = {
-                    let end_width_idx = f
+                    let end_width_idx = analysis
                         .non_narrow_chars
                         .binary_search_by_key(&pos, |x| x.pos())
                         .unwrap_or_else(|x| x);
-                    let non_narrow: usize = f.non_narrow_chars[0..end_width_idx]
+                    let non_narrow: usize = analysis.non_narrow_chars[0..end_width_idx]
                         .iter()
                         .map(|x| x.width())
                         .sum();
@@ -1025,11 +1031,11 @@ impl SourceMap {
     ) -> u32 {
         let mut total_extra_bytes = state.total_extra_bytes;
         let mut index = state.mbc_index;
-
+        let analysis = file.analyze();
         if bpos >= state.pos {
-            let range = index..file.multibyte_chars.len();
+            let range = index..analysis.multibyte_chars.len();
             for i in range {
-                let mbc = &file.multibyte_chars[i];
+                let mbc = &analysis.multibyte_chars[i];
                 debug!("{}-byte char at {:?}", mbc.bytes, mbc.pos);
                 if mbc.pos >= bpos {
                     break;
@@ -1049,7 +1055,7 @@ impl SourceMap {
         } else {
             let range = 0..index;
             for i in range.rev() {
-                let mbc = &file.multibyte_chars[i];
+                let mbc = &analysis.multibyte_chars[i];
                 debug!("{}-byte char at {:?}", mbc.bytes, mbc.pos);
                 if mbc.pos < bpos {
                     break;
@@ -1319,7 +1325,8 @@ impl SourceMap {
                 None => continue,
             };
 
-            let linebpos = f.lines[line as usize];
+            let analysis = f.analyze();
+            let linebpos = analysis.lines[line as usize];
             debug_assert!(
                 pos >= linebpos,
                 "{}: bpos = {:?}; linebpos = {:?};",

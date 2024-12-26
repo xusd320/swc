@@ -1,6 +1,6 @@
 {
     "name": "@swc/core",
-    "version": "1.7.28",
+    "version": "1.10.1",
     "description": "Super-fast alternative for babel",
     "homepage": "https://swc.rs",
     "main": "./index.js",
@@ -34,8 +34,8 @@
             "x86_64-unknown-linux-musl",
             "i686-pc-windows-msvc",
             "armv7-unknown-linux-gnueabihf",
-            "aarch64-unknown-linux-gnu",
             "aarch64-apple-darwin",
+            "aarch64-unknown-linux-gnu",
             "aarch64-unknown-linux-musl",
             "aarch64-pc-windows-msvc"
         ]
@@ -54,7 +54,7 @@
         "build:wasm": "npm-run-all \"pack -- build ../../bindings/binding_core_wasm --scope swc {1} -t {2} --features plugin\" --",
         "build": "tsc -d && napi build --manifest-path ../../bindings/Cargo.toml --platform -p binding_core_node --js ./binding.js --dts ./binding.d.ts --release -o .",
         "build:dev": "tsc -d && napi build --manifest-path ../../bindings/Cargo.toml --platform -p binding_core_node --js ./binding.js --dts ./binding.d.ts -o .",
-        "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' jest --config ./jest.config.js",
+        "test": "cross-env NODE_OPTIONS='--experimental-vm-modules ${NODE_OPTIONS}' jest --config ./jest.config.js",
         "version": "napi version --npm-dir scripts/npm"
     },
     "peerDependencies": {

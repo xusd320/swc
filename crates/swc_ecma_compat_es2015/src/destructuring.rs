@@ -11,7 +11,7 @@ use swc_ecma_utils::{
     prop_name_to_expr, quote_ident, ExprFactory, StmtLike,
 };
 use swc_ecma_visit::{
-    as_folder, noop_visit_mut_type, noop_visit_type, Fold, Visit, VisitMut, VisitMutWith, VisitWith,
+    noop_visit_mut_type, noop_visit_type, visit_mut_pass, Visit, VisitMut, VisitMutWith, VisitWith,
 };
 use swc_trace_macro::swc_trace;
 
@@ -36,8 +36,8 @@ use swc_trace_macro::swc_trace;
 ///     b = _arr2[1],
 ///     rest = _arr2.slice(2);
 /// ```
-pub fn destructuring(c: Config) -> impl Fold + VisitMut {
-    as_folder(Destructuring { c })
+pub fn destructuring(c: Config) -> impl Pass {
+    visit_mut_pass(Destructuring { c })
 }
 
 struct Destructuring {
@@ -53,6 +53,8 @@ pub struct Config {
 macro_rules! impl_for_for_stmt {
     ($name:ident, $T:tt) => {
         fn $name(&mut self, for_stmt: &mut $T) {
+            for_stmt.visit_mut_children_with(self);
+
             let (left, stmt) = match &mut for_stmt.left {
                 ForHead::VarDecl(var_decl) => {
                     let has_complex = var_decl.decls.iter().any(|d| match d.name {
@@ -1321,4 +1323,24 @@ impl Check for DestructuringVisitor {
     fn should_handle(&self) -> bool {
         self.found
     }
+}
+
+#[cfg(test)]
+mod tests {
+    use swc_ecma_transforms_testing::test;
+
+    use super::*;
+
+    test!(
+        ::swc_ecma_parser::Syntax::default(),
+        |_| destructuring(Default::default()),
+        nested_for_of,
+        r#"
+            for (const [k1, v1] of Object.entries(o)){
+                for (const [k2, v2] of Object.entries(o)){
+                    console.log(k1, v1, k2, v2);
+                }
+            }        
+        "#
+    );
 }

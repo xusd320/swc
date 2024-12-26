@@ -31,6 +31,7 @@ use tracing::trace;
 pub use self::{
     factory::{ExprFactory, FunctionFactory, IntoIndirectCall},
     value::{
+        Merge,
         Type::{
             self, Bool as BoolType, Null as NullType, Num as NumberType, Obj as ObjectType,
             Str as StringType, Symbol as SymbolType, Undefined as UndefinedType,
@@ -433,6 +434,8 @@ pub fn extract_var_ids<T: VisitWith<Hoister>>(node: &T) -> Vec<Ident> {
 }
 
 pub trait StmtExt {
+    fn as_stmt(&self) -> &Stmt;
+
     /// Extracts hoisted variables
     fn extract_var_ids(&self) -> Vec<Ident>;
 
@@ -459,9 +462,69 @@ pub trait StmtExt {
 
     /// stmts contain top level return/break/continue/throw
     fn terminates(&self) -> bool;
+
+    fn may_have_side_effects(&self, ctx: &ExprCtx) -> bool {
+        match self.as_stmt() {
+            Stmt::Block(block_stmt) => block_stmt
+                .stmts
+                .iter()
+                .any(|stmt| stmt.may_have_side_effects(ctx)),
+            Stmt::Empty(_) => false,
+            Stmt::Labeled(labeled_stmt) => labeled_stmt.body.may_have_side_effects(ctx),
+            Stmt::If(if_stmt) => {
+                if_stmt.test.may_have_side_effects(ctx)
+                    || if_stmt.cons.may_have_side_effects(ctx)
+                    || if_stmt
+                        .alt
+                        .as_ref()
+                        .map_or(false, |stmt| stmt.may_have_side_effects(ctx))
+            }
+            Stmt::Switch(switch_stmt) => {
+                switch_stmt.discriminant.may_have_side_effects(ctx)
+                    || switch_stmt.cases.iter().any(|case| {
+                        case.test
+                            .as_ref()
+                            .map_or(false, |expr| expr.may_have_side_effects(ctx))
+                            || case.cons.iter().any(|con| con.may_have_side_effects(ctx))
+                    })
+            }
+            Stmt::Try(try_stmt) => {
+                try_stmt
+                    .block
+                    .stmts
+                    .iter()
+                    .any(|stmt| stmt.may_have_side_effects(ctx))
+                    || try_stmt.handler.as_ref().map_or(false, |handler| {
+                        handler
+                            .body
+                            .stmts
+                            .iter()
+                            .any(|stmt| stmt.may_have_side_effects(ctx))
+                    })
+                    || try_stmt.finalizer.as_ref().map_or(false, |finalizer| {
+                        finalizer
+                            .stmts
+                            .iter()
+                            .any(|stmt| stmt.may_have_side_effects(ctx))
+                    })
+            }
+            Stmt::Decl(decl) => match decl {
+                Decl::Class(class_decl) => class_has_side_effect(ctx, &class_decl.class),
+                Decl::Fn(_) => !ctx.in_strict,
+                Decl::Var(var_decl) => var_decl.kind == VarDeclKind::Var,
+                _ => false,
+            },
+            Stmt::Expr(expr_stmt) => expr_stmt.expr.may_have_side_effects(ctx),
+            _ => true,
+        }
+    }
 }
 
 impl StmtExt for Stmt {
+    fn as_stmt(&self) -> &Stmt {
+        self
+    }
+
     fn extract_var_ids(&self) -> Vec<Ident> {
         extract_var_ids(self)
     }
@@ -469,7 +532,7 @@ impl StmtExt for Stmt {
     fn terminates(&self) -> bool {
         match self {
             Stmt::Break(_) | Stmt::Continue(_) | Stmt::Throw(_) | Stmt::Return(_) => true,
-            Stmt::Block(block) => block.stmts.terminates(),
+            Stmt::Block(block) => block.stmts.iter().rev().any(|s| s.terminates()),
             Stmt::If(IfStmt {
                 cons,
                 alt: Some(alt),
@@ -481,22 +544,16 @@ impl StmtExt for Stmt {
 }
 
 impl StmtExt for Box<Stmt> {
+    fn as_stmt(&self) -> &Stmt {
+        self
+    }
+
     fn extract_var_ids(&self) -> Vec<Ident> {
         extract_var_ids(&**self)
     }
 
     fn terminates(&self) -> bool {
         (**self).terminates()
-    }
-}
-
-impl StmtExt for Vec<Stmt> {
-    fn extract_var_ids(&self) -> Vec<Ident> {
-        extract_var_ids(self)
-    }
-
-    fn terminates(&self) -> bool {
-        self.iter().rev().any(|s| s.terminates())
     }
 }
 
@@ -540,7 +597,7 @@ impl Visit for Hoister {
     fn visit_fn_expr(&mut self, _n: &FnExpr) {}
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 
 pub struct ExprCtx {
     /// This [SyntaxContext] should be applied only to unresolved references.
@@ -552,6 +609,10 @@ pub struct ExprCtx {
 
     /// True for argument of `typeof`.
     pub is_unresolved_ref_safe: bool,
+
+    /// True if we are in the strict mode. This will be set to `true` for
+    /// statements **after** `'use strict'`
+    pub in_strict: bool,
 }
 
 /// Extension methods for [Expr].
@@ -932,17 +993,10 @@ pub trait ExprExt {
                 op: op!(unary, "-"),
                 arg,
                 ..
-            }) if matches!(
-                &**arg,
-                Expr::Ident(Ident {
-                    sym,
-                    ctxt,
-                    ..
-                }) if &**sym == "Infinity" && *ctxt == ctx.unresolved_ctxt
-            ) =>
-            {
-                -f64::INFINITY
-            }
+            }) => match arg.cast_to_number(ctx) {
+                (Pure, Known(v)) => -v,
+                _ => return (MayBeImpure, Unknown),
+            },
             Expr::Unary(UnaryExpr {
                 op: op!("!"),
                 ref arg,
@@ -1370,6 +1424,7 @@ pub trait ExprExt {
             // Function expression does not have any side effect if it's not used.
             Expr::Fn(..) | Expr::Arrow(..) => false,
 
+            // It's annoying to pass in_strict
             Expr::Class(c) => class_has_side_effect(ctx, &c.class),
             Expr::Array(ArrayLit { elems, .. }) => elems
                 .iter()
@@ -1573,7 +1628,11 @@ pub fn class_has_side_effect(expr_ctx: &ExprCtx, c: &Class) -> bool {
                 }
             }
             ClassMember::StaticBlock(s) => {
-                if !s.body.stmts.is_empty() {
+                if s.body
+                    .stmts
+                    .iter()
+                    .any(|stmt| stmt.may_have_side_effects(expr_ctx))
+                {
                     return true;
                 }
             }
@@ -1583,6 +1642,7 @@ pub fn class_has_side_effect(expr_ctx: &ExprCtx, c: &Class) -> bool {
 
     false
 }
+
 fn and(lt: Value<Type>, rt: Value<Type>) -> Value<Type> {
     if lt == rt {
         return lt;
@@ -2166,10 +2226,16 @@ pub fn prop_name_to_member_prop(prop_name: PropName) -> MemberProp {
     }
 }
 
+#[deprecated(note = "Use default_constructor_with_span instead")]
 pub fn default_constructor(has_super: bool) -> Constructor {
-    trace!(has_super = has_super, "Creating a default constructor");
+    default_constructor_with_span(has_super, DUMMY_SP)
+}
 
-    let span = DUMMY_SP;
+/// `super_call_span` should be the span of the class definition
+/// Use value of [`Class::span`].
+pub fn default_constructor_with_span(has_super: bool, super_call_span: Span) -> Constructor {
+    trace!(has_super = has_super, "Creating a default constructor");
+    let super_call_span = super_call_span.with_hi(super_call_span.lo);
 
     Constructor {
         span: DUMMY_SP,
@@ -2177,7 +2243,7 @@ pub fn default_constructor(has_super: bool) -> Constructor {
         is_optional: false,
         params: if has_super {
             vec![ParamOrTsParamProp::Param(Param {
-                span,
+                span: DUMMY_SP,
                 decorators: Vec::new(),
                 pat: Pat::Rest(RestPat {
                     span: DUMMY_SP,
@@ -2192,7 +2258,7 @@ pub fn default_constructor(has_super: bool) -> Constructor {
         body: Some(BlockStmt {
             stmts: if has_super {
                 vec![CallExpr {
-                    span: DUMMY_SP,
+                    span: super_call_span,
                     callee: Callee::Super(Super { span: DUMMY_SP }),
                     args: vec![ExprOrSpread {
                         spread: Some(DUMMY_SP),
@@ -2406,6 +2472,13 @@ where
 }
 
 pub struct DropSpan;
+
+impl Pass for DropSpan {
+    fn process(&mut self, program: &mut Program) {
+        program.visit_mut_with(self);
+    }
+}
+
 impl VisitMut for DropSpan {
     fn visit_mut_span(&mut self, span: &mut Span) {
         *span = DUMMY_SP;
@@ -2418,7 +2491,7 @@ pub struct IdentUsageFinder<'a> {
     found: bool,
 }
 
-impl<'a> Visit for IdentUsageFinder<'a> {
+impl Visit for IdentUsageFinder<'_> {
     noop_visit_type!();
 
     visit_obj_and_computed!();
@@ -2666,7 +2739,6 @@ pub fn prop_name_eq(p: &PropName, key: &str) -> bool {
 /// Replace all `from` in `expr` with `to`.
 ///
 /// # Usage
-
 ///
 /// ```ignore
 /// replace_ident(&mut dec.expr, cls_name.to_id(), alias);
@@ -2952,7 +3024,6 @@ pub fn contains_top_level_await<V: VisitWith<TopLevelAwait>>(t: &V) -> bool {
 ///
 /// This visitor modifies [SyntaxContext] while preserving the symbol of
 /// [Ident]s.
-
 pub struct Remapper<'a> {
     vars: &'a FxHashMap<Id, SyntaxContext>,
 }
@@ -3101,6 +3172,86 @@ where
     pub query: T,
 }
 
+impl<T> RefRewriter<T>
+where
+    T: QueryRef,
+{
+    pub fn exit_prop(&mut self, n: &mut Prop) {
+        if let Prop::Shorthand(shorthand) = n {
+            if let Some(expr) = self.query.query_ref(shorthand) {
+                *n = KeyValueProp {
+                    key: shorthand.take().into(),
+                    value: expr,
+                }
+                .into()
+            }
+        }
+    }
+
+    pub fn exit_pat(&mut self, n: &mut Pat) {
+        if let Pat::Ident(id) = n {
+            if let Some(expr) = self.query.query_lhs(&id.clone().into()) {
+                *n = expr.into();
+            }
+        }
+    }
+
+    pub fn exit_expr(&mut self, n: &mut Expr) {
+        if let Expr::Ident(ref_ident) = n {
+            if let Some(expr) = self.query.query_ref(ref_ident) {
+                *n = *expr;
+            }
+        };
+    }
+
+    pub fn exit_simple_assign_target(&mut self, n: &mut SimpleAssignTarget) {
+        if let SimpleAssignTarget::Ident(ref_ident) = n {
+            if let Some(expr) = self.query.query_lhs(&ref_ident.clone().into()) {
+                *n = expr.try_into().unwrap();
+            }
+        };
+    }
+
+    pub fn exit_jsx_element_name(&mut self, n: &mut JSXElementName) {
+        if let JSXElementName::Ident(ident) = n {
+            if let Some(expr) = self.query.query_jsx(ident) {
+                *n = expr;
+            }
+        }
+    }
+
+    pub fn exit_jsx_object(&mut self, n: &mut JSXObject) {
+        if let JSXObject::Ident(ident) = n {
+            if let Some(expr) = self.query.query_jsx(ident) {
+                *n = match expr {
+                    JSXElementName::Ident(ident) => ident.into(),
+                    JSXElementName::JSXMemberExpr(expr) => Box::new(expr).into(),
+                    JSXElementName::JSXNamespacedName(..) => unimplemented!(),
+                }
+            }
+        }
+    }
+
+    pub fn exit_object_pat_prop(&mut self, n: &mut ObjectPatProp) {
+        if let ObjectPatProp::Assign(AssignPatProp { key, value, .. }) = n {
+            if let Some(expr) = self.query.query_lhs(&key.id) {
+                let value = value
+                    .take()
+                    .map(|default_value| {
+                        let left = expr.clone().try_into().unwrap();
+                        Box::new(default_value.make_assign_to(op!("="), left))
+                    })
+                    .unwrap_or(expr);
+
+                *n = ObjectPatProp::KeyValue(KeyValuePatProp {
+                    key: PropName::Ident(key.take().into()),
+                    value: value.into(),
+                });
+            }
+        }
+    }
+}
+
 impl<T> VisitMut for RefRewriter<T>
 where
     T: QueryRef,
@@ -3115,18 +3266,8 @@ where
     /// cobst foo = { bar: baz }
     /// ```
     fn visit_mut_prop(&mut self, n: &mut Prop) {
-        match n {
-            Prop::Shorthand(shorthand) => {
-                if let Some(expr) = self.query.query_ref(shorthand) {
-                    *n = KeyValueProp {
-                        key: shorthand.take().into(),
-                        value: expr,
-                    }
-                    .into()
-                }
-            }
-            _ => n.visit_mut_children_with(self),
-        }
+        n.visit_mut_children_with(self);
+        self.exit_prop(n);
     }
 
     fn visit_mut_var_declarator(&mut self, n: &mut VarDeclarator) {
@@ -3139,38 +3280,18 @@ where
     }
 
     fn visit_mut_pat(&mut self, n: &mut Pat) {
-        match n {
-            Pat::Ident(id) => {
-                if let Some(expr) = self.query.query_lhs(&id.clone().into()) {
-                    *n = expr.into();
-                }
-            }
-            _ => n.visit_mut_children_with(self),
-        }
+        n.visit_mut_children_with(self);
+        self.exit_pat(n);
     }
 
     fn visit_mut_expr(&mut self, n: &mut Expr) {
-        match n {
-            Expr::Ident(ref_ident) => {
-                if let Some(expr) = self.query.query_ref(ref_ident) {
-                    *n = *expr;
-                }
-            }
-
-            _ => n.visit_mut_children_with(self),
-        };
+        n.visit_mut_children_with(self);
+        self.exit_expr(n);
     }
 
     fn visit_mut_simple_assign_target(&mut self, n: &mut SimpleAssignTarget) {
-        match n {
-            SimpleAssignTarget::Ident(ref_ident) => {
-                if let Some(expr) = self.query.query_lhs(&ref_ident.clone().into()) {
-                    *n = expr.try_into().unwrap();
-                }
-            }
-
-            _ => n.visit_mut_children_with(self),
-        };
+        n.visit_mut_children_with(self);
+        self.exit_simple_assign_target(n);
     }
 
     fn visit_mut_callee(&mut self, n: &mut Callee) {
@@ -3208,25 +3329,13 @@ where
     fn visit_mut_jsx_element_name(&mut self, n: &mut JSXElementName) {
         n.visit_mut_children_with(self);
 
-        if let JSXElementName::Ident(ident) = n {
-            if let Some(expr) = self.query.query_jsx(ident) {
-                *n = expr;
-            }
-        }
+        self.exit_jsx_element_name(n);
     }
 
     fn visit_mut_jsx_object(&mut self, n: &mut JSXObject) {
         n.visit_mut_children_with(self);
 
-        if let JSXObject::Ident(ident) = n {
-            if let Some(expr) = self.query.query_jsx(ident) {
-                *n = match expr {
-                    JSXElementName::Ident(ident) => ident.into(),
-                    JSXElementName::JSXMemberExpr(expr) => Box::new(expr).into(),
-                    JSXElementName::JSXNamespacedName(..) => unimplemented!(),
-                }
-            }
-        }
+        self.exit_jsx_object(n);
     }
 }
 

@@ -8,7 +8,7 @@ use std::{
 #[cfg(feature = "concurrent-renamer")]
 use rayon::prelude::*;
 use rustc_hash::FxHashSet;
-use swc_atoms::Atom;
+use swc_atoms::{atom, Atom};
 use swc_common::{collections::AHashMap, util::take::Take, Mark, SyntaxContext};
 use swc_ecma_ast::*;
 use tracing::debug;
@@ -51,7 +51,7 @@ pub(super) struct ScopeData {
 
 impl Scope {
     pub(super) fn add_decl(&mut self, id: &Id, has_eval: bool, top_level_mark: Mark) {
-        if id.0 == "arguments" {
+        if id.0 == atom!("arguments") {
             return;
         }
 
@@ -73,7 +73,7 @@ impl Scope {
     }
 
     pub(super) fn add_usage(&mut self, id: Id) {
-        if id.0 == "arguments" {
+        if id.0 == atom!("arguments") {
             return;
         }
 
@@ -99,6 +99,7 @@ impl Scope {
         to: &mut RenameMap,
         previous: &RenameMap,
         reverse: &mut ReverseMap,
+        preserved: &FxHashSet<Id>,
         preserved_symbols: &FxHashSet<Atom>,
     ) where
         R: Renamer,
@@ -113,6 +114,7 @@ impl Scope {
             previous,
             reverse,
             queue,
+            preserved,
             preserved_symbols,
         );
 
@@ -122,6 +124,7 @@ impl Scope {
                 to,
                 &Default::default(),
                 reverse,
+                preserved,
                 preserved_symbols,
             );
         }
@@ -134,6 +137,7 @@ impl Scope {
         previous: &RenameMap,
         reverse: &mut ReverseMap,
         queue: Vec<Id>,
+        preserved: &FxHashSet<Id>,
         preserved_symbols: &FxHashSet<Atom>,
     ) where
         R: Renamer,
@@ -141,7 +145,11 @@ impl Scope {
         let mut n = 0;
 
         for id in queue {
-            if to.get(&id).is_some() || previous.get(&id).is_some() || id.0 == "eval" {
+            if preserved.contains(&id)
+                || to.get(&id).is_some()
+                || previous.get(&id).is_some()
+                || id.0 == "eval"
+            {
                 continue;
             }
 

@@ -165,7 +165,7 @@ lto = true
 serde = "1"
 swc_core = {{ version = "{}", features = ["ecma_plugin_transform"] }}
 
-# .cargo/config defines few alias to build plugin.
+# .cargo/config.toml defines few alias to build plugin.
 # cargo build-wasi generates wasm-wasi32 binary
 # cargo build-wasm32 generates wasm32-unknown-unknown binary.
 "#,
@@ -185,11 +185,11 @@ swc_core = {{ version = "{}", features = ["ecma_plugin_transform"] }}
             PluginTargetType::Wasm32Wasi => "build-wasi",
         };
 
-        // Create cargo config for build target
+        // Create `.cargo/config.toml` file for build target
         let cargo_config_path = path.join(".cargo");
         create_dir_all(&cargo_config_path).context("`create_dir_all` failed")?;
         fs::write(
-            cargo_config_path.join("config"),
+            cargo_config_path.join("config.toml"),
             r#"# These command aliases are not final, may change
 [alias]
 # Alias to build actual plugin binary for the specified target.
@@ -238,7 +238,7 @@ build-wasm32 = "build --target wasm32-unknown-unknown"
             r##"use swc_core::ecma::{
     ast::Program,
     transforms::testing::test_inline,
-    visit::{as_folder, FoldWith, VisitMut},
+    visit::{visit_mut_pass, FoldWith, VisitMut},
 };
 use swc_core::plugin::{plugin_transform, proxies::TransformPluginProgramMetadata};
 
@@ -267,7 +267,7 @@ impl VisitMut for TransformVisitor {
 /// Refer swc_plugin_macro to see how does it work internally.
 #[plugin_transform]
 pub fn process_transform(program: Program, _metadata: TransformPluginProgramMetadata) -> Program {
-    program.fold_with(&mut as_folder(TransformVisitor))
+    program.fold_with(&mut visit_mut_pass(TransformVisitor))
 }
 
 // An example to test plugin transform.
@@ -276,7 +276,7 @@ pub fn process_transform(program: Program, _metadata: TransformPluginProgramMeta
 // unless explicitly required to do so.
 test_inline!(
     Default::default(),
-    |_| as_folder(TransformVisitor),
+    |_| visit_mut_pass(TransformVisitor),
     boo,
     // Input codes
     r#"console.log("transform");"#,

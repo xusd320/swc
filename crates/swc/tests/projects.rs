@@ -14,7 +14,6 @@ use swc::{
     try_with_handler, BoolOrDataConfig, Compiler, TransformOutput,
 };
 use swc_common::{
-    chain,
     comments::{Comment, SingleThreadedComments},
     errors::{EmitterWriter, Handler, HANDLER},
     sync::Lrc,
@@ -24,11 +23,8 @@ use swc_compiler_base::{IsModule, PrintArgs};
 use swc_ecma_ast::*;
 use swc_ecma_minifier::option::MangleOptions;
 use swc_ecma_parser::{EsSyntax, Syntax, TsSyntax};
-use swc_ecma_transforms::{
-    helpers::{self, Helpers},
-    pass::noop,
-};
-use swc_ecma_visit::{Fold, FoldWith};
+use swc_ecma_transforms::helpers::{self, Helpers};
+use swc_ecma_visit::{fold_pass, Fold};
 use testing::{NormalizedOutput, StdErr, Tester};
 use walkdir::WalkDir;
 
@@ -602,6 +598,15 @@ fn issue_1203() {
 }
 
 #[test]
+fn issue_9663() {
+    let f = file("tests/projects/issue-9663/input.js").unwrap();
+    println!("{}", f);
+
+    assert!(f.contains("set = Reflect.set"));
+    assert!(!f.contains("function set1("));
+}
+
+#[test]
 fn codegen_1() {
     let f = file("tests/projects/codegen-1/input.js").unwrap();
     println!("{}", f);
@@ -723,14 +728,14 @@ fn should_visit() {
                     },
                     &fm.name,
                     Some(&comments),
-                    |_| noop(),
+                    |_| noop_pass(),
                 )
                 .unwrap()
                 .unwrap();
 
             dbg!(config.syntax);
 
-            let config = config.with_pass(|pass| chain!(Panicking, pass));
+            let config = config.with_pass(|pass| (fold_pass(Panicking), pass));
 
             if config.minify {
                 let preserve_excl = |_: &BytePos, vc: &mut Vec<Comment>| -> bool {
@@ -740,12 +745,12 @@ fn should_visit() {
                 c.comments().leading.retain(preserve_excl);
                 c.comments().trailing.retain(preserve_excl);
             }
-            let mut pass = config.pass;
+            let pass = config.pass;
             let program = config.program;
             let program = helpers::HELPERS.set(&Helpers::new(config.external_helpers), || {
                 HANDLER.set(&handler, || {
                     // Fold module
-                    program.fold_with(&mut pass)
+                    program.apply(pass)
                 })
             });
 
@@ -779,7 +784,7 @@ fn fixture(input_dir: PathBuf) {
     tests(input_dir, Some(IsModule::Unknown));
 }
 
-#[testing::fixture("tests/ts-isolated-declaration/**/input/")]
+#[testing::fixture("tests/typescript/**/input/")]
 fn ts_id(input_dir: PathBuf) {
     tests(input_dir, Some(IsModule::Bool(true)));
 }
@@ -1063,7 +1068,7 @@ fn issue_6009() {
             // test parsing input
             let config = c
                 .parse_js_as_input(fm.clone(), None, &handler, &options, &fm.name, None, |_| {
-                    noop()
+                    noop_pass()
                 })
                 .unwrap();
 

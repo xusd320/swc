@@ -13,7 +13,7 @@ use indexmap::IndexSet;
 use petgraph::{prelude::DiGraphMap, Direction};
 
 #[derive(Debug, Parser)]
-struct CliArs {
+struct CliArgs {
     #[clap(long)]
     pub dry_run: bool,
 
@@ -27,7 +27,7 @@ enum Cmd {
 }
 
 fn main() -> Result<()> {
-    let CliArs { dry_run, cmd } = CliArs::parse();
+    let CliArgs { dry_run, cmd } = CliArgs::parse();
 
     let workspace_dir = env::var("CARGO_WORKSPACE_DIR")
         .map(PathBuf::from)
@@ -90,7 +90,8 @@ fn run_bump(workspace_dir: &Path, dry_run: bool) -> Result<()> {
         update_changelog().with_context(|| "failed to update changelog")?;
     }
 
-    commit(dry_run).context("failed to commit")?;
+    git_commit(dry_run).context("failed to commit")?;
+    git_tag_core(dry_run).context("failed to tag core")?;
 
     Ok(())
 }
@@ -126,7 +127,7 @@ fn get_swc_core_version() -> Result<String> {
         .context("failed to find swc_core")
 }
 
-fn commit(dry_run: bool) -> Result<()> {
+fn git_commit(dry_run: bool) -> Result<()> {
     let core_ver = get_swc_core_version()?;
 
     let mut cmd = Command::new("git");
@@ -146,6 +147,23 @@ fn commit(dry_run: bool) -> Result<()> {
     Ok(())
 }
 
+fn git_tag_core(dry_run: bool) -> Result<()> {
+    let core_ver = get_swc_core_version()?;
+
+    let mut cmd = Command::new("git");
+    cmd.arg("tag").arg(format!("swc_core@v{}", core_ver));
+
+    eprintln!("Running {:?}", cmd);
+
+    if dry_run {
+        return Ok(());
+    }
+
+    cmd.status().context("failed to run git tag")?;
+
+    Ok(())
+}
+
 struct Bump<'a> {
     /// Original versions
     versions: &'a VersionMap,
@@ -155,7 +173,7 @@ struct Bump<'a> {
     new_versions: &'a mut VersionMap,
 }
 
-impl<'a> Bump<'a> {
+impl Bump<'_> {
     fn is_breaking(&self, pkg_name: &str, change_type: Option<&ChangeType>) -> Result<bool> {
         let original_version = self
             .versions
@@ -289,7 +307,9 @@ impl InternedGraph {
     }
 
     fn node(&self, name: &str) -> usize {
-        self.ix.get_index_of(name).expect("unknown node")
+        self.ix.get_index_of(name).unwrap_or_else(|| {
+            panic!("unknown node: {}", name);
+        })
     }
 }
 

@@ -1,3 +1,5 @@
+import { Assumptions } from "./assumptions";
+
 export interface Plugin {
     (module: Program): Program;
 }
@@ -109,7 +111,7 @@ export interface JsFormatOptions {
      * Currently noop.
      * @alias inline_script
      */
-    inlineScript?: number;
+    inlineScript?: boolean;
 
     /**
      * Currently noop.
@@ -305,7 +307,7 @@ export interface TerserMangleOptions {
     /**
      * Pass `true` to mangle names declared in the top level scope.
      */
-    topLevel?: boolean
+    topLevel?: boolean;
 
     /**
      * @deprecated An alias for compatibility with terser.
@@ -608,6 +610,7 @@ export interface EnvConfig {
 }
 
 export interface JscConfig {
+    assumptions?: Assumptions;
     loose?: boolean;
 
     /**
@@ -638,6 +641,8 @@ export interface JscConfig {
 
         /**
          * Preserve `with` in imports and exports.
+         *
+         * @deprecated Use `keepImportAssertions` instead.
          */
         keepImportAttributes?: boolean;
 
@@ -663,6 +668,13 @@ export interface JscConfig {
         plugins?: Array<[string, Record<string, any>]>;
 
         /**
+         * Run Wasm plugins before stripping TypeScript or decorators.
+         *
+         * See https://github.com/swc-project/swc/issues/9132 for more details.
+         */
+        runPluginFirst?: boolean;
+
+        /**
          * Disable builtin transforms. If enabled, only Wasm plugins are used.
          */
         disableBuiltinTransformsForInternalTesting?: boolean;
@@ -671,6 +683,16 @@ export interface JscConfig {
          * Emit isolated dts files for each module.
          */
         emitIsolatedDts?: boolean;
+
+        /**
+         * Disable all lint rules.
+         */
+        disableAllLints?: boolean;
+
+        /**
+         * Keep import assertions.
+         */
+        keepImportAssertions?: boolean;
     };
 
     baseUrl?: string;
@@ -695,6 +717,8 @@ export type JscTarget =
     | "es2020"
     | "es2021"
     | "es2022"
+    | "es2023"
+    | "es2024"
     | "esnext";
 
 export type ParserConfig = TsParserConfig | EsParserConfig;
@@ -2414,11 +2438,7 @@ export interface TsPropertySignature extends Node, HasSpan {
     computed: boolean;
     optional: boolean;
 
-    init?: Expression;
-    params: TsFnParameter[];
-
     typeAnnotation?: TsTypeAnnotation;
-    typeParams?: TsTypeParameterDeclaration;
 }
 
 export interface TsGetterSignature extends Node, HasSpan {

@@ -7,7 +7,7 @@ use swc_common::{
 use swc_ecma_ast::*;
 use swc_ecma_utils::{find_pat_ids, stack_size::maybe_grow_default};
 use swc_ecma_visit::{
-    as_folder, noop_visit_mut_type, visit_mut_obj_and_computed, Fold, VisitMut, VisitMutWith,
+    noop_visit_mut_type, visit_mut_obj_and_computed, visit_mut_pass, VisitMut, VisitMutWith,
 };
 use tracing::{debug, span, Level};
 
@@ -134,7 +134,7 @@ pub fn resolver(
     unresolved_mark: Mark,
     top_level_mark: Mark,
     typescript: bool,
-) -> impl 'static + Fold + VisitMut {
+) -> impl 'static + Pass + VisitMut {
     assert_ne!(
         unresolved_mark,
         Mark::root(),
@@ -144,7 +144,7 @@ pub fn resolver(
     let _ = SyntaxContext::empty().apply_mark(unresolved_mark);
     let _ = SyntaxContext::empty().apply_mark(top_level_mark);
 
-    as_folder(Resolver {
+    visit_mut_pass(Resolver {
         current: Scope::new(ScopeKind::Fn, top_level_mark, None),
         ident_type: IdentType::Ref,
         in_type: false,
@@ -220,6 +220,7 @@ struct InnerConfig {
     top_level_mark: Mark,
 }
 
+#[allow(clippy::needless_lifetimes)]
 impl<'a> Resolver<'a> {
     #[cfg(test)]
     fn new(current: Scope<'a>, config: InnerConfig) -> Self {
@@ -443,7 +444,7 @@ macro_rules! noop {
     };
 }
 
-impl<'a> VisitMut for Resolver<'a> {
+impl VisitMut for Resolver<'_> {
     noop!(visit_mut_accessibility, Accessibility);
 
     noop!(visit_mut_true_plus_minus, TruePlusMinus);
@@ -734,12 +735,9 @@ impl<'a> VisitMut for Resolver<'a> {
             c.params.visit_mut_with(child);
             child.ident_type = old;
 
-            match &mut c.body {
-                Some(body) => {
-                    child.mark_block(&mut body.ctxt);
-                    body.visit_mut_children_with(child);
-                }
-                None => {}
+            if let Some(body) = &mut c.body {
+                child.mark_block(&mut body.ctxt);
+                body.visit_mut_children_with(child);
             }
         });
     }
@@ -895,22 +893,19 @@ impl<'a> VisitMut for Resolver<'a> {
         f.return_type.visit_mut_with(self);
 
         self.ident_type = IdentType::Ref;
-        match &mut f.body {
-            Some(body) => {
-                self.mark_block(&mut body.ctxt);
-                let old_strict_mode = self.strict_mode;
-                if !self.strict_mode {
-                    self.strict_mode = body
-                        .stmts
-                        .first()
-                        .map(|stmt| stmt.is_use_strict())
-                        .unwrap_or(false);
-                }
-                // Prevent creating new scope.
-                body.visit_mut_children_with(self);
-                self.strict_mode = old_strict_mode;
+        if let Some(body) = &mut f.body {
+            self.mark_block(&mut body.ctxt);
+            let old_strict_mode = self.strict_mode;
+            if !self.strict_mode {
+                self.strict_mode = body
+                    .stmts
+                    .first()
+                    .map(|stmt| stmt.is_use_strict())
+                    .unwrap_or(false);
             }
-            None => {}
+            // Prevent creating new scope.
+            body.visit_mut_children_with(self);
+            self.strict_mode = old_strict_mode;
         }
     }
 
@@ -923,6 +918,28 @@ impl<'a> VisitMut for Resolver<'a> {
         f.type_ann.visit_mut_with(self);
 
         f.body.visit_mut_with(self);
+    }
+
+    fn visit_mut_jsx_element_name(&mut self, node: &mut JSXElementName) {
+        if let JSXElementName::Ident(i) = node {
+            if i.as_ref().starts_with(|c: char| c.is_ascii_lowercase()) {
+                if cfg!(debug_assertions) && LOG {
+                    debug!("\t -> JSXElementName");
+                }
+
+                let ctxt = i.ctxt.apply_mark(self.config.unresolved_mark);
+
+                if cfg!(debug_assertions) && LOG {
+                    debug!("\t -> {:?}", ctxt);
+                }
+
+                i.ctxt = ctxt;
+
+                return;
+            }
+        }
+
+        node.visit_mut_children_with(self);
     }
 
     fn visit_mut_ident(&mut self, i: &mut Ident) {
@@ -1481,6 +1498,10 @@ impl<'a> VisitMut for Resolver<'a> {
     }
 
     fn visit_mut_var_decl(&mut self, decl: &mut VarDecl) {
+        if decl.declare {
+            return;
+        }
+
         let old_kind = self.decl_kind;
         self.decl_kind = decl.kind.into();
         decl.decls.visit_mut_with(self);
@@ -1606,13 +1627,13 @@ impl VisitMut for Hoister<'_, '_> {
 
         let params: Vec<Id> = find_pat_ids(&c.param);
 
+        let orig = self.catch_param_decls.clone();
+
         self.catch_param_decls
             .extend(params.into_iter().map(|v| v.0));
 
         self.in_catch_body = true;
         c.body.visit_mut_with(self);
-
-        let orig = self.catch_param_decls.clone();
 
         // let mut excluded = find_ids::<_, Id>(&c.body);
 
@@ -1837,6 +1858,10 @@ impl VisitMut for Hoister<'_, '_> {
     fn visit_mut_using_decl(&mut self, _: &mut UsingDecl) {}
 
     fn visit_mut_var_decl(&mut self, node: &mut VarDecl) {
+        if node.declare {
+            return;
+        }
+
         if self.in_block {
             match node.kind {
                 VarDeclKind::Const | VarDeclKind::Let => return,

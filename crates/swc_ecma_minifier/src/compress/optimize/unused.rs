@@ -178,7 +178,6 @@ impl Optimizer<'_> {
                 && v.usage_count == 0
                 && !v.reassigned
                 && v.property_mutation_count == 0
-                && !v.declared_as_catch_param
             {
                 self.changed = true;
                 report_change!(
@@ -356,19 +355,16 @@ impl Optimizer<'_> {
 
             Pat::Array(arr) => {
                 for (idx, arr_elem) in arr.elems.iter_mut().enumerate() {
-                    match arr_elem {
-                        Some(p) => {
-                            let elem = init
-                                .as_mut()
-                                .and_then(|expr| self.access_numeric_property(expr, idx));
+                    if let Some(p) = arr_elem {
+                        let elem = init
+                            .as_mut()
+                            .and_then(|expr| self.access_numeric_property(expr, idx));
 
-                            self.take_pat_if_unused(p, elem, is_var_decl);
+                        self.take_pat_if_unused(p, elem, is_var_decl);
 
-                            if p.is_invalid() {
-                                *arr_elem = None;
-                            }
+                        if p.is_invalid() {
+                            *arr_elem = None;
                         }
-                        None => {}
                     }
                 }
 
@@ -507,7 +503,8 @@ impl Optimizer<'_> {
                     );
                     // This will remove the declaration.
                     let class = decl.take().class().unwrap();
-                    let mut side_effects = extract_class_side_effect(&self.expr_ctx, *class.class);
+                    let mut side_effects =
+                        extract_class_side_effect(&self.ctx.expr_ctx, *class.class);
 
                     if !side_effects.is_empty() {
                         self.prepend_stmts.push(
@@ -691,7 +688,7 @@ impl Optimizer<'_> {
                     && !var.exported
                     && var.usage_count == 0
                     && var.declared
-                    && (!var.declared_as_fn_param || !used_arguments || self.ctx.in_strict)
+                    && (!var.declared_as_fn_param || !used_arguments || self.ctx.expr_ctx.in_strict)
                 {
                     report_change!(
                         "unused: Dropping assignment to var '{}{:?}', which is never used",
@@ -831,7 +828,7 @@ impl Optimizer<'_> {
             PropOrSpread::Prop(p) => match &**p {
                 Prop::Shorthand(_) => false,
                 Prop::KeyValue(p) => {
-                    p.key.is_computed() || p.value.may_have_side_effects(&self.expr_ctx)
+                    p.key.is_computed() || p.value.may_have_side_effects(&self.ctx.expr_ctx)
                 }
                 Prop::Assign(_) => true,
                 Prop::Getter(p) => p.key.is_computed(),

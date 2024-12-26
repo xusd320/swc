@@ -85,7 +85,7 @@ impl<N: Node> Node for Box<N> {
         (**self).emit_with(e)
     }
 }
-impl<'a, N: Node> Node for &'a N {
+impl<N: Node> Node for &N {
     #[inline]
     fn emit_with<W, S>(&self, e: &mut Emitter<'_, W, S>) -> Result
     where
@@ -141,7 +141,7 @@ fn replace_close_inline_script(raw: &str) -> Cow<str> {
 
 static NEW_LINE_TPL_REGEX: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r"\\n|\n").unwrap());
 
-impl<'a, W, S: SourceMapper> Emitter<'a, W, S>
+impl<W, S: SourceMapper> Emitter<'_, W, S>
 where
     W: WriteJs,
     S: SourceMapperExt,
@@ -157,6 +157,7 @@ where
     }
 
     #[emitter]
+    #[tracing::instrument(skip_all)]
     pub fn emit_module(&mut self, node: &Module) -> Result {
         self.emit_leading_comments_of_span(node.span(), false)?;
 
@@ -180,6 +181,7 @@ where
     }
 
     #[emitter]
+    #[tracing::instrument(skip_all)]
     pub fn emit_script(&mut self, node: &Script) -> Result {
         self.emit_leading_comments_of_span(node.span(), false)?;
 
@@ -609,7 +611,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_lit(&mut self, node: &Lit) -> Result {
         self.emit_leading_comments_of_span(node.span(), false)?;
 
@@ -644,7 +646,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_str_lit(&mut self, node: &Str) -> Result {
         self.wr.commit_pending_semi()?;
 
@@ -655,6 +657,7 @@ where
         if &*node.value == "use strict"
             && node.raw.is_some()
             && node.raw.as_ref().unwrap().contains('\\')
+            && (!self.cfg.inline_script || !node.raw.as_ref().unwrap().contains("script"))
         {
             self.wr
                 .write_str_lit(DUMMY_SP, node.raw.as_ref().unwrap())?;
@@ -668,7 +671,9 @@ where
 
         if !self.cfg.minify {
             if let Some(raw) = &node.raw {
-                if !self.cfg.ascii_only || raw.is_ascii() {
+                if (!self.cfg.ascii_only || raw.is_ascii())
+                    && (!self.cfg.inline_script || !node.raw.as_ref().unwrap().contains("script"))
+                {
                     self.wr.write_str_lit(DUMMY_SP, raw)?;
                     return Ok(());
                 }
@@ -689,7 +694,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_num_lit(&mut self, num: &Number) -> Result {
         self.emit_num_lit_internal(num, false)?;
     }
@@ -888,7 +893,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_expr(&mut self, node: &Expr) -> Result {
         match node {
             Expr::Array(ref n) => emit!(n),
@@ -1265,6 +1270,13 @@ where
         let need_post_space = if self.cfg.minify {
             if is_kwd_op {
                 node.right.starts_with_alpha_num()
+            } else if node.op == op!("/") {
+                let span = node.right.span();
+
+                span.is_pure()
+                    || self
+                        .comments
+                        .map_or(false, |comments| comments.has_leading(node.right.span().lo))
             } else {
                 require_space_before_rhs(&node.right, &node.op)
             }
@@ -1404,7 +1416,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_class_member(&mut self, node: &ClassMember) -> Result {
         match *node {
             ClassMember::Constructor(ref n) => emit!(n),
@@ -1780,7 +1792,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_class_constructor(&mut self, n: &Constructor) -> Result {
         self.emit_leading_comments_of_span(n.span(), false)?;
 
@@ -1992,8 +2004,13 @@ where
                 .match_indices('\n')
                 .zip(NEW_LINE_TPL_REGEX.find_iter(&raw))
             {
-                self.wr
-                    .add_srcmap(span.lo + BytePos(last_offset_origin as u32))?;
+                // If the string starts with a newline char, then adding a mark is redundant.
+                // This catches both "no newlines" and "newline after several chars".
+                if offset_gen != 0 {
+                    self.wr
+                        .add_srcmap(span.lo + BytePos(last_offset_origin as u32))?;
+                }
+
                 self.wr
                     .write_str_lit(DUMMY_SP, &v[last_offset_gen..=offset_gen])?;
                 last_offset_gen = offset_gen + 1;
@@ -2770,7 +2787,7 @@ where
 }
 
 /// Patterns
-impl<'a, W, S: SourceMapper> Emitter<'a, W, S>
+impl<W, S: SourceMapper> Emitter<'_, W, S>
 where
     W: WriteJs,
     S: SourceMapperExt,
@@ -2995,7 +3012,7 @@ where
 }
 
 /// Statements
-impl<'a, W, S: SourceMapper> Emitter<'a, W, S>
+impl<W, S: SourceMapper> Emitter<'_, W, S>
 where
     W: WriteJs,
     S: SourceMapperExt,
@@ -3040,7 +3057,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_expr_stmt(&mut self, e: &ExprStmt) -> Result {
         self.emit_leading_comments_of_span(e.span, false)?;
 
@@ -3050,7 +3067,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_block_stmt(&mut self, node: &BlockStmt) -> Result {
         self.emit_block_stmt_inner(node, false)?;
     }
@@ -3475,7 +3492,7 @@ where
     }
 
     #[emitter]
-    #[tracing::instrument(skip_all)]
+
     fn emit_try_stmt(&mut self, n: &TryStmt) -> Result {
         self.emit_leading_comments_of_span(n.span(), false)?;
 
@@ -3653,7 +3670,7 @@ where
     }
 }
 
-impl<'a, W, S: SourceMapper> Emitter<'a, W, S>
+impl<W, S: SourceMapper> Emitter<'_, W, S>
 where
     W: WriteJs,
     S: SourceMapperExt,

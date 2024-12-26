@@ -6,16 +6,16 @@ use swc_common::{util::take::Take, Mark, Spanned, SyntaxContext, DUMMY_SP};
 use swc_ecma_ast::*;
 use swc_ecma_transforms_base::{helper, helper_expr};
 use swc_ecma_utils::{
-    alias_ident_for, constructor::inject_after_super, default_constructor,
+    alias_ident_for, constructor::inject_after_super, default_constructor_with_span,
     is_maybe_branch_directive, private_ident, prop_name_to_expr_value, quote_ident, replace_ident,
     stack_size::maybe_grow_default, ExprFactory, IdentRenamer,
 };
-use swc_ecma_visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith};
+use swc_ecma_visit::{noop_visit_mut_type, visit_mut_pass, VisitMut, VisitMutWith};
 
 use crate::DecoratorVersion;
 
-pub(crate) fn decorator_impl(version: DecoratorVersion) -> impl VisitMut + Fold {
-    as_folder(DecoratorPass {
+pub(crate) fn decorator_impl(version: DecoratorVersion) -> impl Pass {
+    visit_mut_pass(DecoratorPass {
         version,
         ..Default::default()
     })
@@ -278,7 +278,7 @@ impl DecoratorPass {
                 }
             },
             _ => {
-                let key_ident = private_ident!("_computedKey");
+                let key_ident = private_ident!(name.span(), "_computedKey");
                 self.extra_vars.push(VarDeclarator {
                     span: DUMMY_SP,
                     name: key_ident.clone().into(),
@@ -330,7 +330,7 @@ impl DecoratorPass {
 
         c.body.insert(
             insert_index,
-            default_constructor(c.super_class.is_some()).into(),
+            default_constructor_with_span(c.super_class.is_some(), c.span).into(),
         );
 
         if let Some(ClassMember::Constructor(c)) = c.body.get_mut(insert_index) {

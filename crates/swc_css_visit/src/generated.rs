@@ -107957,6 +107957,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AbsoluteColorBaseField {
         #[doc = "Represents [`AbsoluteColorBase::HexColor`]"]
         HexColor,
@@ -107972,6 +107973,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AlphaValueField {
         #[doc = "Represents [`AlphaValue::Number`]"]
         Number,
@@ -107985,6 +107987,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AnPlusBField {
         #[doc = "Represents [`AnPlusB::Ident`]"]
         Ident,
@@ -107999,6 +108002,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AnPlusBNotationField {
         #[doc = "Represents [`AnPlusBNotation::span`]"]
         Span,
@@ -108019,6 +108023,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AngleField {
         #[doc = "Represents [`Angle::span`]"]
         Span,
@@ -108034,6 +108039,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AnglePercentageField {
         #[doc = "Represents [`AnglePercentage::Angle`]"]
         Angle,
@@ -108048,6 +108054,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AnyNamespaceField {
         #[doc = "Represents [`AnyNamespace::span`]"]
         Span,
@@ -108060,6 +108067,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AtRuleField {
         #[doc = "Represents [`AtRule::span`]"]
         Span,
@@ -108077,6 +108085,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AtRuleNameField {
         #[doc = "Represents [`AtRuleName::DashedIdent`]"]
         DashedIdent,
@@ -108090,6 +108099,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AtRulePreludeField {
         #[doc = "Represents [`AtRulePrelude::ListOfComponentValues`]"]
         ListOfComponentValues,
@@ -108138,6 +108148,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AttributeSelectorField {
         #[doc = "Represents [`AttributeSelector::span`]"]
         Span,
@@ -108158,6 +108169,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AttributeSelectorMatcherField {
         #[doc = "Represents [`AttributeSelectorMatcher::span`]"]
         Span,
@@ -108171,6 +108183,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AttributeSelectorMatcherValueField {
         #[doc = "Represents [`AttributeSelectorMatcherValue::Equals`]"]
         Equals,
@@ -108193,6 +108206,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AttributeSelectorModifierField {
         #[doc = "Represents [`AttributeSelectorModifier::span`]"]
         Span,
@@ -108206,6 +108220,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AttributeSelectorValueField {
         #[doc = "Represents [`AttributeSelectorValue::Str`]"]
         Str,
@@ -108219,6 +108234,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BinOpField {
         #[doc = "Represents [`BinOp::Add`]"]
         Add,
@@ -108237,6 +108253,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcOperatorField {
         #[doc = "Represents [`CalcOperator::span`]"]
         Span,
@@ -108250,6 +108267,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcOperatorTypeField {
         #[doc = "Represents [`CalcOperatorType::Add`]"]
         Add,
@@ -108272,6 +108290,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcProductField {
         #[doc = "Represents [`CalcProduct::span`]"]
         Span,
@@ -108285,6 +108304,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcProductOrOperatorField {
         #[doc = "Represents [`CalcProductOrOperator::Product`]"]
         Product,
@@ -108303,6 +108323,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcSumField {
         #[doc = "Represents [`CalcSum::span`]"]
         Span,
@@ -108316,6 +108337,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcValueField {
         #[doc = "Represents [`CalcValue::Number`]"]
         Number,
@@ -108337,6 +108359,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalcValueOrOperatorField {
         #[doc = "Represents [`CalcValueOrOperator::Value`]"]
         Value,
@@ -108351,6 +108374,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassSelectorField {
         #[doc = "Represents [`ClassSelector::span`]"]
         Span,
@@ -108364,6 +108388,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CmykComponentField {
         #[doc = "Represents [`CmykComponent::Number`]"]
         Number,
@@ -108379,6 +108404,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ColorField {
         #[doc = "Represents [`Color::AbsoluteColorBase`]"]
         AbsoluteColorBase,
@@ -108394,6 +108420,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ColorProfileNameField {
         #[doc = "Represents [`ColorProfileName::DashedIdent`]"]
         DashedIdent,
@@ -108408,6 +108435,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CombinatorField {
         #[doc = "Represents [`Combinator::span`]"]
         Span,
@@ -108421,6 +108449,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CombinatorValueField {
         #[doc = "Represents [`CombinatorValue::Descendant`]"]
         Descendant,
@@ -108445,6 +108474,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ComplexSelectorField {
         #[doc = "Represents [`ComplexSelector::span`]"]
         Span,
@@ -108458,6 +108488,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ComplexSelectorChildrenField {
         #[doc = "Represents [`ComplexSelectorChildren::CompoundSelector`]"]
         CompoundSelector,
@@ -108471,6 +108502,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ComponentValueField {
         #[doc = "Represents [`ComponentValue::PreservedToken`]"]
         PreservedToken,
@@ -108549,6 +108581,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CompoundSelectorField {
         #[doc = "Represents [`CompoundSelector::span`]"]
         Span,
@@ -108571,6 +108604,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CompoundSelectorListField {
         #[doc = "Represents [`CompoundSelectorList::span`]"]
         Span,
@@ -108585,6 +108619,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerConditionField {
         #[doc = "Represents [`ContainerCondition::span`]"]
         Span,
@@ -108600,6 +108635,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerNameField {
         #[doc = "Represents [`ContainerName::CustomIdent`]"]
         CustomIdent,
@@ -108616,6 +108652,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerQueryField {
         #[doc = "Represents [`ContainerQuery::span`]"]
         Span,
@@ -108630,6 +108667,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerQueryAndField {
         #[doc = "Represents [`ContainerQueryAnd::span`]"]
         Span,
@@ -108646,6 +108684,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerQueryNotField {
         #[doc = "Represents [`ContainerQueryNot::span`]"]
         Span,
@@ -108662,6 +108701,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerQueryOrField {
         #[doc = "Represents [`ContainerQueryOr::span`]"]
         Span,
@@ -108677,6 +108717,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContainerQueryTypeField {
         #[doc = "Represents [`ContainerQueryType::Not`]"]
         Not,
@@ -108695,6 +108736,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CustomHighlightNameField {
         #[doc = "Represents [`CustomHighlightName::span`]"]
         Span,
@@ -108711,6 +108753,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CustomIdentField {
         #[doc = "Represents [`CustomIdent::span`]"]
         Span,
@@ -108727,6 +108770,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CustomMediaQueryField {
         #[doc = "Represents [`CustomMediaQuery::span`]"]
         Span,
@@ -108742,6 +108786,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CustomMediaQueryMediaTypeField {
         #[doc = "Represents [`CustomMediaQueryMediaType::Ident`]"]
         Ident,
@@ -108756,6 +108801,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CustomPropertyNameField {
         #[doc = "Represents [`CustomPropertyName::span`]"]
         Span,
@@ -108772,6 +108818,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DashedIdentField {
         #[doc = "Represents [`DashedIdent::span`]"]
         Span,
@@ -108792,6 +108839,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DeclarationField {
         #[doc = "Represents [`Declaration::span`]"]
         Span,
@@ -108809,6 +108857,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DeclarationNameField {
         #[doc = "Represents [`DeclarationName::Ident`]"]
         Ident,
@@ -108822,6 +108871,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DeclarationOrAtRuleField {
         #[doc = "Represents [`DeclarationOrAtRule::Declaration`]"]
         Declaration,
@@ -108838,6 +108888,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DelimiterField {
         #[doc = "Represents [`Delimiter::span`]"]
         Span,
@@ -108851,6 +108902,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DelimiterValueField {
         #[doc = "Represents [`DelimiterValue::Comma`]"]
         Comma,
@@ -108866,6 +108918,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DimensionField {
         #[doc = "Represents [`Dimension::Length`]"]
         Length,
@@ -108890,6 +108943,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DimensionTokenField {
         #[doc = "Represents [`DimensionToken::value`]"]
         Value,
@@ -108914,6 +108968,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DocumentPreludeField {
         #[doc = "Represents [`DocumentPrelude::span`]"]
         Span,
@@ -108927,6 +108982,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DocumentPreludeMatchingFunctionField {
         #[doc = "Represents [`DocumentPreludeMatchingFunction::Url`]"]
         Url,
@@ -108941,6 +108997,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExtensionNameField {
         #[doc = "Represents [`ExtensionName::span`]"]
         Span,
@@ -108956,6 +109013,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FamilyNameField {
         #[doc = "Represents [`FamilyName::Str`]"]
         Str,
@@ -108970,6 +109028,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FlexField {
         #[doc = "Represents [`Flex::span`]"]
         Span,
@@ -108990,6 +109049,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FontFeatureValuesPreludeField {
         #[doc = "Represents [`FontFeatureValuesPrelude::span`]"]
         Span,
@@ -109003,6 +109063,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForgivingComplexSelectorField {
         #[doc = "Represents [`ForgivingComplexSelector::ComplexSelector`]"]
         ComplexSelector,
@@ -109016,6 +109077,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForgivingRelativeSelectorField {
         #[doc = "Represents [`ForgivingRelativeSelector::RelativeSelector`]"]
         RelativeSelector,
@@ -109034,6 +109096,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForgivingRelativeSelectorListField {
         #[doc = "Represents [`ForgivingRelativeSelectorList::span`]"]
         Span,
@@ -109052,6 +109115,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForgivingSelectorListField {
         #[doc = "Represents [`ForgivingSelectorList::span`]"]
         Span,
@@ -109066,6 +109130,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FrequencyField {
         #[doc = "Represents [`Frequency::span`]"]
         Span,
@@ -109081,6 +109146,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FrequencyPercentageField {
         #[doc = "Represents [`FrequencyPercentage::Frequency`]"]
         Frequency,
@@ -109099,6 +109165,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FunctionField {
         #[doc = "Represents [`Function::span`]"]
         Span,
@@ -109114,6 +109181,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FunctionNameField {
         #[doc = "Represents [`FunctionName::Ident`]"]
         Ident,
@@ -109127,6 +109195,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum GeneralEnclosedField {
         #[doc = "Represents [`GeneralEnclosed::Function`]"]
         Function,
@@ -109141,6 +109210,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum HexColorField {
         #[doc = "Represents [`HexColor::span`]"]
         Span,
@@ -109156,6 +109226,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum HueField {
         #[doc = "Represents [`Hue::Number`]"]
         Number,
@@ -109170,6 +109241,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum IdSelectorField {
         #[doc = "Represents [`IdSelector::span`]"]
         Span,
@@ -109184,6 +109256,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum IdentField {
         #[doc = "Represents [`Ident::span`]"]
         Span,
@@ -109200,6 +109273,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportConditionsField {
         #[doc = "Represents [`ImportConditions::span`]"]
         Span,
@@ -109215,6 +109289,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportHrefField {
         #[doc = "Represents [`ImportHref::Url`]"]
         Url,
@@ -109228,6 +109303,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportLayerNameField {
         #[doc = "Represents [`ImportLayerName::Ident`]"]
         Ident,
@@ -109242,6 +109318,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportPreludeField {
         #[doc = "Represents [`ImportPrelude::span`]"]
         Span,
@@ -109260,6 +109337,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportantFlagField {
         #[doc = "Represents [`ImportantFlag::span`]"]
         Span,
@@ -109274,6 +109352,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum IntegerField {
         #[doc = "Represents [`Integer::span`]"]
         Span,
@@ -109294,6 +109373,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyframeBlockField {
         #[doc = "Represents [`KeyframeBlock::span`]"]
         Span,
@@ -109309,6 +109389,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyframeSelectorField {
         #[doc = "Represents [`KeyframeSelector::Ident`]"]
         Ident,
@@ -109322,6 +109403,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyframesNameField {
         #[doc = "Represents [`KeyframesName::CustomIdent`]"]
         CustomIdent,
@@ -109340,6 +109422,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyframesPseudoFunctionField {
         #[doc = "Represents [`KeyframesPseudoFunction::span`]"]
         Span,
@@ -109356,6 +109439,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyframesPseudoPrefixField {
         #[doc = "Represents [`KeyframesPseudoPrefix::span`]"]
         Span,
@@ -109376,6 +109460,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LayerNameField {
         #[doc = "Represents [`LayerName::span`]"]
         Span,
@@ -109394,6 +109479,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LayerNameListField {
         #[doc = "Represents [`LayerNameList::span`]"]
         Span,
@@ -109407,6 +109493,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LayerPreludeField {
         #[doc = "Represents [`LayerPrelude::Name`]"]
         Name,
@@ -109421,6 +109508,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LengthField {
         #[doc = "Represents [`Length::span`]"]
         Span,
@@ -109436,6 +109524,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LengthPercentageField {
         #[doc = "Represents [`LengthPercentage::Length`]"]
         Length,
@@ -109454,6 +109543,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ListOfComponentValuesField {
         #[doc = "Represents [`ListOfComponentValues::span`]"]
         Span,
@@ -109468,6 +109558,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaAndField {
         #[doc = "Represents [`MediaAnd::span`]"]
         Span,
@@ -109488,6 +109579,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaConditionField {
         #[doc = "Represents [`MediaCondition::span`]"]
         Span,
@@ -109501,6 +109593,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaConditionAllTypeField {
         #[doc = "Represents [`MediaConditionAllType::Not`]"]
         Not,
@@ -109518,6 +109611,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaConditionTypeField {
         #[doc = "Represents [`MediaConditionType::All`]"]
         All,
@@ -109536,6 +109630,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaConditionWithoutOrField {
         #[doc = "Represents [`MediaConditionWithoutOr::span`]"]
         Span,
@@ -109549,6 +109644,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaConditionWithoutOrTypeField {
         #[doc = "Represents [`MediaConditionWithoutOrType::Not`]"]
         Not,
@@ -109564,6 +109660,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureField {
         #[doc = "Represents [`MediaFeature::Plain`]"]
         Plain,
@@ -109582,6 +109679,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureBooleanField {
         #[doc = "Represents [`MediaFeatureBoolean::span`]"]
         Span,
@@ -109595,6 +109693,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureNameField {
         #[doc = "Represents [`MediaFeatureName::Ident`]"]
         Ident,
@@ -109609,6 +109708,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeaturePlainField {
         #[doc = "Represents [`MediaFeaturePlain::span`]"]
         Span,
@@ -109625,6 +109725,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureRangeField {
         #[doc = "Represents [`MediaFeatureRange::span`]"]
         Span,
@@ -109642,6 +109743,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureRangeComparisonField {
         #[doc = "Represents [`MediaFeatureRangeComparison::Lt`]"]
         Lt,
@@ -109662,6 +109764,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureRangeIntervalField {
         #[doc = "Represents [`MediaFeatureRangeInterval::span`]"]
         Span,
@@ -109683,6 +109786,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaFeatureValueField {
         #[doc = "Represents [`MediaFeatureValue::Number`]"]
         Number,
@@ -109702,6 +109806,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaInParensField {
         #[doc = "Represents [`MediaInParens::MediaCondition`]"]
         MediaCondition,
@@ -109718,6 +109823,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaNotField {
         #[doc = "Represents [`MediaNot::span`]"]
         Span,
@@ -109734,6 +109840,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaOrField {
         #[doc = "Represents [`MediaOr::span`]"]
         Span,
@@ -109750,6 +109857,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaQueryField {
         #[doc = "Represents [`MediaQuery::span`]"]
         Span,
@@ -109774,6 +109882,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaQueryListField {
         #[doc = "Represents [`MediaQueryList::span`]"]
         Span,
@@ -109787,6 +109896,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MediaTypeField {
         #[doc = "Represents [`MediaType::Ident`]"]
         Ident,
@@ -109799,6 +109909,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NamedNamespaceField {
         #[doc = "Represents [`NamedNamespace::span`]"]
         Span,
@@ -109812,6 +109923,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NamespaceField {
         #[doc = "Represents [`Namespace::Named`]"]
         Named,
@@ -109826,6 +109938,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NamespacePrefixField {
         #[doc = "Represents [`NamespacePrefix::span`]"]
         Span,
@@ -109840,6 +109953,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NamespacePreludeField {
         #[doc = "Represents [`NamespacePrelude::span`]"]
         Span,
@@ -109855,6 +109969,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NamespacePreludeUriField {
         #[doc = "Represents [`NamespacePreludeUri::Url`]"]
         Url,
@@ -109869,6 +109984,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NestingSelectorField {
         #[doc = "Represents [`NestingSelector::span`]"]
         Span,
@@ -109881,6 +109997,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NumberField {
         #[doc = "Represents [`Number::span`]"]
         Span,
@@ -109896,6 +110013,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NumberTypeField {
         #[doc = "Represents [`NumberType::Integer`]"]
         Integer,
@@ -109914,6 +110032,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PageSelectorField {
         #[doc = "Represents [`PageSelector::span`]"]
         Span,
@@ -109934,6 +110053,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PageSelectorListField {
         #[doc = "Represents [`PageSelectorList::span`]"]
         Span,
@@ -109948,6 +110068,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PageSelectorPseudoField {
         #[doc = "Represents [`PageSelectorPseudo::span`]"]
         Span,
@@ -109962,6 +110083,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PageSelectorTypeField {
         #[doc = "Represents [`PageSelectorType::span`]"]
         Span,
@@ -109976,6 +110098,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PercentageField {
         #[doc = "Represents [`Percentage::span`]"]
         Span,
@@ -109994,6 +110117,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PseudoClassSelectorField {
         #[doc = "Represents [`PseudoClassSelector::span`]"]
         Span,
@@ -110009,6 +110133,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PseudoClassSelectorChildrenField {
         #[doc = "Represents [`PseudoClassSelectorChildren::PreservedToken`]"]
         PreservedToken,
@@ -110047,6 +110172,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PseudoElementSelectorField {
         #[doc = "Represents [`PseudoElementSelector::span`]"]
         Span,
@@ -110062,6 +110188,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PseudoElementSelectorChildrenField {
         #[doc = "Represents [`PseudoElementSelectorChildren::PreservedToken`]"]
         PreservedToken,
@@ -110080,6 +110207,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum QualifiedRuleField {
         #[doc = "Represents [`QualifiedRule::span`]"]
         Span,
@@ -110095,6 +110223,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum QualifiedRulePreludeField {
         #[doc = "Represents [`QualifiedRulePrelude::SelectorList`]"]
         SelectorList,
@@ -110110,6 +110239,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum QueryInParensField {
         #[doc = "Represents [`QueryInParens::ContainerQuery`]"]
         ContainerQuery,
@@ -110126,6 +110256,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum RatioField {
         #[doc = "Represents [`Ratio::span`]"]
         Span,
@@ -110142,6 +110273,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum RelativeSelectorField {
         #[doc = "Represents [`RelativeSelector::span`]"]
         Span,
@@ -110162,6 +110294,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum RelativeSelectorListField {
         #[doc = "Represents [`RelativeSelectorList::span`]"]
         Span,
@@ -110176,6 +110309,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ResolutionField {
         #[doc = "Represents [`Resolution::span`]"]
         Span,
@@ -110191,6 +110325,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum RuleField {
         #[doc = "Represents [`Rule::QualifiedRule`]"]
         QualifiedRule,
@@ -110207,6 +110342,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ScopeRangeField {
         #[doc = "Represents [`ScopeRange::span`]"]
         Span,
@@ -110227,6 +110363,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SelectorListField {
         #[doc = "Represents [`SelectorList::span`]"]
         Span,
@@ -110245,6 +110382,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SequenceOfCustomIdentsField {
         #[doc = "Represents [`SequenceOfCustomIdents::span`]"]
         Span,
@@ -110263,6 +110401,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SimpleBlockField {
         #[doc = "Represents [`SimpleBlock::span`]"]
         Span,
@@ -110278,6 +110417,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureField {
         #[doc = "Represents [`SizeFeature::Plain`]"]
         Plain,
@@ -110296,6 +110436,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureBooleanField {
         #[doc = "Represents [`SizeFeatureBoolean::span`]"]
         Span,
@@ -110309,6 +110450,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureNameField {
         #[doc = "Represents [`SizeFeatureName::Ident`]"]
         Ident,
@@ -110321,6 +110463,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeaturePlainField {
         #[doc = "Represents [`SizeFeaturePlain::span`]"]
         Span,
@@ -110337,6 +110480,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureRangeField {
         #[doc = "Represents [`SizeFeatureRange::span`]"]
         Span,
@@ -110354,6 +110498,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureRangeComparisonField {
         #[doc = "Represents [`SizeFeatureRangeComparison::Lt`]"]
         Lt,
@@ -110374,6 +110519,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureRangeIntervalField {
         #[doc = "Represents [`SizeFeatureRangeInterval::span`]"]
         Span,
@@ -110395,6 +110541,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SizeFeatureValueField {
         #[doc = "Represents [`SizeFeatureValue::Number`]"]
         Number,
@@ -110415,6 +110562,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum StrField {
         #[doc = "Represents [`Str::span`]"]
         Span,
@@ -110430,6 +110578,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum StyleBlockField {
         #[doc = "Represents [`StyleBlock::AtRule`]"]
         AtRule,
@@ -110452,6 +110601,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum StylesheetField {
         #[doc = "Represents [`Stylesheet::span`]"]
         Span,
@@ -110465,6 +110615,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SubclassSelectorField {
         #[doc = "Represents [`SubclassSelector::Id`]"]
         Id,
@@ -110485,6 +110636,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsAndField {
         #[doc = "Represents [`SupportsAnd::span`]"]
         Span,
@@ -110505,6 +110657,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsConditionField {
         #[doc = "Represents [`SupportsCondition::span`]"]
         Span,
@@ -110518,6 +110671,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsConditionTypeField {
         #[doc = "Represents [`SupportsConditionType::Not`]"]
         Not,
@@ -110535,6 +110689,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsFeatureField {
         #[doc = "Represents [`SupportsFeature::Declaration`]"]
         Declaration,
@@ -110548,6 +110703,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsInParensField {
         #[doc = "Represents [`SupportsInParens::SupportsCondition`]"]
         SupportsCondition,
@@ -110564,6 +110720,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsNotField {
         #[doc = "Represents [`SupportsNot::span`]"]
         Span,
@@ -110580,6 +110737,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SupportsOrField {
         #[doc = "Represents [`SupportsOr::span`]"]
         Span,
@@ -110596,6 +110754,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TagNameSelectorField {
         #[doc = "Represents [`TagNameSelector::span`]"]
         Span,
@@ -110610,6 +110769,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TimeField {
         #[doc = "Represents [`Time::span`]"]
         Span,
@@ -110625,6 +110785,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TimePercentageField {
         #[doc = "Represents [`TimePercentage::Time`]"]
         Time,
@@ -110638,6 +110799,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TokenField {
         #[doc = "Represents [`Token::Ident`]"]
         Ident,
@@ -110696,6 +110858,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TokenAndSpanField {
         #[doc = "Represents [`TokenAndSpan::span`]"]
         Span,
@@ -110709,6 +110872,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TypeSelectorField {
         #[doc = "Represents [`TypeSelector::TagName`]"]
         TagName,
@@ -110723,6 +110887,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UnicodeRangeField {
         #[doc = "Represents [`UnicodeRange::span`]"]
         Span,
@@ -110741,6 +110906,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UniversalSelectorField {
         #[doc = "Represents [`UniversalSelector::span`]"]
         Span,
@@ -110755,6 +110921,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UnknownDimensionField {
         #[doc = "Represents [`UnknownDimension::span`]"]
         Span,
@@ -110775,6 +110942,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UrlField {
         #[doc = "Represents [`Url::span`]"]
         Span,
@@ -110793,6 +110961,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UrlKeyValueField {}
     impl UrlModifierField {
         #[inline(always)]
@@ -110801,6 +110970,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UrlModifierField {
         #[doc = "Represents [`UrlModifier::Ident`]"]
         Ident,
@@ -110814,6 +110984,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UrlValueField {
         #[doc = "Represents [`UrlValue::Str`]"]
         Str,
@@ -110828,6 +110999,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UrlValueRawField {
         #[doc = "Represents [`UrlValueRaw::span`]"]
         Span,
@@ -110844,6 +111016,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum WqNameField {
         #[doc = "Represents [`WqName::span`]"]
         Span,
@@ -110853,6 +111026,7 @@ pub mod fields {
         Value,
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AstParentKind {
         AbsoluteColorBase(AbsoluteColorBaseField),
         AlphaValue(AlphaValueField),

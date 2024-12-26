@@ -6,7 +6,7 @@ edition       = "2021"
 license       = "Apache-2.0"
 name          = "swc_allocator"
 repository    = { workspace = true }
-version       = "0.1.8"
+version       = "2.0.0"
 
   [package.metadata.docs.rs]
   all-features = true
@@ -14,9 +14,9 @@ version       = "0.1.8"
 
 
 [features]
-default = ["scoped"]
+default = ["scoped", "rkyv"]
 nightly = ["bumpalo/allocator_api", "hashbrown/nightly"]
-rkyv    = ["dep:rkyv"]
+rkyv    = ["dep:rkyv", "dep:rancor"]
 scoped  = ["nightly"]
 serde   = ["dep:serde"]
 
@@ -28,6 +28,7 @@ bumpalo = { workspace = true, features = [
 ] }
 hashbrown = { workspace = true }
 ptr_meta = { workspace = true }
+rancor = { workspace = true, optional = true }
 rkyv = { workspace = true, optional = true }
 rustc-hash = { workspace = true }
 serde = { workspace = true, optional = true }
@@ -38,7 +39,7 @@ triomphe = { workspace = true }
 criterion = { workspace = true }
 
 codspeed-criterion-compat = { workspace = true }
-swc_malloc                = { version = "0.5.10", path = "../swc_malloc" }
+swc_malloc                = { version = "1.0.0", path = "../swc_malloc" }
 
 
 [[bench]]

@@ -458,7 +458,7 @@ impl Optimizer<'_> {
         }) = e
         {
             if let (Some(id), Expr::Seq(seq)) = (left.as_ident(), &mut **right) {
-                if id.ctxt == self.expr_ctx.unresolved_ctxt {
+                if id.ctxt == self.ctx.expr_ctx.unresolved_ctxt {
                     return;
                 }
                 // Do we really need this?
@@ -545,7 +545,7 @@ impl Optimizer<'_> {
         }
 
         if let Some(last) = e.exprs.last() {
-            if is_pure_undefined(&self.expr_ctx, last) {
+            if is_pure_undefined(&self.ctx.expr_ctx, last) {
                 self.changed = true;
                 report_change!("sequences: Shifting void");
 
@@ -1101,7 +1101,7 @@ impl Optimizer<'_> {
     }
 
     fn is_ident_skippable_for_seq(&self, a: Option<&Mergable>, e: &Ident) -> bool {
-        if e.ctxt == self.expr_ctx.unresolved_ctxt
+        if e.ctxt == self.ctx.expr_ctx.unresolved_ctxt
             && self.options.pristine_globals
             && is_global_var_with_pure_property_access(&e.sym)
         {
@@ -1389,7 +1389,7 @@ impl Optimizer<'_> {
                 }
 
                 if let Callee::Expr(callee) = &e.callee {
-                    if callee.is_pure_callee(&self.expr_ctx) {
+                    if callee.is_pure_callee(&self.ctx.expr_ctx) {
                         if !self.is_skippable_for_seq(a, callee) {
                             return false;
                         }
@@ -1426,7 +1426,7 @@ impl Optimizer<'_> {
 
             Expr::Update(..) => false,
             Expr::SuperProp(..) => false,
-            Expr::Class(_) => e.may_have_side_effects(&self.expr_ctx),
+            Expr::Class(_) => e.may_have_side_effects(&self.ctx.expr_ctx),
 
             Expr::Paren(e) => self.is_skippable_for_seq(a, &e.expr),
             Expr::Unary(e) => self.is_skippable_for_seq(a, &e.arg),
@@ -1452,7 +1452,7 @@ impl Optimizer<'_> {
                     false
                 }
                 OptChainBase::Call(e) => {
-                    if e.callee.is_pure_callee(&self.expr_ctx) {
+                    if e.callee.is_pure_callee(&self.ctx.expr_ctx) {
                         if !self.is_skippable_for_seq(a, &e.callee) {
                             return false;
                         }
@@ -1496,9 +1496,9 @@ impl Optimizer<'_> {
             Mergable::Expr(a) => {
                 let has_side_effect = match a {
                     Expr::Assign(a) if a.is_simple_assign() => {
-                        a.right.may_have_side_effects(&self.expr_ctx)
+                        a.right.may_have_side_effects(&self.ctx.expr_ctx)
                     }
-                    _ => a.may_have_side_effects(&self.expr_ctx),
+                    _ => a.may_have_side_effects(&self.ctx.expr_ctx),
                 };
                 if has_side_effect && !usgae.is_fn_local && (usgae.exported || usgae.reassigned) {
                     log_abort!("a (expr) has side effect");
@@ -1507,7 +1507,7 @@ impl Optimizer<'_> {
             }
             Mergable::Var(a) => {
                 if let Some(init) = &a.init {
-                    if init.may_have_side_effects(&self.expr_ctx)
+                    if init.may_have_side_effects(&self.ctx.expr_ctx)
                         && !usgae.is_fn_local
                         && (usgae.exported || usgae.reassigned)
                     {
@@ -1611,7 +1611,7 @@ impl Optimizer<'_> {
                             return Ok(false);
                         }
 
-                        if a.may_have_side_effects(&self.expr_ctx) {
+                        if a.may_have_side_effects(&self.ctx.expr_ctx) {
                             return Ok(false);
                         }
                     }
@@ -1713,7 +1713,7 @@ impl Optimizer<'_> {
                     return Ok(true);
                 }
 
-                if obj.may_have_side_effects(&self.expr_ctx) {
+                if obj.may_have_side_effects(&self.ctx.expr_ctx) {
                     return Ok(false);
                 }
 
@@ -1758,7 +1758,7 @@ impl Optimizer<'_> {
                             b_assign.left = match AssignTarget::try_from(b_left_expr) {
                                 Ok(v) => v,
                                 Err(b_left_expr) => {
-                                    if is_pure_undefined(&self.expr_ctx, &b_left_expr) {
+                                    if is_pure_undefined(&self.ctx.expr_ctx, &b_left_expr) {
                                         *b = *b_assign.right.take();
                                         return Ok(true);
                                     }
@@ -1840,20 +1840,15 @@ impl Optimizer<'_> {
             }
 
             Expr::Array(b) => {
-                for elem in &mut b.elems {
-                    match elem {
-                        Some(elem) => {
-                            trace_op!("seq: Try element of array");
-                            if self.merge_sequential_expr(a, &mut elem.expr)? {
-                                return Ok(true);
-                            }
+                for elem in b.elems.iter_mut().flatten() {
+                    trace_op!("seq: Try element of array");
+                    if self.merge_sequential_expr(a, &mut elem.expr)? {
+                        return Ok(true);
+                    }
 
-                            if !self.is_skippable_for_seq(Some(a), &elem.expr) {
-                                // To preserve side-effects, we need to abort.
-                                break;
-                            }
-                        }
-                        None => {}
+                    if !self.is_skippable_for_seq(Some(a), &elem.expr) {
+                        // To preserve side-effects, we need to abort.
+                        break;
                     }
                 }
 
@@ -2088,7 +2083,6 @@ impl Optimizer<'_> {
     /// is same as
     ///
     /// console.log(++c)
-
     fn replace_seq_update(&mut self, a: &mut Mergable, b: &mut Expr) -> Result<bool, ()> {
         if !self.options.sequences() {
             return Ok(false);
@@ -2485,13 +2479,18 @@ impl Optimizer<'_> {
                         _ => None,
                     };
 
+                    let var_type = self
+                        .data
+                        .vars
+                        .get(&left_id.to_id())
+                        .and_then(|info| info.merged_var_type);
                     let Some(a_type) = a_type else {
                         return Ok(false);
                     };
                     let b_type = b.right.get_type();
 
                     if let Some(a_op) = a_op {
-                        if can_drop_op_for(a_op, b.op, a_type, b_type) {
+                        if can_drop_op_for(a_op, b.op, var_type, a_type, b_type) {
                             if b_left.to_id() == left_id.to_id() {
                                 if let Some(bin_op) = b.op.to_update() {
                                     report_change!(
@@ -2723,13 +2722,26 @@ pub(crate) fn is_trivial_lit(e: &Expr) -> bool {
 }
 
 /// This assumes `a.left.to_id() == b.left.to_id()`
-fn can_drop_op_for(a: AssignOp, b: AssignOp, a_type: Value<Type>, b_type: Value<Type>) -> bool {
+fn can_drop_op_for(
+    a: AssignOp,
+    b: AssignOp,
+    var_type: Option<Value<Type>>,
+    a_type: Value<Type>,
+    b_type: Value<Type>,
+) -> bool {
     if a == op!("=") {
         return true;
     }
 
     if a == b {
-        if a == op!("+=") && a_type.is_known() && a_type == b_type {
+        if a == op!("+=")
+            && a_type.is_known()
+            && a_type == b_type
+            && (match var_type {
+                Some(ty) => a_type == ty,
+                None => true,
+            })
+        {
             return true;
         }
 

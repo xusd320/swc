@@ -308,13 +308,6 @@ pub trait Visit {
     fn visit_empty_stmt(&mut self, node: &EmptyStmt) {
         <EmptyStmt as VisitWith<Self>>::visit_children_with(node, self)
     }
-    #[doc = "Visit a node of type `EsVersion`.\n\nBy default, this method calls \
-             [`EsVersion::visit_children_with`]. If you want to recurse, you need to call it \
-             manually."]
-    #[inline]
-    fn visit_es_version(&mut self, node: &EsVersion) {
-        <EsVersion as VisitWith<Self>>::visit_children_with(node, self)
-    }
     #[doc = "Visit a node of type `ExportAll`.\n\nBy default, this method calls \
              [`ExportAll::visit_children_with`]. If you want to recurse, you need to call it \
              manually."]
@@ -2246,11 +2239,6 @@ where
     }
 
     #[inline]
-    fn visit_es_version(&mut self, node: &EsVersion) {
-        <V as Visit>::visit_es_version(&mut **self, node)
-    }
-
-    #[inline]
     fn visit_export_all(&mut self, node: &ExportAll) {
         <V as Visit>::visit_export_all(&mut **self, node)
     }
@@ -3710,11 +3698,6 @@ where
     #[inline]
     fn visit_empty_stmt(&mut self, node: &EmptyStmt) {
         <V as Visit>::visit_empty_stmt(&mut **self, node)
-    }
-
-    #[inline]
-    fn visit_es_version(&mut self, node: &EsVersion) {
-        <V as Visit>::visit_es_version(&mut **self, node)
     }
 
     #[inline]
@@ -5309,14 +5292,6 @@ where
         match self {
             swc_visit::Either::Left(visitor) => Visit::visit_empty_stmt(visitor, node),
             swc_visit::Either::Right(visitor) => Visit::visit_empty_stmt(visitor, node),
-        }
-    }
-
-    #[inline]
-    fn visit_es_version(&mut self, node: &EsVersion) {
-        match self {
-            swc_visit::Either::Left(visitor) => Visit::visit_es_version(visitor, node),
-            swc_visit::Either::Right(visitor) => Visit::visit_es_version(visitor, node),
         }
     }
 
@@ -7699,14 +7674,6 @@ where
     fn visit_empty_stmt(&mut self, node: &EmptyStmt) {
         if self.enabled {
             <V as Visit>::visit_empty_stmt(&mut self.visitor, node)
-        } else {
-        }
-    }
-
-    #[inline]
-    fn visit_es_version(&mut self, node: &EsVersion) {
-        if self.enabled {
-            <V as Visit>::visit_es_version(&mut self.visitor, node)
         } else {
         }
     }
@@ -10722,28 +10689,6 @@ impl<V: ?Sized + Visit> VisitWith<V> for EmptyStmt {
                     <swc_common::Span as VisitWith<V>>::visit_with(span, visitor)
                 };
             }
-        }
-    }
-}
-impl<V: ?Sized + Visit> VisitWith<V> for EsVersion {
-    #[doc = "Calls [Visit`::visit_es_version`] with `self`."]
-    fn visit_with(&self, visitor: &mut V) {
-        <V as Visit>::visit_es_version(visitor, self)
-    }
-
-    fn visit_children_with(&self, visitor: &mut V) {
-        match self {
-            EsVersion::Es3 => {}
-            EsVersion::Es5 => {}
-            EsVersion::Es2015 => {}
-            EsVersion::Es2016 => {}
-            EsVersion::Es2017 => {}
-            EsVersion::Es2018 => {}
-            EsVersion::Es2019 => {}
-            EsVersion::Es2020 => {}
-            EsVersion::Es2021 => {}
-            EsVersion::Es2022 => {}
-            EsVersion::EsNext => {}
         }
     }
 }
@@ -16778,17 +16723,6 @@ pub trait VisitAstPath {
     ) {
         <EmptyStmt as VisitWithAstPath<Self>>::visit_children_with_ast_path(node, self, __ast_path)
     }
-    #[doc = "Visit a node of type `EsVersion`.\n\nBy default, this method calls \
-             [`EsVersion::visit_children_with_ast_path`]. If you want to recurse, you need to call \
-             it manually."]
-    #[inline]
-    fn visit_es_version<'ast: 'r, 'r>(
-        &mut self,
-        node: &'ast EsVersion,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        <EsVersion as VisitWithAstPath<Self>>::visit_children_with_ast_path(node, self, __ast_path)
-    }
     #[doc = "Visit a node of type `ExportAll`.\n\nBy default, this method calls \
              [`ExportAll::visit_children_with_ast_path`]. If you want to recurse, you need to call \
              it manually."]
@@ -20133,15 +20067,6 @@ where
     }
 
     #[inline]
-    fn visit_es_version<'ast: 'r, 'r>(
-        &mut self,
-        node: &'ast EsVersion,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        <V as VisitAstPath>::visit_es_version(&mut **self, node, __ast_path)
-    }
-
-    #[inline]
     fn visit_export_all<'ast: 'r, 'r>(
         &mut self,
         node: &'ast ExportAll,
@@ -22668,15 +22593,6 @@ where
         __ast_path: &mut AstNodePath<'r>,
     ) {
         <V as VisitAstPath>::visit_empty_stmt(&mut **self, node, __ast_path)
-    }
-
-    #[inline]
-    fn visit_es_version<'ast: 'r, 'r>(
-        &mut self,
-        node: &'ast EsVersion,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        <V as VisitAstPath>::visit_es_version(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -25507,22 +25423,6 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 VisitAstPath::visit_empty_stmt(visitor, node, __ast_path)
-            }
-        }
-    }
-
-    #[inline]
-    fn visit_es_version<'ast: 'r, 'r>(
-        &mut self,
-        node: &'ast EsVersion,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        match self {
-            swc_visit::Either::Left(visitor) => {
-                VisitAstPath::visit_es_version(visitor, node, __ast_path)
-            }
-            swc_visit::Either::Right(visitor) => {
-                VisitAstPath::visit_es_version(visitor, node, __ast_path)
             }
         }
     }
@@ -29881,18 +29781,6 @@ where
     ) {
         if self.enabled {
             <V as VisitAstPath>::visit_empty_stmt(&mut self.visitor, node, __ast_path)
-        } else {
-        }
-    }
-
-    #[inline]
-    fn visit_es_version<'ast: 'r, 'r>(
-        &mut self,
-        node: &'ast EsVersion,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        if self.enabled {
-            <V as VisitAstPath>::visit_es_version(&mut self.visitor, node, __ast_path)
         } else {
         }
     }
@@ -35256,38 +35144,6 @@ impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for EmptyStmt {
                     )
                 };
             }
-        }
-    }
-}
-#[cfg(any(docsrs, feature = "path"))]
-#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
-impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for EsVersion {
-    #[doc = "Calls [VisitAstPath`::visit_es_version`] with `self`."]
-    fn visit_with_ast_path<'ast: 'r, 'r>(
-        &'ast self,
-        visitor: &mut V,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        <V as VisitAstPath>::visit_es_version(visitor, self, __ast_path)
-    }
-
-    fn visit_children_with_ast_path<'ast: 'r, 'r>(
-        &'ast self,
-        visitor: &mut V,
-        __ast_path: &mut AstNodePath<'r>,
-    ) {
-        match self {
-            EsVersion::Es3 => {}
-            EsVersion::Es5 => {}
-            EsVersion::Es2015 => {}
-            EsVersion::Es2016 => {}
-            EsVersion::Es2017 => {}
-            EsVersion::Es2018 => {}
-            EsVersion::Es2019 => {}
-            EsVersion::Es2020 => {}
-            EsVersion::Es2021 => {}
-            EsVersion::Es2022 => {}
-            EsVersion::EsNext => {}
         }
     }
 }
@@ -48709,13 +48565,6 @@ pub trait VisitMut {
     fn visit_mut_empty_stmt(&mut self, node: &mut EmptyStmt) {
         <EmptyStmt as VisitMutWith<Self>>::visit_mut_children_with(node, self)
     }
-    #[doc = "Visit a node of type `EsVersion`.\n\nBy default, this method calls \
-             [`EsVersion::visit_mut_children_with`]. If you want to recurse, you need to call it \
-             manually."]
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion) {
-        <EsVersion as VisitMutWith<Self>>::visit_mut_children_with(node, self)
-    }
     #[doc = "Visit a node of type `ExportAll`.\n\nBy default, this method calls \
              [`ExportAll::visit_mut_children_with`]. If you want to recurse, you need to call it \
              manually."]
@@ -50673,11 +50522,6 @@ where
     }
 
     #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion) {
-        <V as VisitMut>::visit_mut_es_version(&mut **self, node)
-    }
-
-    #[inline]
     fn visit_mut_export_all(&mut self, node: &mut ExportAll) {
         <V as VisitMut>::visit_mut_export_all(&mut **self, node)
     }
@@ -52137,11 +51981,6 @@ where
     #[inline]
     fn visit_mut_empty_stmt(&mut self, node: &mut EmptyStmt) {
         <V as VisitMut>::visit_mut_empty_stmt(&mut **self, node)
-    }
-
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion) {
-        <V as VisitMut>::visit_mut_es_version(&mut **self, node)
     }
 
     #[inline]
@@ -53748,14 +53587,6 @@ where
         match self {
             swc_visit::Either::Left(visitor) => VisitMut::visit_mut_empty_stmt(visitor, node),
             swc_visit::Either::Right(visitor) => VisitMut::visit_mut_empty_stmt(visitor, node),
-        }
-    }
-
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion) {
-        match self {
-            swc_visit::Either::Left(visitor) => VisitMut::visit_mut_es_version(visitor, node),
-            swc_visit::Either::Right(visitor) => VisitMut::visit_mut_es_version(visitor, node),
         }
     }
 
@@ -56430,14 +56261,6 @@ where
     fn visit_mut_empty_stmt(&mut self, node: &mut EmptyStmt) {
         if self.enabled {
             <V as VisitMut>::visit_mut_empty_stmt(&mut self.visitor, node)
-        } else {
-        }
-    }
-
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion) {
-        if self.enabled {
-            <V as VisitMut>::visit_mut_es_version(&mut self.visitor, node)
         } else {
         }
     }
@@ -59476,28 +59299,6 @@ impl<V: ?Sized + VisitMut> VisitMutWith<V> for EmptyStmt {
                     <swc_common::Span as VisitMutWith<V>>::visit_mut_with(span, visitor)
                 };
             }
-        }
-    }
-}
-impl<V: ?Sized + VisitMut> VisitMutWith<V> for EsVersion {
-    #[doc = "Calls [VisitMut`::visit_mut_es_version`] with `self`."]
-    fn visit_mut_with(&mut self, visitor: &mut V) {
-        <V as VisitMut>::visit_mut_es_version(visitor, self)
-    }
-
-    fn visit_mut_children_with(&mut self, visitor: &mut V) {
-        match self {
-            EsVersion::Es3 => {}
-            EsVersion::Es5 => {}
-            EsVersion::Es2015 => {}
-            EsVersion::Es2016 => {}
-            EsVersion::Es2017 => {}
-            EsVersion::Es2018 => {}
-            EsVersion::Es2019 => {}
-            EsVersion::Es2020 => {}
-            EsVersion::Es2021 => {}
-            EsVersion::Es2022 => {}
-            EsVersion::EsNext => {}
         }
     }
 }
@@ -65465,15 +65266,6 @@ pub trait VisitMutAstPath {
             node, self, __ast_path,
         )
     }
-    #[doc = "Visit a node of type `EsVersion`.\n\nBy default, this method calls \
-             [`EsVersion::visit_mut_children_with_ast_path`]. If you want to recurse, you need to \
-             call it manually."]
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion, __ast_path: &mut AstKindPath) {
-        <EsVersion as VisitMutWithAstPath<Self>>::visit_mut_children_with_ast_path(
-            node, self, __ast_path,
-        )
-    }
     #[doc = "Visit a node of type `ExportAll`.\n\nBy default, this method calls \
              [`ExportAll::visit_mut_children_with_ast_path`]. If you want to recurse, you need to \
              call it manually."]
@@ -68380,11 +68172,6 @@ where
     }
 
     #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion, __ast_path: &mut AstKindPath) {
-        <V as VisitMutAstPath>::visit_mut_es_version(&mut **self, node, __ast_path)
-    }
-
-    #[inline]
     fn visit_mut_export_all(&mut self, node: &mut ExportAll, __ast_path: &mut AstKindPath) {
         <V as VisitMutAstPath>::visit_mut_export_all(&mut **self, node, __ast_path)
     }
@@ -70319,11 +70106,6 @@ where
     #[inline]
     fn visit_mut_empty_stmt(&mut self, node: &mut EmptyStmt, __ast_path: &mut AstKindPath) {
         <V as VisitMutAstPath>::visit_mut_empty_stmt(&mut **self, node, __ast_path)
-    }
-
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion, __ast_path: &mut AstKindPath) {
-        <V as VisitMutAstPath>::visit_mut_es_version(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -72568,18 +72350,6 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 VisitMutAstPath::visit_mut_empty_stmt(visitor, node, __ast_path)
-            }
-        }
-    }
-
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion, __ast_path: &mut AstKindPath) {
-        match self {
-            swc_visit::Either::Left(visitor) => {
-                VisitMutAstPath::visit_mut_es_version(visitor, node, __ast_path)
-            }
-            swc_visit::Either::Right(visitor) => {
-                VisitMutAstPath::visit_mut_es_version(visitor, node, __ast_path)
             }
         }
     }
@@ -76382,14 +76152,6 @@ where
     fn visit_mut_empty_stmt(&mut self, node: &mut EmptyStmt, __ast_path: &mut AstKindPath) {
         if self.enabled {
             <V as VisitMutAstPath>::visit_mut_empty_stmt(&mut self.visitor, node, __ast_path)
-        } else {
-        }
-    }
-
-    #[inline]
-    fn visit_mut_es_version(&mut self, node: &mut EsVersion, __ast_path: &mut AstKindPath) {
-        if self.enabled {
-            <V as VisitMutAstPath>::visit_mut_es_version(&mut self.visitor, node, __ast_path)
         } else {
         }
     }
@@ -81018,30 +80780,6 @@ impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for EmptyStmt {
                     )
                 };
             }
-        }
-    }
-}
-#[cfg(any(docsrs, feature = "path"))]
-#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
-impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for EsVersion {
-    #[doc = "Calls [VisitMutAstPath`::visit_mut_es_version`] with `self`."]
-    fn visit_mut_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
-        <V as VisitMutAstPath>::visit_mut_es_version(visitor, self, __ast_path)
-    }
-
-    fn visit_mut_children_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
-        match self {
-            EsVersion::Es3 => {}
-            EsVersion::Es5 => {}
-            EsVersion::Es2015 => {}
-            EsVersion::Es2016 => {}
-            EsVersion::Es2017 => {}
-            EsVersion::Es2018 => {}
-            EsVersion::Es2019 => {}
-            EsVersion::Es2020 => {}
-            EsVersion::Es2021 => {}
-            EsVersion::Es2022 => {}
-            EsVersion::EsNext => {}
         }
     }
 }
@@ -91641,13 +91379,6 @@ pub trait Fold {
     fn fold_empty_stmt(&mut self, node: EmptyStmt) -> EmptyStmt {
         <EmptyStmt as FoldWith<Self>>::fold_children_with(node, self)
     }
-    #[doc = "Visit a node of type `EsVersion`.\n\nBy default, this method calls \
-             [`EsVersion::fold_children_with`]. If you want to recurse, you need to call it \
-             manually."]
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion) -> EsVersion {
-        <EsVersion as FoldWith<Self>>::fold_children_with(node, self)
-    }
     #[doc = "Visit a node of type `ExportAll`.\n\nBy default, this method calls \
              [`ExportAll::fold_children_with`]. If you want to recurse, you need to call it \
              manually."]
@@ -93619,11 +93350,6 @@ where
     }
 
     #[inline]
-    fn fold_es_version(&mut self, node: EsVersion) -> EsVersion {
-        <V as Fold>::fold_es_version(&mut **self, node)
-    }
-
-    #[inline]
     fn fold_export_all(&mut self, node: ExportAll) -> ExportAll {
         <V as Fold>::fold_export_all(&mut **self, node)
     }
@@ -95137,11 +94863,6 @@ where
     #[inline]
     fn fold_empty_stmt(&mut self, node: EmptyStmt) -> EmptyStmt {
         <V as Fold>::fold_empty_stmt(&mut **self, node)
-    }
-
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion) -> EsVersion {
-        <V as Fold>::fold_es_version(&mut **self, node)
     }
 
     #[inline]
@@ -96790,14 +96511,6 @@ where
         match self {
             swc_visit::Either::Left(visitor) => Fold::fold_empty_stmt(visitor, node),
             swc_visit::Either::Right(visitor) => Fold::fold_empty_stmt(visitor, node),
-        }
-    }
-
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion) -> EsVersion {
-        match self {
-            swc_visit::Either::Left(visitor) => Fold::fold_es_version(visitor, node),
-            swc_visit::Either::Right(visitor) => Fold::fold_es_version(visitor, node),
         }
     }
 
@@ -99251,15 +98964,6 @@ where
     fn fold_empty_stmt(&mut self, node: EmptyStmt) -> EmptyStmt {
         if self.enabled {
             <V as Fold>::fold_empty_stmt(&mut self.visitor, node)
-        } else {
-            node
-        }
-    }
-
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion) -> EsVersion {
-        if self.enabled {
-            <V as Fold>::fold_es_version(&mut self.visitor, node)
         } else {
             node
         }
@@ -102555,28 +102259,6 @@ impl<V: ?Sized + Fold> FoldWith<V> for EmptyStmt {
                 let span = { <swc_common::Span as FoldWith<V>>::fold_with(span, visitor) };
                 EmptyStmt { span }
             }
-        }
-    }
-}
-impl<V: ?Sized + Fold> FoldWith<V> for EsVersion {
-    #[doc = "Calls [Fold`::fold_es_version`] with `self`."]
-    fn fold_with(self, visitor: &mut V) -> Self {
-        <V as Fold>::fold_es_version(visitor, self)
-    }
-
-    fn fold_children_with(self, visitor: &mut V) -> Self {
-        match self {
-            EsVersion::Es3 => EsVersion::Es3,
-            EsVersion::Es5 => EsVersion::Es5,
-            EsVersion::Es2015 => EsVersion::Es2015,
-            EsVersion::Es2016 => EsVersion::Es2016,
-            EsVersion::Es2017 => EsVersion::Es2017,
-            EsVersion::Es2018 => EsVersion::Es2018,
-            EsVersion::Es2019 => EsVersion::Es2019,
-            EsVersion::Es2020 => EsVersion::Es2020,
-            EsVersion::Es2021 => EsVersion::Es2021,
-            EsVersion::Es2022 => EsVersion::Es2022,
-            EsVersion::EsNext => EsVersion::EsNext,
         }
     }
 }
@@ -108432,13 +108114,6 @@ pub trait FoldAstPath {
     fn fold_empty_stmt(&mut self, node: EmptyStmt, __ast_path: &mut AstKindPath) -> EmptyStmt {
         <EmptyStmt as FoldWithAstPath<Self>>::fold_children_with_ast_path(node, self, __ast_path)
     }
-    #[doc = "Visit a node of type `EsVersion`.\n\nBy default, this method calls \
-             [`EsVersion::fold_children_with_ast_path`]. If you want to recurse, you need to call \
-             it manually."]
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion, __ast_path: &mut AstKindPath) -> EsVersion {
-        <EsVersion as FoldWithAstPath<Self>>::fold_children_with_ast_path(node, self, __ast_path)
-    }
     #[doc = "Visit a node of type `ExportAll`.\n\nBy default, this method calls \
              [`ExportAll::fold_children_with_ast_path`]. If you want to recurse, you need to call \
              it manually."]
@@ -111355,11 +111030,6 @@ where
     }
 
     #[inline]
-    fn fold_es_version(&mut self, node: EsVersion, __ast_path: &mut AstKindPath) -> EsVersion {
-        <V as FoldAstPath>::fold_es_version(&mut **self, node, __ast_path)
-    }
-
-    #[inline]
     fn fold_export_all(&mut self, node: ExportAll, __ast_path: &mut AstKindPath) -> ExportAll {
         <V as FoldAstPath>::fold_export_all(&mut **self, node, __ast_path)
     }
@@ -113526,11 +113196,6 @@ where
     #[inline]
     fn fold_empty_stmt(&mut self, node: EmptyStmt, __ast_path: &mut AstKindPath) -> EmptyStmt {
         <V as FoldAstPath>::fold_empty_stmt(&mut **self, node, __ast_path)
-    }
-
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion, __ast_path: &mut AstKindPath) -> EsVersion {
-        <V as FoldAstPath>::fold_es_version(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -115989,18 +115654,6 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 FoldAstPath::fold_empty_stmt(visitor, node, __ast_path)
-            }
-        }
-    }
-
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion, __ast_path: &mut AstKindPath) -> EsVersion {
-        match self {
-            swc_visit::Either::Left(visitor) => {
-                FoldAstPath::fold_es_version(visitor, node, __ast_path)
-            }
-            swc_visit::Either::Right(visitor) => {
-                FoldAstPath::fold_es_version(visitor, node, __ast_path)
             }
         }
     }
@@ -119994,15 +119647,6 @@ where
     fn fold_empty_stmt(&mut self, node: EmptyStmt, __ast_path: &mut AstKindPath) -> EmptyStmt {
         if self.enabled {
             <V as FoldAstPath>::fold_empty_stmt(&mut self.visitor, node, __ast_path)
-        } else {
-            node
-        }
-    }
-
-    #[inline]
-    fn fold_es_version(&mut self, node: EsVersion, __ast_path: &mut AstKindPath) -> EsVersion {
-        if self.enabled {
-            <V as FoldAstPath>::fold_es_version(&mut self.visitor, node, __ast_path)
         } else {
             node
         }
@@ -124979,30 +124623,6 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for EmptyStmt {
                 };
                 EmptyStmt { span }
             }
-        }
-    }
-}
-#[cfg(any(docsrs, feature = "path"))]
-#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
-impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for EsVersion {
-    #[doc = "Calls [FoldAstPath`::fold_es_version`] with `self`."]
-    fn fold_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
-        <V as FoldAstPath>::fold_es_version(visitor, self, __ast_path)
-    }
-
-    fn fold_children_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
-        match self {
-            EsVersion::Es3 => EsVersion::Es3,
-            EsVersion::Es5 => EsVersion::Es5,
-            EsVersion::Es2015 => EsVersion::Es2015,
-            EsVersion::Es2016 => EsVersion::Es2016,
-            EsVersion::Es2017 => EsVersion::Es2017,
-            EsVersion::Es2018 => EsVersion::Es2018,
-            EsVersion::Es2019 => EsVersion::Es2019,
-            EsVersion::Es2020 => EsVersion::Es2020,
-            EsVersion::Es2021 => EsVersion::Es2021,
-            EsVersion::Es2022 => EsVersion::Es2022,
-            EsVersion::EsNext => EsVersion::EsNext,
         }
     }
 }
@@ -136038,6 +135658,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AccessibilityField {
         #[doc = "Represents [`Accessibility::Public`]"]
         Public,
@@ -136058,6 +135679,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ArrayLitField {
         #[doc = "Represents [`ArrayLit::span`]"]
         Span,
@@ -136076,6 +135698,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ArrayPatField {
         #[doc = "Represents [`ArrayPat::span`]"]
         Span,
@@ -136098,6 +135721,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ArrowExprField {
         #[doc = "Represents [`ArrowExpr::span`]"]
         Span,
@@ -136124,6 +135748,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignExprField {
         #[doc = "Represents [`AssignExpr::span`]"]
         Span,
@@ -136141,6 +135766,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignOpField {
         #[doc = "Represents [`AssignOp::Assign`]"]
         Assign,
@@ -136183,6 +135809,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignPatField {
         #[doc = "Represents [`AssignPat::span`]"]
         Span,
@@ -136199,6 +135826,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignPatPropField {
         #[doc = "Represents [`AssignPatProp::span`]"]
         Span,
@@ -136215,6 +135843,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignPropField {
         #[doc = "Represents [`AssignProp::span`]"]
         Span,
@@ -136230,6 +135859,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignTargetField {
         #[doc = "Represents [`AssignTarget::Simple`]"]
         Simple,
@@ -136243,6 +135873,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AssignTargetPatField {
         #[doc = "Represents [`AssignTargetPat::Array`]"]
         Array,
@@ -136263,6 +135894,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AutoAccessorField {
         #[doc = "Represents [`AutoAccessor::span`]"]
         Span,
@@ -136293,6 +135925,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AwaitExprField {
         #[doc = "Represents [`AwaitExpr::span`]"]
         Span,
@@ -136307,6 +135940,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BigIntField {
         #[doc = "Represents [`BigInt::span`]"]
         Span,
@@ -136323,6 +135957,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BinExprField {
         #[doc = "Represents [`BinExpr::span`]"]
         Span,
@@ -136340,6 +135975,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BinaryOpField {
         #[doc = "Represents [`BinaryOp::EqEq`]"]
         EqEq,
@@ -136400,6 +136036,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BindingIdentField {
         #[doc = "Represents [`BindingIdent::id`]"]
         Id,
@@ -136418,6 +136055,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BlockStmtField {
         #[doc = "Represents [`BlockStmt::span`]"]
         Span,
@@ -136433,6 +136071,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BlockStmtOrExprField {
         #[doc = "Represents [`BlockStmtOrExpr::BlockStmt`]"]
         BlockStmt,
@@ -136447,6 +136086,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BoolField {
         #[doc = "Represents [`Bool::span`]"]
         Span,
@@ -136461,6 +136101,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum BreakStmtField {
         #[doc = "Represents [`BreakStmt::span`]"]
         Span,
@@ -136479,6 +136120,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CallExprField {
         #[doc = "Represents [`CallExpr::span`]"]
         Span,
@@ -136498,6 +136140,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CalleeField {
         #[doc = "Represents [`Callee::Super`]"]
         Super,
@@ -136514,6 +136157,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CatchClauseField {
         #[doc = "Represents [`CatchClause::span`]"]
         Span,
@@ -136542,6 +136186,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassField {
         #[doc = "Represents [`Class::span`]"]
         Span,
@@ -136570,6 +136215,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassDeclField {
         #[doc = "Represents [`ClassDecl::ident`]"]
         Ident,
@@ -136586,6 +136232,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassExprField {
         #[doc = "Represents [`ClassExpr::ident`]"]
         Ident,
@@ -136599,6 +136246,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassMemberField {
         #[doc = "Represents [`ClassMember::Constructor`]"]
         Constructor,
@@ -136627,6 +136275,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassMethodField {
         #[doc = "Represents [`ClassMethod::span`]"]
         Span,
@@ -136659,6 +136308,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ClassPropField {
         #[doc = "Represents [`ClassProp::span`]"]
         Span,
@@ -136695,6 +136345,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ComputedPropNameField {
         #[doc = "Represents [`ComputedPropName::span`]"]
         Span,
@@ -136709,6 +136360,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum CondExprField {
         #[doc = "Represents [`CondExpr::span`]"]
         Span,
@@ -136731,6 +136383,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ConstructorField {
         #[doc = "Represents [`Constructor::span`]"]
         Span,
@@ -136755,6 +136408,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ContinueStmtField {
         #[doc = "Represents [`ContinueStmt::span`]"]
         Span,
@@ -136769,6 +136423,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DebuggerStmtField {
         #[doc = "Represents [`DebuggerStmt::span`]"]
         Span,
@@ -136780,6 +136435,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DeclField {
         #[doc = "Represents [`Decl::Class`]"]
         Class,
@@ -136806,6 +136462,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DecoratorField {
         #[doc = "Represents [`Decorator::span`]"]
         Span,
@@ -136819,6 +136476,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DefaultDeclField {
         #[doc = "Represents [`DefaultDecl::Class`]"]
         Class,
@@ -136835,6 +136493,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum DoWhileStmtField {
         #[doc = "Represents [`DoWhileStmt::span`]"]
         Span,
@@ -136851,40 +136510,10 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum EmptyStmtField {
         #[doc = "Represents [`EmptyStmt::span`]"]
         Span,
-    }
-    impl EsVersionField {
-        #[inline(always)]
-        pub(crate) fn set_index(&mut self, _: usize) {
-            swc_visit::wrong_ast_path();
-        }
-    }
-    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-    pub enum EsVersionField {
-        #[doc = "Represents [`EsVersion::Es3`]"]
-        Es3,
-        #[doc = "Represents [`EsVersion::Es5`]"]
-        Es5,
-        #[doc = "Represents [`EsVersion::Es2015`]"]
-        Es2015,
-        #[doc = "Represents [`EsVersion::Es2016`]"]
-        Es2016,
-        #[doc = "Represents [`EsVersion::Es2017`]"]
-        Es2017,
-        #[doc = "Represents [`EsVersion::Es2018`]"]
-        Es2018,
-        #[doc = "Represents [`EsVersion::Es2019`]"]
-        Es2019,
-        #[doc = "Represents [`EsVersion::Es2020`]"]
-        Es2020,
-        #[doc = "Represents [`EsVersion::Es2021`]"]
-        Es2021,
-        #[doc = "Represents [`EsVersion::Es2022`]"]
-        Es2022,
-        #[doc = "Represents [`EsVersion::EsNext`]"]
-        EsNext,
     }
     impl ExportAllField {
         pub(crate) fn set_index(&mut self, index: usize) {
@@ -136894,6 +136523,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportAllField {
         #[doc = "Represents [`ExportAll::span`]"]
         Span,
@@ -136912,6 +136542,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportDeclField {
         #[doc = "Represents [`ExportDecl::span`]"]
         Span,
@@ -136926,6 +136557,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportDefaultDeclField {
         #[doc = "Represents [`ExportDefaultDecl::span`]"]
         Span,
@@ -136940,6 +136572,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportDefaultExprField {
         #[doc = "Represents [`ExportDefaultExpr::span`]"]
         Span,
@@ -136954,6 +136587,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportDefaultSpecifierField {
         #[doc = "Represents [`ExportDefaultSpecifier::exported`]"]
         Exported,
@@ -136966,6 +136600,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportNamedSpecifierField {
         #[doc = "Represents [`ExportNamedSpecifier::span`]"]
         Span,
@@ -136984,6 +136619,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportNamespaceSpecifierField {
         #[doc = "Represents [`ExportNamespaceSpecifier::span`]"]
         Span,
@@ -136997,6 +136633,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExportSpecifierField {
         #[doc = "Represents [`ExportSpecifier::Namespace`]"]
         Namespace,
@@ -137012,6 +136649,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExprField {
         #[doc = "Represents [`Expr::This`]"]
         This,
@@ -137098,6 +136736,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExprOrSpreadField {
         #[doc = "Represents [`ExprOrSpread::spread`]"]
         Spread,
@@ -137112,6 +136751,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ExprStmtField {
         #[doc = "Represents [`ExprStmt::span`]"]
         Span,
@@ -137126,6 +136766,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FnDeclField {
         #[doc = "Represents [`FnDecl::ident`]"]
         Ident,
@@ -137142,6 +136783,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FnExprField {
         #[doc = "Represents [`FnExpr::ident`]"]
         Ident,
@@ -137155,6 +136797,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForHeadField {
         #[doc = "Represents [`ForHead::VarDecl`]"]
         VarDecl,
@@ -137171,6 +136814,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForInStmtField {
         #[doc = "Represents [`ForInStmt::span`]"]
         Span,
@@ -137189,6 +136833,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForOfStmtField {
         #[doc = "Represents [`ForOfStmt::span`]"]
         Span,
@@ -137209,6 +136854,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ForStmtField {
         #[doc = "Represents [`ForStmt::span`]"]
         Span,
@@ -137237,6 +136883,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum FunctionField {
         #[doc = "Represents [`Function::params`]"]
         Params(usize),
@@ -137265,6 +136912,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum GetterPropField {
         #[doc = "Represents [`GetterProp::span`]"]
         Span,
@@ -137283,6 +136931,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum IdentField {
         #[doc = "Represents [`Ident::span`]"]
         Span,
@@ -137301,6 +136950,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum IdentNameField {
         #[doc = "Represents [`IdentName::span`]"]
         Span,
@@ -137315,6 +136965,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum IfStmtField {
         #[doc = "Represents [`IfStmt::span`]"]
         Span,
@@ -137333,6 +136984,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportField {
         #[doc = "Represents [`Import::span`]"]
         Span,
@@ -137351,6 +137003,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportDeclField {
         #[doc = "Represents [`ImportDecl::span`]"]
         Span,
@@ -137373,6 +137026,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportDefaultSpecifierField {
         #[doc = "Represents [`ImportDefaultSpecifier::span`]"]
         Span,
@@ -137387,6 +137041,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportNamedSpecifierField {
         #[doc = "Represents [`ImportNamedSpecifier::span`]"]
         Span,
@@ -137404,6 +137059,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportPhaseField {
         #[doc = "Represents [`ImportPhase::Evaluation`]"]
         Evaluation,
@@ -137419,6 +137075,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportSpecifierField {
         #[doc = "Represents [`ImportSpecifier::Named`]"]
         Named,
@@ -137435,6 +137092,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportStarAsSpecifierField {
         #[doc = "Represents [`ImportStarAsSpecifier::span`]"]
         Span,
@@ -137453,6 +137111,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportWithField {
         #[doc = "Represents [`ImportWith::span`]"]
         Span,
@@ -137467,6 +137126,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ImportWithItemField {
         #[doc = "Represents [`ImportWithItem::key`]"]
         Key,
@@ -137481,6 +137141,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum InvalidField {
         #[doc = "Represents [`Invalid::span`]"]
         Span,
@@ -137493,6 +137154,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXAttrField {
         #[doc = "Represents [`JSXAttr::span`]"]
         Span,
@@ -137508,6 +137170,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXAttrNameField {
         #[doc = "Represents [`JSXAttrName::Ident`]"]
         Ident,
@@ -137521,6 +137184,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXAttrOrSpreadField {
         #[doc = "Represents [`JSXAttrOrSpread::JSXAttr`]"]
         Jsxattr,
@@ -137534,6 +137198,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXAttrValueField {
         #[doc = "Represents [`JSXAttrValue::Lit`]"]
         Lit,
@@ -137552,6 +137217,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXClosingElementField {
         #[doc = "Represents [`JSXClosingElement::span`]"]
         Span,
@@ -137566,6 +137232,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXClosingFragmentField {
         #[doc = "Represents [`JSXClosingFragment::span`]"]
         Span,
@@ -137582,6 +137249,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXElementField {
         #[doc = "Represents [`JSXElement::span`]"]
         Span,
@@ -137599,6 +137267,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXElementChildField {
         #[doc = "Represents [`JSXElementChild::JSXText`]"]
         Jsxtext,
@@ -137618,6 +137287,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXElementNameField {
         #[doc = "Represents [`JSXElementName::Ident`]"]
         Ident,
@@ -137634,6 +137304,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXEmptyExprField {
         #[doc = "Represents [`JSXEmptyExpr::span`]"]
         Span,
@@ -137645,6 +137316,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXExprField {
         #[doc = "Represents [`JSXExpr::JSXEmptyExpr`]"]
         JsxemptyExpr,
@@ -137659,6 +137331,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXExprContainerField {
         #[doc = "Represents [`JSXExprContainer::span`]"]
         Span,
@@ -137677,6 +137350,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXFragmentField {
         #[doc = "Represents [`JSXFragment::span`]"]
         Span,
@@ -137695,6 +137369,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXMemberExprField {
         #[doc = "Represents [`JSXMemberExpr::span`]"]
         Span,
@@ -137711,6 +137386,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXNamespacedNameField {
         #[doc = "Represents [`JSXNamespacedName::span`]"]
         Span,
@@ -137726,6 +137402,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXObjectField {
         #[doc = "Represents [`JSXObject::JSXMemberExpr`]"]
         JsxmemberExpr,
@@ -137744,6 +137421,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXOpeningElementField {
         #[doc = "Represents [`JSXOpeningElement::name`]"]
         Name,
@@ -137764,6 +137442,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXOpeningFragmentField {
         #[doc = "Represents [`JSXOpeningFragment::span`]"]
         Span,
@@ -137776,6 +137455,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXSpreadChildField {
         #[doc = "Represents [`JSXSpreadChild::span`]"]
         Span,
@@ -137790,6 +137470,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum JSXTextField {
         #[doc = "Represents [`JSXText::span`]"]
         Span,
@@ -137805,6 +137486,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyField {
         #[doc = "Represents [`Key::Private`]"]
         Private,
@@ -137819,6 +137501,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyValuePatPropField {
         #[doc = "Represents [`KeyValuePatProp::key`]"]
         Key,
@@ -137833,6 +137516,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum KeyValuePropField {
         #[doc = "Represents [`KeyValueProp::key`]"]
         Key,
@@ -137847,6 +137531,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LabeledStmtField {
         #[doc = "Represents [`LabeledStmt::span`]"]
         Span,
@@ -137862,6 +137547,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum LitField {
         #[doc = "Represents [`Lit::Str`]"]
         Str,
@@ -137886,6 +137572,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MemberExprField {
         #[doc = "Represents [`MemberExpr::span`]"]
         Span,
@@ -137901,6 +137588,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MemberPropField {
         #[doc = "Represents [`MemberProp::Ident`]"]
         Ident,
@@ -137917,6 +137605,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MetaPropExprField {
         #[doc = "Represents [`MetaPropExpr::span`]"]
         Span,
@@ -137930,6 +137619,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MetaPropKindField {
         #[doc = "Represents [`MetaPropKind::NewTarget`]"]
         NewTarget,
@@ -137943,6 +137633,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MethodKindField {
         #[doc = "Represents [`MethodKind::Method`]"]
         Method,
@@ -137959,6 +137650,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum MethodPropField {
         #[doc = "Represents [`MethodProp::key`]"]
         Key,
@@ -137977,6 +137669,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ModuleField {
         #[doc = "Represents [`Module::span`]"]
         Span,
@@ -137992,6 +137685,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ModuleDeclField {
         #[doc = "Represents [`ModuleDecl::Import`]"]
         Import,
@@ -138019,6 +137713,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ModuleExportNameField {
         #[doc = "Represents [`ModuleExportName::Ident`]"]
         Ident,
@@ -138032,6 +137727,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ModuleItemField {
         #[doc = "Represents [`ModuleItem::ModuleDecl`]"]
         ModuleDecl,
@@ -138050,6 +137746,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NamedExportField {
         #[doc = "Represents [`NamedExport::span`]"]
         Span,
@@ -138074,6 +137771,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NewExprField {
         #[doc = "Represents [`NewExpr::span`]"]
         Span,
@@ -138094,6 +137792,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NullField {
         #[doc = "Represents [`Null::span`]"]
         Span,
@@ -138106,6 +137805,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum NumberField {
         #[doc = "Represents [`Number::span`]"]
         Span,
@@ -138126,6 +137826,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ObjectLitField {
         #[doc = "Represents [`ObjectLit::span`]"]
         Span,
@@ -138144,6 +137845,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ObjectPatField {
         #[doc = "Represents [`ObjectPat::span`]"]
         Span,
@@ -138161,6 +137863,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ObjectPatPropField {
         #[doc = "Represents [`ObjectPatProp::KeyValue`]"]
         KeyValue,
@@ -138181,6 +137884,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum OptCallField {
         #[doc = "Represents [`OptCall::span`]"]
         Span,
@@ -138200,6 +137904,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum OptChainBaseField {
         #[doc = "Represents [`OptChainBase::Member`]"]
         Member,
@@ -138214,6 +137919,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum OptChainExprField {
         #[doc = "Represents [`OptChainExpr::span`]"]
         Span,
@@ -138234,6 +137940,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ParamField {
         #[doc = "Represents [`Param::span`]"]
         Span,
@@ -138249,6 +137956,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ParamOrTsParamPropField {
         #[doc = "Represents [`ParamOrTsParamProp::TsParamProp`]"]
         TsParamProp,
@@ -138263,6 +137971,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ParenExprField {
         #[doc = "Represents [`ParenExpr::span`]"]
         Span,
@@ -138276,6 +137985,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PatField {
         #[doc = "Represents [`Pat::Ident`]"]
         Ident,
@@ -138300,6 +138010,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PrivateMethodField {
         #[doc = "Represents [`PrivateMethod::span`]"]
         Span,
@@ -138328,6 +138039,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PrivateNameField {
         #[doc = "Represents [`PrivateName::span`]"]
         Span,
@@ -138346,6 +138058,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PrivatePropField {
         #[doc = "Represents [`PrivateProp::span`]"]
         Span,
@@ -138379,6 +138092,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ProgramField {
         #[doc = "Represents [`Program::Module`]"]
         Module,
@@ -138392,6 +138106,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PropField {
         #[doc = "Represents [`Prop::Shorthand`]"]
         Shorthand,
@@ -138413,6 +138128,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PropNameField {
         #[doc = "Represents [`PropName::Ident`]"]
         Ident,
@@ -138432,6 +138148,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum PropOrSpreadField {
         #[doc = "Represents [`PropOrSpread::Spread`]"]
         Spread,
@@ -138446,6 +138163,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum RegexField {
         #[doc = "Represents [`Regex::span`]"]
         Span,
@@ -138462,6 +138180,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum RestPatField {
         #[doc = "Represents [`RestPat::span`]"]
         Span,
@@ -138480,6 +138199,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ReturnStmtField {
         #[doc = "Represents [`ReturnStmt::span`]"]
         Span,
@@ -138498,6 +138218,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ScriptField {
         #[doc = "Represents [`Script::span`]"]
         Span,
@@ -138518,6 +138239,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SeqExprField {
         #[doc = "Represents [`SeqExpr::span`]"]
         Span,
@@ -138532,6 +138254,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SetterPropField {
         #[doc = "Represents [`SetterProp::span`]"]
         Span,
@@ -138551,6 +138274,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SimpleAssignTargetField {
         #[doc = "Represents [`SimpleAssignTarget::Ident`]"]
         Ident,
@@ -138583,6 +138307,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SpreadElementField {
         #[doc = "Represents [`SpreadElement::dot3_token`]"]
         Dot3Token,
@@ -138597,6 +138322,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum StaticBlockField {
         #[doc = "Represents [`StaticBlock::span`]"]
         Span,
@@ -138610,6 +138336,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum StmtField {
         #[doc = "Represents [`Stmt::Block`]"]
         Block,
@@ -138658,6 +138385,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum StrField {
         #[doc = "Represents [`Str::span`]"]
         Span,
@@ -138674,6 +138402,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SuperField {
         #[doc = "Represents [`Super::span`]"]
         Span,
@@ -138685,6 +138414,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SuperPropField {
         #[doc = "Represents [`SuperProp::Ident`]"]
         Ident,
@@ -138699,6 +138429,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SuperPropExprField {
         #[doc = "Represents [`SuperPropExpr::span`]"]
         Span,
@@ -138719,6 +138450,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SwitchCaseField {
         #[doc = "Represents [`SwitchCase::span`]"]
         Span,
@@ -138739,6 +138471,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum SwitchStmtField {
         #[doc = "Represents [`SwitchStmt::span`]"]
         Span,
@@ -138755,6 +138488,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TaggedTplField {
         #[doc = "Represents [`TaggedTpl::span`]"]
         Span,
@@ -138775,6 +138509,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ThisExprField {
         #[doc = "Represents [`ThisExpr::span`]"]
         Span,
@@ -138787,6 +138522,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum ThrowStmtField {
         #[doc = "Represents [`ThrowStmt::span`]"]
         Span,
@@ -138809,6 +138545,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TplField {
         #[doc = "Represents [`Tpl::span`]"]
         Span,
@@ -138825,6 +138562,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TplElementField {
         #[doc = "Represents [`TplElement::span`]"]
         Span,
@@ -138842,6 +138580,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TruePlusMinusField {
         #[doc = "Represents [`TruePlusMinus::True`]"]
         True,
@@ -138858,6 +138597,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TryStmtField {
         #[doc = "Represents [`TryStmt::span`]"]
         Span,
@@ -138876,6 +138616,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsArrayTypeField {
         #[doc = "Represents [`TsArrayType::span`]"]
         Span,
@@ -138890,6 +138631,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsAsExprField {
         #[doc = "Represents [`TsAsExpr::span`]"]
         Span,
@@ -138910,6 +138652,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsCallSignatureDeclField {
         #[doc = "Represents [`TsCallSignatureDecl::span`]"]
         Span,
@@ -138928,6 +138671,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsConditionalTypeField {
         #[doc = "Represents [`TsConditionalType::span`]"]
         Span,
@@ -138948,6 +138692,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsConstAssertionField {
         #[doc = "Represents [`TsConstAssertion::span`]"]
         Span,
@@ -138966,6 +138711,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsConstructSignatureDeclField {
         #[doc = "Represents [`TsConstructSignatureDecl::span`]"]
         Span,
@@ -138988,6 +138734,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsConstructorTypeField {
         #[doc = "Represents [`TsConstructorType::span`]"]
         Span,
@@ -139007,6 +138754,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsEntityNameField {
         #[doc = "Represents [`TsEntityName::TsQualifiedName`]"]
         TsQualifiedName,
@@ -139025,6 +138773,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsEnumDeclField {
         #[doc = "Represents [`TsEnumDecl::span`]"]
         Span,
@@ -139045,6 +138794,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsEnumMemberField {
         #[doc = "Represents [`TsEnumMember::span`]"]
         Span,
@@ -139060,6 +138810,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsEnumMemberIdField {
         #[doc = "Represents [`TsEnumMemberId::Ident`]"]
         Ident,
@@ -139074,6 +138825,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsExportAssignmentField {
         #[doc = "Represents [`TsExportAssignment::span`]"]
         Span,
@@ -139088,6 +138840,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsExprWithTypeArgsField {
         #[doc = "Represents [`TsExprWithTypeArgs::span`]"]
         Span,
@@ -139104,6 +138857,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsExternalModuleRefField {
         #[doc = "Represents [`TsExternalModuleRef::span`]"]
         Span,
@@ -139117,6 +138871,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsFnOrConstructorTypeField {
         #[doc = "Represents [`TsFnOrConstructorType::TsFnType`]"]
         TsFnType,
@@ -139130,6 +138885,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsFnParamField {
         #[doc = "Represents [`TsFnParam::Ident`]"]
         Ident,
@@ -139152,6 +138908,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsFnTypeField {
         #[doc = "Represents [`TsFnType::span`]"]
         Span,
@@ -139170,6 +138927,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsGetterSignatureField {
         #[doc = "Represents [`TsGetterSignature::span`]"]
         Span,
@@ -139188,6 +138946,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsImportEqualsDeclField {
         #[doc = "Represents [`TsImportEqualsDecl::span`]"]
         Span,
@@ -139208,6 +138967,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsImportTypeField {
         #[doc = "Represents [`TsImportType::span`]"]
         Span,
@@ -139230,6 +138990,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsIndexSignatureField {
         #[doc = "Represents [`TsIndexSignature::params`]"]
         Params(usize),
@@ -139250,6 +139011,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsIndexedAccessTypeField {
         #[doc = "Represents [`TsIndexedAccessType::span`]"]
         Span,
@@ -139268,6 +139030,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsInferTypeField {
         #[doc = "Represents [`TsInferType::span`]"]
         Span,
@@ -139282,6 +139045,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsInstantiationField {
         #[doc = "Represents [`TsInstantiation::span`]"]
         Span,
@@ -139302,6 +139066,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsInterfaceBodyField {
         #[doc = "Represents [`TsInterfaceBody::span`]"]
         Span,
@@ -139320,6 +139085,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsInterfaceDeclField {
         #[doc = "Represents [`TsInterfaceDecl::span`]"]
         Span,
@@ -139346,6 +139112,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsIntersectionTypeField {
         #[doc = "Represents [`TsIntersectionType::span`]"]
         Span,
@@ -139360,6 +139127,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsKeywordTypeField {
         #[doc = "Represents [`TsKeywordType::span`]"]
         Span,
@@ -139373,6 +139141,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsKeywordTypeKindField {
         #[doc = "Represents [`TsKeywordTypeKind::TsAnyKeyword`]"]
         TsAnyKeyword,
@@ -139408,6 +139177,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsLitField {
         #[doc = "Represents [`TsLit::Number`]"]
         Number,
@@ -139428,6 +139198,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsLitTypeField {
         #[doc = "Represents [`TsLitType::span`]"]
         Span,
@@ -139442,6 +139213,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsMappedTypeField {
         #[doc = "Represents [`TsMappedType::span`]"]
         Span,
@@ -139468,6 +139240,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsMethodSignatureField {
         #[doc = "Represents [`TsMethodSignature::span`]"]
         Span,
@@ -139496,6 +139269,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsModuleBlockField {
         #[doc = "Represents [`TsModuleBlock::span`]"]
         Span,
@@ -139510,6 +139284,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsModuleDeclField {
         #[doc = "Represents [`TsModuleDecl::span`]"]
         Span,
@@ -139529,6 +139304,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsModuleNameField {
         #[doc = "Represents [`TsModuleName::Ident`]"]
         Ident,
@@ -139542,6 +139318,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsModuleRefField {
         #[doc = "Represents [`TsModuleRef::TsEntityName`]"]
         TsEntityName,
@@ -139555,6 +139332,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsNamespaceBodyField {
         #[doc = "Represents [`TsNamespaceBody::TsModuleBlock`]"]
         TsModuleBlock,
@@ -139569,6 +139347,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsNamespaceDeclField {
         #[doc = "Represents [`TsNamespaceDecl::span`]"]
         Span,
@@ -139589,6 +139368,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsNamespaceExportDeclField {
         #[doc = "Represents [`TsNamespaceExportDecl::span`]"]
         Span,
@@ -139603,6 +139383,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsNonNullExprField {
         #[doc = "Represents [`TsNonNullExpr::span`]"]
         Span,
@@ -139617,6 +139398,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsOptionalTypeField {
         #[doc = "Represents [`TsOptionalType::span`]"]
         Span,
@@ -139635,6 +139417,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsParamPropField {
         #[doc = "Represents [`TsParamProp::span`]"]
         Span,
@@ -139656,6 +139439,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsParamPropParamField {
         #[doc = "Represents [`TsParamPropParam::Ident`]"]
         Ident,
@@ -139670,6 +139454,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsParenthesizedTypeField {
         #[doc = "Represents [`TsParenthesizedType::span`]"]
         Span,
@@ -139684,6 +139469,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsPropertySignatureField {
         #[doc = "Represents [`TsPropertySignature::span`]"]
         Span,
@@ -139706,6 +139492,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsQualifiedNameField {
         #[doc = "Represents [`TsQualifiedName::span`]"]
         Span,
@@ -139722,6 +139509,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsRestTypeField {
         #[doc = "Represents [`TsRestType::span`]"]
         Span,
@@ -139736,6 +139524,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsSatisfiesExprField {
         #[doc = "Represents [`TsSatisfiesExpr::span`]"]
         Span,
@@ -139752,6 +139541,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsSetterSignatureField {
         #[doc = "Represents [`TsSetterSignature::span`]"]
         Span,
@@ -139770,6 +139560,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsThisTypeField {
         #[doc = "Represents [`TsThisType::span`]"]
         Span,
@@ -139781,6 +139572,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsThisTypeOrIdentField {
         #[doc = "Represents [`TsThisTypeOrIdent::TsThisType`]"]
         TsThisType,
@@ -139803,6 +139595,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTplLitTypeField {
         #[doc = "Represents [`TsTplLitType::span`]"]
         Span,
@@ -139819,6 +139612,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTupleElementField {
         #[doc = "Represents [`TsTupleElement::span`]"]
         Span,
@@ -139839,6 +139633,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTupleTypeField {
         #[doc = "Represents [`TsTupleType::span`]"]
         Span,
@@ -139852,6 +139647,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeField {
         #[doc = "Represents [`TsType::TsKeywordType`]"]
         TsKeywordType,
@@ -139902,6 +139698,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeAliasDeclField {
         #[doc = "Represents [`TsTypeAliasDecl::span`]"]
         Span,
@@ -139922,6 +139719,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeAnnField {
         #[doc = "Represents [`TsTypeAnn::span`]"]
         Span,
@@ -139936,6 +139734,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeAssertionField {
         #[doc = "Represents [`TsTypeAssertion::span`]"]
         Span,
@@ -139951,6 +139750,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeElementField {
         #[doc = "Represents [`TsTypeElement::TsCallSignatureDecl`]"]
         TsCallSignatureDecl,
@@ -139979,6 +139779,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeLitField {
         #[doc = "Represents [`TsTypeLit::span`]"]
         Span,
@@ -139993,6 +139794,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeOperatorField {
         #[doc = "Represents [`TsTypeOperator::span`]"]
         Span,
@@ -140008,6 +139810,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeOperatorOpField {
         #[doc = "Represents [`TsTypeOperatorOp::KeyOf`]"]
         KeyOf,
@@ -140024,6 +139827,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeParamField {
         #[doc = "Represents [`TsTypeParam::span`]"]
         Span,
@@ -140052,6 +139856,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeParamDeclField {
         #[doc = "Represents [`TsTypeParamDecl::span`]"]
         Span,
@@ -140070,6 +139875,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeParamInstantiationField {
         #[doc = "Represents [`TsTypeParamInstantiation::span`]"]
         Span,
@@ -140084,6 +139890,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypePredicateField {
         #[doc = "Represents [`TsTypePredicate::span`]"]
         Span,
@@ -140102,6 +139909,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeQueryField {
         #[doc = "Represents [`TsTypeQuery::span`]"]
         Span,
@@ -140117,6 +139925,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeQueryExprField {
         #[doc = "Represents [`TsTypeQueryExpr::TsEntityName`]"]
         TsEntityName,
@@ -140131,6 +139940,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsTypeRefField {
         #[doc = "Represents [`TsTypeRef::span`]"]
         Span,
@@ -140146,6 +139956,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsUnionOrIntersectionTypeField {
         #[doc = "Represents [`TsUnionOrIntersectionType::TsUnionType`]"]
         TsUnionType,
@@ -140164,6 +139975,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum TsUnionTypeField {
         #[doc = "Represents [`TsUnionType::span`]"]
         Span,
@@ -140178,6 +139990,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UnaryExprField {
         #[doc = "Represents [`UnaryExpr::span`]"]
         Span,
@@ -140193,6 +140006,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UnaryOpField {
         #[doc = "Represents [`UnaryOp::Minus`]"]
         Minus,
@@ -140217,6 +140031,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UpdateExprField {
         #[doc = "Represents [`UpdateExpr::span`]"]
         Span,
@@ -140234,6 +140049,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UpdateOpField {
         #[doc = "Represents [`UpdateOp::PlusPlus`]"]
         PlusPlus,
@@ -140252,6 +140068,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum UsingDeclField {
         #[doc = "Represents [`UsingDecl::span`]"]
         Span,
@@ -140272,6 +140089,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum VarDeclField {
         #[doc = "Represents [`VarDecl::span`]"]
         Span,
@@ -140291,6 +140109,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum VarDeclKindField {
         #[doc = "Represents [`VarDeclKind::Var`]"]
         Var,
@@ -140306,6 +140125,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum VarDeclOrExprField {
         #[doc = "Represents [`VarDeclOrExpr::VarDecl`]"]
         VarDecl,
@@ -140320,6 +140140,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum VarDeclaratorField {
         #[doc = "Represents [`VarDeclarator::span`]"]
         Span,
@@ -140338,6 +140159,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum WhileStmtField {
         #[doc = "Represents [`WhileStmt::span`]"]
         Span,
@@ -140354,6 +140176,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum WithStmtField {
         #[doc = "Represents [`WithStmt::span`]"]
         Span,
@@ -140370,6 +140193,7 @@ pub mod fields {
         }
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum YieldExprField {
         #[doc = "Represents [`YieldExpr::span`]"]
         Span,
@@ -140379,6 +140203,7 @@ pub mod fields {
         Delegate,
     }
     #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
     pub enum AstParentKind {
         Accessibility(AccessibilityField),
         ArrayLit(ArrayLitField),
@@ -140420,7 +140245,6 @@ pub mod fields {
         DefaultDecl(DefaultDeclField),
         DoWhileStmt(DoWhileStmtField),
         EmptyStmt(EmptyStmtField),
-        EsVersion(EsVersionField),
         ExportAll(ExportAllField),
         ExportDecl(ExportDeclField),
         ExportDefaultDecl(ExportDefaultDeclField),
@@ -140661,7 +140485,6 @@ pub mod fields {
                 Self::DefaultDecl(v) => v.set_index(index),
                 Self::DoWhileStmt(v) => v.set_index(index),
                 Self::EmptyStmt(v) => v.set_index(index),
-                Self::EsVersion(v) => v.set_index(index),
                 Self::ExportAll(v) => v.set_index(index),
                 Self::ExportDecl(v) => v.set_index(index),
                 Self::ExportDefaultDecl(v) => v.set_index(index),
@@ -140902,7 +140725,6 @@ pub mod fields {
         DefaultDecl(&'ast DefaultDecl, DefaultDeclField),
         DoWhileStmt(&'ast DoWhileStmt, DoWhileStmtField),
         EmptyStmt(&'ast EmptyStmt, EmptyStmtField),
-        EsVersion(&'ast EsVersion, EsVersionField),
         ExportAll(&'ast ExportAll, ExportAllField),
         ExportDecl(&'ast ExportDecl, ExportDeclField),
         ExportDefaultDecl(&'ast ExportDefaultDecl, ExportDefaultDeclField),
@@ -141161,7 +140983,6 @@ pub mod fields {
                 Self::DefaultDecl(_, __field_kind) => __field_kind.set_index(index),
                 Self::DoWhileStmt(_, __field_kind) => __field_kind.set_index(index),
                 Self::EmptyStmt(_, __field_kind) => __field_kind.set_index(index),
-                Self::EsVersion(_, __field_kind) => __field_kind.set_index(index),
                 Self::ExportAll(_, __field_kind) => __field_kind.set_index(index),
                 Self::ExportDecl(_, __field_kind) => __field_kind.set_index(index),
                 Self::ExportDefaultDecl(_, __field_kind) => __field_kind.set_index(index),
@@ -141411,7 +141232,6 @@ pub mod fields {
                 Self::DefaultDecl(_, __field_kind) => AstParentKind::DefaultDecl(*__field_kind),
                 Self::DoWhileStmt(_, __field_kind) => AstParentKind::DoWhileStmt(*__field_kind),
                 Self::EmptyStmt(_, __field_kind) => AstParentKind::EmptyStmt(*__field_kind),
-                Self::EsVersion(_, __field_kind) => AstParentKind::EsVersion(*__field_kind),
                 Self::ExportAll(_, __field_kind) => AstParentKind::ExportAll(*__field_kind),
                 Self::ExportDecl(_, __field_kind) => AstParentKind::ExportDecl(*__field_kind),
                 Self::ExportDefaultDecl(_, __field_kind) => {
@@ -141941,11 +141761,6 @@ impl<'ast> From<&'ast DoWhileStmt> for NodeRef<'ast> {
 impl<'ast> From<&'ast EmptyStmt> for NodeRef<'ast> {
     fn from(node: &'ast EmptyStmt) -> Self {
         NodeRef::EmptyStmt(node)
-    }
-}
-impl<'ast> From<&'ast EsVersion> for NodeRef<'ast> {
-    fn from(node: &'ast EsVersion) -> Self {
-        NodeRef::EsVersion(node)
     }
 }
 impl<'ast> From<&'ast ExportAll> for NodeRef<'ast> {
@@ -142965,7 +142780,6 @@ pub enum NodeRef<'ast> {
     DefaultDecl(&'ast DefaultDecl),
     DoWhileStmt(&'ast DoWhileStmt),
     EmptyStmt(&'ast EmptyStmt),
-    EsVersion(&'ast EsVersion),
     ExportAll(&'ast ExportAll),
     ExportDecl(&'ast ExportDecl),
     ExportDefaultDecl(&'ast ExportDefaultDecl),
@@ -143595,9 +143409,6 @@ impl<'ast> NodeRef<'ast> {
                 let iterator = ::std::iter::empty::<NodeRef<'ast>>();
                 Box::new(iterator)
             }
-            NodeRef::EsVersion(node) => match node {
-                _ => Box::new(::std::iter::empty::<NodeRef<'ast>>()),
-            },
             NodeRef::ExportAll(node) => {
                 let iterator = ::std::iter::empty::<NodeRef<'ast>>()
                     .chain({

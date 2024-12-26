@@ -59,7 +59,6 @@ impl<I: Tokens> Parser<I> {
     }
 
     /// `tsIsListTerminator`
-
     fn is_ts_list_terminator(&mut self, kind: ParsingContext) -> PResult<bool> {
         debug_assert!(self.input.syntax().typescript());
 
@@ -714,11 +713,17 @@ impl<I: Tokens> Parser<I> {
     pub(super) fn next_then_parse_ts_type(&mut self) -> PResult<Box<TsType>> {
         debug_assert!(self.input.syntax().typescript());
 
-        self.in_type().parse_with(|p| {
+        let result = self.in_type().parse_with(|p| {
             bump!(p);
 
             p.parse_ts_type()
-        })
+        });
+
+        if !self.ctx().in_type && is_one_of!(self, '>', '<') {
+            self.input.merge_lt_gt();
+        }
+
+        result
     }
 
     /// `tsParseEnumMember`
