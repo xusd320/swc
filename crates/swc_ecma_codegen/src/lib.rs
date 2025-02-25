@@ -5,11 +5,12 @@
 #![allow(clippy::nonminimal_bool)]
 #![allow(non_local_definitions)]
 
-use std::{borrow::Cow, fmt::Write, io};
+use std::{borrow::Cow, fmt::Write, io, ops::Deref, str};
 
+use ascii::AsciiChar;
+use compact_str::{format_compact, CompactString};
 use memchr::memmem::Finder;
 use once_cell::sync::Lazy;
-use swc_allocator::maybe::vec::Vec;
 use swc_atoms::Atom;
 use swc_common::{
     comments::{CommentKind, Comments},
@@ -107,7 +108,23 @@ where
     pub wr: W,
 }
 
-fn replace_close_inline_script(raw: &str) -> Cow<str> {
+enum CowStr<'a> {
+    Borrowed(&'a str),
+    Owned(CompactString),
+}
+
+impl Deref for CowStr<'_> {
+    type Target = str;
+
+    fn deref(&self) -> &str {
+        match self {
+            CowStr::Borrowed(s) => s,
+            CowStr::Owned(s) => s.as_str(),
+        }
+    }
+}
+
+fn replace_close_inline_script(raw: &str) -> CowStr {
     let chars = raw.as_bytes();
     let pattern_len = 8; // </script>
 
@@ -127,16 +144,16 @@ fn replace_close_inline_script(raw: &str) -> Cow<str> {
         .peekable();
 
     if matched_indexes.peek().is_none() {
-        return Cow::Borrowed(raw);
+        return CowStr::Borrowed(raw);
     }
 
-    let mut result = String::from(raw);
+    let mut result = CompactString::new(raw);
 
     for (offset, i) in matched_indexes.enumerate() {
         result.insert(i + 1 + offset, '\\');
     }
 
-    Cow::Owned(result)
+    CowStr::Owned(result)
 }
 
 static NEW_LINE_TPL_REGEX: Lazy<regex::Regex> = Lazy::new(|| regex::Regex::new(r"\\n|\n").unwrap());
@@ -680,15 +697,26 @@ where
             }
         }
 
-        let mut value = get_quoted_utf16(&node.value, self.cfg.ascii_only, target);
+        let (quote_char, mut value) = get_quoted_utf16(&node.value, self.cfg.ascii_only, target);
 
         if self.cfg.inline_script {
-            value = replace_close_inline_script(&value)
-                .replace("\x3c!--", "\\x3c!--")
-                .replace("--\x3e", "--\\x3e");
+            value = CowStr::Owned(
+                replace_close_inline_script(&value)
+                    .replace("\x3c!--", "\\x3c!--")
+                    .replace("--\x3e", "--\\x3e")
+                    .into(),
+            );
         }
 
+        let quote_str = [quote_char.as_byte()];
+        let quote_str = unsafe {
+            // Safety: quote_char is valid ascii
+            str::from_utf8_unchecked(&quote_str)
+        };
+
+        self.wr.write_str(quote_str)?;
         self.wr.write_str_lit(DUMMY_SP, &value)?;
+        self.wr.write_str(quote_str)?;
 
         // srcmap!(node, false);
     }
@@ -2899,11 +2927,14 @@ where
         srcmap!(node, true);
 
         punct!("[");
-        self.emit_list(
-            node.span(),
-            Some(&node.elems),
-            ListFormat::ArrayBindingPatternElements,
-        )?;
+
+        let mut format = ListFormat::ArrayBindingPatternElements;
+
+        if let Some(None) = node.elems.last() {
+            format |= ListFormat::ForceTrailingComma;
+        }
+
+        self.emit_list(node.span(), Some(&node.elems), format)?;
         punct!("]");
         if node.optional {
             punct!("?");
@@ -3042,6 +3073,10 @@ where
             Stmt::ForIn(ref e) => emit!(e),
             Stmt::ForOf(ref e) => emit!(e),
             Stmt::Decl(Decl::Var(e)) => {
+                emit!(e);
+                semi!();
+            }
+            Stmt::Decl(e @ Decl::Using(..)) => {
                 emit!(e);
                 semi!();
             }
@@ -3947,13 +3982,13 @@ fn get_template_element_from_raw(s: &str, ascii_only: bool) -> String {
     buf
 }
 
-fn get_ascii_only_ident(sym: &str, may_need_quote: bool, target: EsVersion) -> Cow<str> {
+fn get_ascii_only_ident(sym: &str, may_need_quote: bool, target: EsVersion) -> CowStr {
     if sym.is_ascii() {
-        return Cow::Borrowed(sym);
+        return CowStr::Borrowed(sym);
     }
 
     let mut first = true;
-    let mut buf = String::with_capacity(sym.len() + 8);
+    let mut buf = CompactString::with_capacity(sym.len() + 8);
     let mut iter = sym.chars().peekable();
     let mut need_quote = false;
 
@@ -4115,19 +4150,83 @@ fn get_ascii_only_ident(sym: &str, may_need_quote: bool, target: EsVersion) -> C
     }
 
     if need_quote {
-        Cow::Owned(format!("\"{}\"", buf))
+        CowStr::Owned(format_compact!("\"{}\"", buf))
     } else {
-        Cow::Owned(buf)
+        CowStr::Owned(buf)
     }
 }
 
-fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
-    let mut buf = String::with_capacity(v.len() + 2);
+/// Returns `(quote_char, value)`
+fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> (AsciiChar, CowStr) {
+    // Fast path: If the string is ASCII and doesn't need escaping, we can avoid
+    // allocation
+    if v.is_ascii() {
+        let mut needs_escaping = false;
+        let mut single_quote_count = 0;
+        let mut double_quote_count = 0;
+
+        for &b in v.as_bytes() {
+            match b {
+                b'\'' => single_quote_count += 1,
+                b'"' => double_quote_count += 1,
+                // Control characters and backslash need escaping
+                0..=0x1f | b'\\' => {
+                    needs_escaping = true;
+                    break;
+                }
+                _ => {}
+            }
+        }
+
+        if !needs_escaping {
+            let quote_char = if double_quote_count > single_quote_count {
+                AsciiChar::Apostrophe
+            } else {
+                AsciiChar::Quotation
+            };
+
+            // If there are no quotes to escape, we can return the original string
+            if (quote_char == AsciiChar::Apostrophe && single_quote_count == 0)
+                || (quote_char == AsciiChar::Quotation && double_quote_count == 0)
+            {
+                return (quote_char, CowStr::Borrowed(v));
+            }
+        }
+    }
+
+    // Slow path: Original implementation for strings that need processing
+    // Count quotes first to determine which quote character to use
+    let (mut single_quote_count, mut double_quote_count) = (0, 0);
+    for c in v.chars() {
+        match c {
+            '\'' => single_quote_count += 1,
+            '"' => double_quote_count += 1,
+            _ => {}
+        }
+    }
+
+    // Pre-calculate capacity to avoid reallocations
+    let quote_char = if double_quote_count > single_quote_count {
+        AsciiChar::Apostrophe
+    } else {
+        AsciiChar::Quotation
+    };
+    let escape_char = if quote_char == AsciiChar::Apostrophe {
+        AsciiChar::Apostrophe
+    } else {
+        AsciiChar::Quotation
+    };
+    let escape_count = if quote_char == AsciiChar::Apostrophe {
+        single_quote_count
+    } else {
+        double_quote_count
+    };
+
+    // Add 1 for each escaped quote
+    let capacity = v.len() + escape_count;
+    let mut buf = CompactString::with_capacity(capacity);
+
     let mut iter = v.chars().peekable();
-
-    let mut single_quote_count = 0;
-    let mut double_quote_count = 0;
-
     while let Some(c) = iter.next() {
         match c {
             '\x00' => {
@@ -4145,12 +4244,9 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
             '\t' => buf.push('\t'),
             '\\' => {
                 let next = iter.peek();
-
                 match next {
-                    // TODO fix me - workaround for surrogate pairs
                     Some('u') => {
                         let mut inner_iter = iter.clone();
-
                         inner_iter.next();
 
                         let mut is_curly = false;
@@ -4158,7 +4254,6 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
 
                         if next == Some(&'{') {
                             is_curly = true;
-
                             inner_iter.next();
                             next = inner_iter.peek();
                         } else if next != Some(&'D') && next != Some(&'d') {
@@ -4166,8 +4261,7 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
                         }
 
                         if let Some(c @ 'D' | c @ 'd') = next {
-                            let mut inner_buf = String::new();
-
+                            let mut inner_buf = String::with_capacity(8);
                             inner_buf.push('\\');
                             inner_buf.push('u');
 
@@ -4176,21 +4270,17 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
                             }
 
                             inner_buf.push(*c);
-
                             inner_iter.next();
 
                             let mut is_valid = true;
-
                             for _ in 0..3 {
-                                let c = inner_iter.next();
-
-                                match c {
-                                    Some('0'..='9') | Some('a'..='f') | Some('A'..='F') => {
-                                        inner_buf.push(c.unwrap());
+                                match inner_iter.next() {
+                                    Some(c @ '0'..='9') | Some(c @ 'a'..='f')
+                                    | Some(c @ 'A'..='F') => {
+                                        inner_buf.push(c);
                                     }
                                     _ => {
                                         is_valid = false;
-
                                         break;
                                     }
                                 }
@@ -4208,29 +4298,23 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
 
                             if is_valid {
                                 let val_str = &inner_buf[range];
-
-                                let v = u32::from_str_radix(val_str, 16).unwrap_or_else(|err| {
-                                    unreachable!(
-                                        "failed to parse {} as a hex value: {:?}",
-                                        val_str, err
-                                    )
-                                });
-
-                                if v > 0xffff {
-                                    buf.push_str(&inner_buf);
-
-                                    let end = if is_curly { 7 } else { 5 };
-
-                                    for _ in 0..end {
-                                        iter.next();
+                                if let Ok(v) = u32::from_str_radix(val_str, 16) {
+                                    if v > 0xffff {
+                                        buf.push_str(&inner_buf);
+                                        let end = if is_curly { 7 } else { 5 };
+                                        for _ in 0..end {
+                                            iter.next();
+                                        }
+                                    } else if (0xd800..=0xdfff).contains(&v) {
+                                        buf.push('\\');
+                                    } else {
+                                        buf.push_str("\\\\");
                                     }
-                                } else if (0xd800..=0xdfff).contains(&v) {
-                                    buf.push('\\');
                                 } else {
                                     buf.push_str("\\\\");
                                 }
                             } else {
-                                buf.push_str("\\\\")
+                                buf.push_str("\\\\");
                             }
                         } else if is_curly {
                             buf.push_str("\\\\");
@@ -4238,66 +4322,48 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
                             buf.push('\\');
                         }
                     }
-                    _ => {
-                        buf.push_str("\\\\");
-                    }
+                    _ => buf.push_str("\\\\"),
                 }
             }
-            '\'' => {
-                single_quote_count += 1;
-                buf.push('\'');
-            }
-            '"' => {
-                double_quote_count += 1;
-                buf.push('"');
-            }
-            '\x01'..='\x0f' => {
-                let _ = write!(buf, "\\x0{:x}", c as u8);
-            }
-            '\x10'..='\x1f' => {
-                let _ = write!(buf, "\\x{:x}", c as u8);
-            }
-            '\x20'..='\x7e' => {
+            c if c == escape_char => {
+                buf.push('\\');
                 buf.push(c);
             }
+            '\x01'..='\x0f' => {
+                buf.push_str("\\x0");
+                write!(&mut buf, "{:x}", c as u8).unwrap();
+            }
+            '\x10'..='\x1f' => {
+                buf.push_str("\\x");
+                write!(&mut buf, "{:x}", c as u8).unwrap();
+            }
+            '\x20'..='\x7e' => buf.push(c),
             '\u{7f}'..='\u{ff}' => {
                 if ascii_only || target <= EsVersion::Es5 {
-                    let _ = write!(buf, "\\x{:x}", c as u8);
+                    buf.push_str("\\x");
+                    write!(&mut buf, "{:x}", c as u8).unwrap();
                 } else {
                     buf.push(c);
                 }
             }
-            '\u{2028}' => {
-                buf.push_str("\\u2028");
-            }
-            '\u{2029}' => {
-                buf.push_str("\\u2029");
-            }
-            '\u{FEFF}' => {
-                buf.push_str("\\uFEFF");
-            }
-            _ => {
+            '\u{2028}' => buf.push_str("\\u2028"),
+            '\u{2029}' => buf.push_str("\\u2029"),
+            '\u{FEFF}' => buf.push_str("\\uFEFF"),
+            c => {
                 if c.is_ascii() {
                     buf.push(c);
                 } else if c > '\u{FFFF}' {
-                    // if we've got this far the char isn't reserved and if the callee has specified
-                    // we should output unicode for non-ascii chars then we have
-                    // to make sure we output unicode that is safe for the target
-                    // Es5 does not support code point escapes and so surrograte formula must be
-                    // used
                     if target <= EsVersion::Es5 {
-                        // https://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
                         let h = ((c as u32 - 0x10000) / 0x400) + 0xd800;
                         let l = (c as u32 - 0x10000) % 0x400 + 0xdc00;
-
-                        let _ = write!(buf, "\\u{:04X}\\u{:04X}", h, l);
+                        write!(&mut buf, "\\u{:04X}\\u{:04X}", h, l).unwrap();
                     } else if ascii_only {
-                        let _ = write!(buf, "\\u{{{:04X}}}", c as u32);
+                        write!(&mut buf, "\\u{{{:04X}}}", c as u32).unwrap();
                     } else {
                         buf.push(c);
                     }
                 } else if ascii_only {
-                    let _ = write!(buf, "\\u{:04X}", c as u16);
+                    write!(&mut buf, "\\u{:04X}", c as u16).unwrap();
                 } else {
                     buf.push(c);
                 }
@@ -4305,11 +4371,7 @@ fn get_quoted_utf16(v: &str, ascii_only: bool, target: EsVersion) -> String {
         }
     }
 
-    if double_quote_count > single_quote_count {
-        format!("'{}'", buf.replace('\'', "\\'"))
-    } else {
-        format!("\"{}\"", buf.replace('"', "\\\""))
-    }
+    (quote_char, CowStr::Owned(buf))
 }
 
 fn handle_invalid_unicodes(s: &str) -> Cow<str> {

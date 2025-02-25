@@ -5,6 +5,7 @@ use napi::{
     bindgen_prelude::{AbortSignal, AsyncTask, Buffer, External},
     JsObject, Task,
 };
+use rustc_hash::FxHashMap;
 use serde::Deserialize;
 use swc_compiler_base::{
     minify_file_comments, parse_js, IdentCollector, PrintArgs, SourceMapsConfig, TransformOutput,
@@ -13,7 +14,6 @@ use swc_config::config_types::BoolOr;
 use swc_core::{
     base::JsMinifyExtras,
     common::{
-        collections::AHashMap,
         comments::{Comments, SingleThreadedComments},
         sync::Lrc,
         FileName, Mark, SourceFile, SourceMap,
@@ -50,7 +50,7 @@ enum MinifyTarget {
     /// Code to minify.
     Single(String),
     /// `{ filename: code }`
-    Map(AHashMap<String, String>),
+    Map(FxHashMap<String, String>),
 }
 
 impl MinifyTarget {
@@ -212,7 +212,11 @@ fn do_work(
             .clone()
             .into_inner()
             .unwrap_or(BoolOr::Data(JsMinifyCommentOption::PreserveSomeComments));
-        minify_file_comments(&comments, preserve_comments);
+        minify_file_comments(
+            &comments,
+            preserve_comments,
+            options.format.preserve_annotations,
+        );
 
         swc_compiler_base::print(
             cm.clone(),

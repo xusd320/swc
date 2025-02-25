@@ -245,7 +245,7 @@
  */ function(window1) {
         var i, support, Expr, getText, isXML, tokenize, compile, select, outermostContext, sortInput, hasDuplicate, // Local document vars
         setDocument, document, docElem, documentIsHTML, rbuggyQSA, rbuggyMatches, matches, contains, // Instance-specific data
-        expando = "sizzle" + 1 * new Date(), preferredDoc = window1.document, dirruns = 0, done = 0, classCache = createCache(), tokenCache = createCache(), compilerCache = createCache(), nonnativeSelectorCache = createCache(), sortOrder = function(a, b) {
+        expando = "sizzle" + +new Date(), preferredDoc = window1.document, dirruns = 0, done = 0, classCache = createCache(), tokenCache = createCache(), compilerCache = createCache(), nonnativeSelectorCache = createCache(), sortOrder = function(a, b) {
             return a === b && (hasDuplicate = !0), 0;
         }, // Instance methods
         hasOwn = {}.hasOwnProperty, arr = [], pop = arr.pop, pushNative = arr.push, push = arr.push, slice = arr.slice, // Use a stripped-down indexOf as it's faster than native
@@ -456,7 +456,7 @@
  * @param {Function} fn
  */ function createPositionalPseudo(fn) {
             return markFunction(function(argument) {
-                return argument = +argument, markFunction(function(seed, matches) {
+                return argument *= 1, markFunction(function(seed, matches) {
                     // Match elements found at the specified indexes
                     for(var j, matchIndexes = fn([], seed.length, argument), i = matchIndexes.length; i--;)seed[j = matchIndexes[i]] && (seed[j] = !(matches[j] = seed[j]));
                 });
@@ -658,7 +658,7 @@
                 // Support: IE 11+, Edge 17 - 18+
                 // IE/Edge sometimes throw a "Permission denied" error when strict-comparing
                 // two documents; shallow comparisons work.
-                /* eslint-disable eqeqeq */ ap[i] == preferredDoc ? -1 : bp[i] == preferredDoc ? 1 : /* eslint-enable eqeqeq */ 0;
+                /* eslint-disable eqeqeq */ ap[i] == preferredDoc ? -1 : +(bp[i] == preferredDoc);
             }), document;
         }, Sizzle.matches = function(expr, elements) {
             return Sizzle(expr, null, null, elements);
@@ -1088,7 +1088,7 @@
             var bySet, byElement, superMatcher, i, setMatchers = [], elementMatchers = [], cached = compilerCache[selector + " "];
             if (!cached) {
                 for(match || (match = tokenize(selector)), i = match.length; i--;)(cached = function matcherFromTokens(tokens) {
-                    for(var checkContext, matcher, j, len = tokens.length, leadingRelative = Expr.relative[tokens[0].type], implicitRelative = leadingRelative || Expr.relative[" "], i = leadingRelative ? 1 : 0, // The foundational matcher ensures that elements are reachable from top-level context(s)
+                    for(var checkContext, matcher, j, len = tokens.length, leadingRelative = Expr.relative[tokens[0].type], implicitRelative = leadingRelative || Expr.relative[" "], i = +!!leadingRelative, // The foundational matcher ensures that elements are reachable from top-level context(s)
                     matchContext = addCombinator(function(elem) {
                         return elem === checkContext;
                     }, implicitRelative, !0), matchAnyContext = addCombinator(function(elem) {
@@ -2321,7 +2321,7 @@
             !("click" === event.type && event.button >= 1)) {
                 for(; cur !== this; cur = cur.parentNode || this)// Don't check non-elements (#13208)
                 // Don't process clicks on disabled elements (#6911, #8165, #11382, #11764)
-                if (1 === cur.nodeType && !("click" === event.type && !0 === cur.disabled)) {
+                if (1 === cur.nodeType && ("click" !== event.type || !0 !== cur.disabled)) {
                     for(i = 0, matchedHandlers = [], matchedSelectors = {}; i < delegateCount; i++)void 0 === matchedSelectors[// Don't conflict with Object.prototype properties (#13203)
                     sel = (handleObj = handlers[i]).selector + " "] && (matchedSelectors[sel] = handleObj.needsContext ? jQuery(sel, this).index(cur) > -1 : jQuery.find(sel, this, null, [
                         cur
@@ -2842,7 +2842,7 @@
         Math.max(0, matches[2] - (subtract || 0)) + (matches[3] || "px") : value;
     }
     function boxModelAdjustment(elem, dimension, box, isBorderBox, styles, computedVal) {
-        var i = "width" === dimension ? 1 : 0, extra = 0, delta = 0;
+        var i = +("width" === dimension), extra = 0, delta = 0;
         // Adjustment may not be necessary
         if (box === (isBorderBox ? "border" : "content")) return 0;
         for(; i < 4; i += 2)"margin" === box && (delta += jQuery.css(elem, box + cssExpand[i], !0, styles)), isBorderBox ? ("content" === box && (delta -= jQuery.css(elem, "padding" + cssExpand[i], !0, styles)), "margin" !== box && (delta -= jQuery.css(elem, "border" + cssExpand[i] + "Width", !0, styles))) : (// Add padding
@@ -3060,7 +3060,7 @@
         };
         for(// If we include width, step value is 1 to do all cssExpand values,
         // otherwise step value is 2 to skip over Left and Right
-        includeWidth = includeWidth ? 1 : 0; i < 4; i += 2 - includeWidth)attrs["margin" + (which = cssExpand[i])] = attrs["padding" + which] = type;
+        includeWidth = +!!includeWidth; i < 4; i += 2 - includeWidth)attrs["margin" + (which = cssExpand[i])] = attrs["padding" + which] = type;
         return includeWidth && (attrs.opacity = attrs.width = type), attrs;
     }
     function createTween(value, prop, animation) {
@@ -3962,7 +3962,7 @@
                 // (no matter how long the jqXHR object will be used)
                 transport = void 0, // Cache response headers
                 responseHeadersString = headers || "", // Set readyState
-                jqXHR.readyState = status > 0 ? 4 : 0, // Determine if successful
+                jqXHR.readyState = 4 * (status > 0), // Determine if successful
                 isSuccess = status >= 200 && status < 300 || 304 === status, responses && (response = /* Handles responses to an ajax request:
  * - finds the right dataType (mediates between content-type and expected dataType)
  * - returns the corresponding response
@@ -4159,8 +4159,9 @@
                 if (xhr.open(options.type, options.url, options.async, options.username, options.password), options.xhrFields) for(i in options.xhrFields)xhr[i] = options.xhrFields[i];
                 // Set headers
                 for(i in options.mimeType && xhr.overrideMimeType && xhr.overrideMimeType(options.mimeType), options.crossDomain || headers["X-Requested-With"] || (headers["X-Requested-With"] = "XMLHttpRequest"), headers)xhr.setRequestHeader(i, headers[i]);
-                // Callback
-                callback = function(type) {
+                // Listen to events
+                xhr.onload = // Callback
+                (callback = function(type) {
                     return function() {
                         callback && (callback = errorCallback = xhr.onload = xhr.onerror = xhr.onabort = xhr.ontimeout = xhr.onreadystatechange = null, "abort" === type ? xhr.abort() : "error" === type ? "number" != typeof xhr.status ? complete(0, "error") : complete(// File: protocol always yields status 0; see #8605, #14207
                         xhr.status, xhr.statusText) : complete(xhrSuccessStatus[xhr.status] || xhr.status, xhr.statusText, "text" !== // Support: IE <=9 only
@@ -4172,8 +4173,7 @@
                             text: xhr.responseText
                         }, xhr.getAllResponseHeaders()));
                     };
-                }, // Listen to events
-                xhr.onload = callback(), errorCallback = xhr.onerror = xhr.ontimeout = callback("error"), void 0 !== xhr.onabort ? xhr.onabort = errorCallback : xhr.onreadystatechange = function() {
+                })(), errorCallback = xhr.onerror = xhr.ontimeout = callback("error"), void 0 !== xhr.onabort ? xhr.onabort = errorCallback : xhr.onreadystatechange = function() {
                     // Check readyState before timeout as it changes
                     4 === xhr.readyState && // Allow onerror to be called first,
                     // but that will not handle a native abort
@@ -4263,12 +4263,12 @@
             s.jsonpCallback = originalSettings.jsonpCallback, // Save the callback name for future use
             oldCallbacks.push(callbackName)), responseContainer && isFunction(overwritten) && overwritten(responseContainer[0]), responseContainer = overwritten = void 0;
         }), "script");
-    }), // Support: Safari 8 only
+    }), (body = document.implementation.createHTMLDocument("").body).innerHTML = "<form></form><form></form>", // Support: Safari 8 only
     // In Safari 8 documents created via document.implementation.createHTMLDocument
     // collapse sibling forms: the second one becomes a child of the first one.
     // Because of that, this security measure has to be disabled in Safari 8.
     // https://bugs.webkit.org/show_bug.cgi?id=137337
-    support.createHTMLDocument = ((body = document.implementation.createHTMLDocument("").body).innerHTML = "<form></form><form></form>", 2 === body.childNodes.length), // Argument "data" should be string of html
+    support.createHTMLDocument = 2 === body.childNodes.length, // Argument "data" should be string of html
     // context (optional): If specified, the fragment will be created in this context,
     // defaults to document
     // keepScripts (optional): If true, will include scripts passed in the html string

@@ -22,7 +22,10 @@ pub use self::{
     decl::{ClassDecl, Decl, FnDecl, UsingDecl, VarDecl, VarDeclKind, VarDeclarator},
     expr::*,
     function::{Function, Param, ParamOrTsParamProp},
-    ident::{BindingIdent, EsReserved, Id, Ident, IdentName, PrivateName},
+    ident::{
+        unsafe_id, unsafe_id_from_ident, BindingIdent, EsReserved, Id, Ident, IdentName,
+        PrivateName, UnsafeId,
+    },
     jsx::{
         JSXAttr, JSXAttrName, JSXAttrOrSpread, JSXAttrValue, JSXClosingElement, JSXClosingFragment,
         JSXElement, JSXElementChild, JSXElementName, JSXEmptyExpr, JSXExpr, JSXExprContainer,
@@ -57,17 +60,17 @@ pub use self::{
         TsConditionalType, TsConstAssertion, TsConstructSignatureDecl, TsConstructorType,
         TsEntityName, TsEnumDecl, TsEnumMember, TsEnumMemberId, TsExportAssignment,
         TsExprWithTypeArgs, TsExternalModuleRef, TsFnOrConstructorType, TsFnParam, TsFnType,
-        TsGetterSignature, TsImportEqualsDecl, TsImportType, TsIndexSignature, TsIndexedAccessType,
-        TsInferType, TsInstantiation, TsInterfaceBody, TsInterfaceDecl, TsIntersectionType,
-        TsKeywordType, TsKeywordTypeKind, TsLit, TsLitType, TsMappedType, TsMethodSignature,
-        TsModuleBlock, TsModuleDecl, TsModuleName, TsModuleRef, TsNamespaceBody, TsNamespaceDecl,
-        TsNamespaceExportDecl, TsNonNullExpr, TsOptionalType, TsParamProp, TsParamPropParam,
-        TsParenthesizedType, TsPropertySignature, TsQualifiedName, TsRestType, TsSatisfiesExpr,
-        TsSetterSignature, TsThisType, TsThisTypeOrIdent, TsTplLitType, TsTupleElement,
-        TsTupleType, TsType, TsTypeAliasDecl, TsTypeAnn, TsTypeAssertion, TsTypeElement, TsTypeLit,
-        TsTypeOperator, TsTypeOperatorOp, TsTypeParam, TsTypeParamDecl, TsTypeParamInstantiation,
-        TsTypePredicate, TsTypeQuery, TsTypeQueryExpr, TsTypeRef, TsUnionOrIntersectionType,
-        TsUnionType,
+        TsGetterSignature, TsImportCallOptions, TsImportEqualsDecl, TsImportType, TsIndexSignature,
+        TsIndexedAccessType, TsInferType, TsInstantiation, TsInterfaceBody, TsInterfaceDecl,
+        TsIntersectionType, TsKeywordType, TsKeywordTypeKind, TsLit, TsLitType, TsMappedType,
+        TsMethodSignature, TsModuleBlock, TsModuleDecl, TsModuleName, TsModuleRef, TsNamespaceBody,
+        TsNamespaceDecl, TsNamespaceExportDecl, TsNonNullExpr, TsOptionalType, TsParamProp,
+        TsParamPropParam, TsParenthesizedType, TsPropertySignature, TsQualifiedName, TsRestType,
+        TsSatisfiesExpr, TsSetterSignature, TsThisType, TsThisTypeOrIdent, TsTplLitType,
+        TsTupleElement, TsTupleType, TsType, TsTypeAliasDecl, TsTypeAnn, TsTypeAssertion,
+        TsTypeElement, TsTypeLit, TsTypeOperator, TsTypeOperatorOp, TsTypeParam, TsTypeParamDecl,
+        TsTypeParamInstantiation, TsTypePredicate, TsTypeQuery, TsTypeQueryExpr, TsTypeRef,
+        TsUnionOrIntersectionType, TsUnionType,
     },
 };
 
@@ -331,6 +334,7 @@ where
 #[ast_node("Invalid")]
 #[derive(Eq, Default, Hash, Copy, EqIgnoreSpan)]
 #[cfg_attr(feature = "arbitrary", derive(arbitrary::Arbitrary))]
+#[cfg_attr(feature = "shrink-to-fit", derive(shrink_to_fit::ShrinkToFit))]
 pub struct Invalid {
     pub span: Span,
 }

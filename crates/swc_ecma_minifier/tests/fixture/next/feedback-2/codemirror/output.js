@@ -70,10 +70,10 @@ function(global, factory) {
         for(var as = a.split(" "), i = 0; i < as.length; i++)as[i] && !classTest(as[i]).test(b) && (b += " " + as[i]);
         return b;
     }
-    document.createRange ? range = function(node, start, end, endNode) {
+    range = document.createRange ? function(node, start, end, endNode) {
         var r = document.createRange();
         return r.setEnd(endNode || node, end), r.setStart(node, start), r;
-    } : range = function(node, start, end) {
+    } : function(node, start, end) {
         var r = document.body.createTextRange();
         try {
             r.moveToElementText(node.parentNode);
@@ -312,7 +312,7 @@ function(global, factory) {
                 for(++i$7; i$7 < len && countsAsLeft.test(types[i$7]); ++i$7);
                 order.push(new BidiSpan(0, start, i$7));
             } else {
-                var pos = i$7, at = order.length, isRTL = "rtl" == direction ? 1 : 0;
+                var pos = i$7, at = order.length, isRTL = +("rtl" == direction);
                 for(++i$7; i$7 < len && "L" != types[i$7]; ++i$7);
                 for(var j$2 = pos; j$2 < i$7;)if (countsAsNum.test(types[j$2])) {
                     pos < j$2 && (order.splice(at, 0, new BidiSpan(1, pos, j$2)), at += isRTL);
@@ -930,7 +930,7 @@ function(global, factory) {
         return marker.inclusiveLeft ? -1 : 0;
     }
     function extraRight(marker) {
-        return marker.inclusiveRight ? 1 : 0;
+        return +!!marker.inclusiveRight;
     }
     // Returns a number indicating which of two overlapping collapsed
     // spans is larger (and thus includes the other). Falls back to
@@ -1417,7 +1417,7 @@ function(global, factory) {
     // only done once.
     function prepareMeasureForLine(cm, line) {
         var line1, lineN, view, built, lineN1 = lineNo(line), view1 = findViewForLine(cm, lineN1);
-        view1 && !view1.text ? view1 = null : view1 && view1.changes && (updateLineForChanges(cm, view1, lineN1, getDimensions(cm)), cm.curOp.forceUpdate = !0), view1 || (lineN = lineNo(line1 = visualLine(line1 = line)), (view = cm.display.externalMeasured = new LineView(cm.doc, line1, lineN)).lineN = lineN, built = view.built = buildLineContent(cm, view), view.text = built.pre, removeChildrenAndAdd(cm.display.lineMeasure, built.pre), view1 = view);
+        view1 && !view1.text ? view1 = null : view1 && view1.changes && (updateLineForChanges(cm, view1, lineN1, getDimensions(cm)), cm.curOp.forceUpdate = !0), view1 || (lineN = lineNo(line1 = visualLine(line1 = line)), (view = cm.display.externalMeasured = new LineView(cm.doc, line1, lineN)).lineN = lineN, view.text = (built = view.built = buildLineContent(cm, view)).pre, removeChildrenAndAdd(cm.display.lineMeasure, built.pre), view1 = view);
         var info = mapFromLineView(view1, line, lineN1);
         return {
             line: line,
@@ -1726,16 +1726,16 @@ function(global, factory) {
                 if (boxAround) {
                     // Distinguish coordinates nearer to the left or right side of the box
                     var atLeft = x - boxAround.left < boxAround.right - x, atStart = atLeft == ltr;
-                    ch = chAround + (atStart ? 0 : 1), sticky = atStart ? "after" : "before", baseX = atLeft ? boxAround.left : boxAround.right;
+                    ch = chAround + +!atStart, sticky = atStart ? "after" : "before", baseX = atLeft ? boxAround.left : boxAround.right;
                 } else {
                     !ltr && (ch == end || ch == begin) && ch++, // To determine which side to associate with, get the box to the
                     // left of the character and compare it's vertical position to the
                     // coordinates
-                    sticky = 0 == ch ? "after" : ch == lineObj.text.length ? "before" : measureCharPrepared(cm, preparedMeasure, ch - (ltr ? 1 : 0)).bottom + widgetHeight <= y == ltr ? "after" : "before";
+                    sticky = 0 == ch ? "after" : ch == lineObj.text.length ? "before" : measureCharPrepared(cm, preparedMeasure, ch - +!!ltr).bottom + widgetHeight <= y == ltr ? "after" : "before";
                     // Now get accurate coordinates for this place, in order to get a
                     // base X position
                     var coords = cursorCoords(cm, Pos(lineNo, ch, sticky), "line", lineObj, preparedMeasure);
-                    baseX = coords.left, outside = y < coords.top ? -1 : y >= coords.bottom ? 1 : 0;
+                    baseX = coords.left, outside = y < coords.top ? -1 : +(y >= coords.bottom);
                 }
                 return PosWithInfo(lineNo, ch = skipExtendingChars(lineObj.text, ch, 1), sticky, outside, x - baseX);
             }(cm, lineObj, lineN, x, y), collapsed = function(line, ch) {
@@ -1745,7 +1745,7 @@ function(global, factory) {
                     sp.marker.collapsed && (null == sp.from || sp.from < ch) && (null == sp.to || sp.to > ch) && (!found || 0 > compareCollapsedMarkers(found, sp.marker)) && (found = sp.marker);
                 }
                 return found;
-            }(lineObj, found.ch + (found.xRel > 0 || found.outside > 0 ? 1 : 0));
+            }(lineObj, found.ch + +(found.xRel > 0 || found.outside > 0));
             if (!collapsed) return found;
             var rangeEnd = collapsed.find(1);
             if (rangeEnd.line == lineN) return rangeEnd;
@@ -1930,7 +1930,7 @@ function(global, factory) {
         }
         for(; visualLineNo(cm.doc, newN) != newN;){
             if (index == (dir < 0 ? 0 : view.length - 1)) return null;
-            newN += dir * view[index - (dir < 0 ? 1 : 0)].size, index += dir;
+            newN += dir * view[index - +(dir < 0)].size, index += dir;
         }
         return {
             index: index,
@@ -2120,7 +2120,7 @@ function(global, factory) {
             newTop != screentop && (result.scrollTop = newTop);
         }
         var gutterSpace = cm.options.fixedGutter ? 0 : display.gutters.offsetWidth, screenleft = cm.curOp && null != cm.curOp.scrollLeft ? cm.curOp.scrollLeft : display.scroller.scrollLeft - gutterSpace, screenw = displayWidth(cm) - display.gutters.offsetWidth, tooWide = rect.right - rect.left > screenw;
-        return tooWide && (rect.right = rect.left + screenw), rect.left < 10 ? result.scrollLeft = 0 : rect.left < screenleft ? result.scrollLeft = Math.max(0, rect.left + gutterSpace - (tooWide ? 0 : 10)) : rect.right > screenw + screenleft - 3 && (result.scrollLeft = rect.right + (tooWide ? 0 : 10) - screenw), result;
+        return tooWide && (rect.right = rect.left + screenw), rect.left < 10 ? result.scrollLeft = 0 : rect.left < screenleft ? result.scrollLeft = Math.max(0, rect.left + gutterSpace - 10 * !tooWide) : rect.right > screenw + screenleft - 3 && (result.scrollLeft = rect.right + 10 * !tooWide - screenw), result;
     }
     // Store a relative adjustment to the scroll position in the current
     // operation (to be applied when the operation finishes).
@@ -4856,19 +4856,19 @@ function(global, factory) {
     // middle-click-paste. Or it might be a click on something we should
     // not interfere with, such as a scrollbar or widget.
     function onMouseDown(e) {
-        var cm, name, behavior, contained, sel, cm1, display, moved, dragEnd, mouseMove, dragStart, now, display1 = this.display;
-        if (!(signalDOMEvent(this, e) || display1.activeTouch && display1.input.supportsTouch())) {
-            if (display1.input.ensurePolled(), display1.shift = e.shiftKey, eventInWidget(display1, e)) {
+        var cm, name, now, display = this.display;
+        if (!(signalDOMEvent(this, e) || display.activeTouch && display.input.supportsTouch())) {
+            if (display.input.ensurePolled(), display.shift = e.shiftKey, eventInWidget(display, e)) {
                 webkit || (// Briefly turn off draggability, to allow widgets to do
                 // normal dragging things.
-                display1.scroller.draggable = !1, setTimeout(function() {
-                    return display1.scroller.draggable = !0;
+                display.scroller.draggable = !1, setTimeout(function() {
+                    return display.scroller.draggable = !0;
                 }, 100));
                 return;
             }
             if (!clickInGutter(this, e)) {
-                var pos = posFromMouse(this, e), button = e_button(e), repeat = pos ? (now = +new Date(), lastDoubleClick && lastDoubleClick.compare(now, pos, button) ? (lastClick = lastDoubleClick = null, "triple") : lastClick && lastClick.compare(now, pos, button) ? (lastDoubleClick = new PastClick(now, pos, button), lastClick = null, "double") : (lastClick = new PastClick(now, pos, button), lastDoubleClick = null, "single")) : "single";
-                window.focus(), 1 == button && this.state.selectingText && this.state.selectingText(e), !(pos && (cm = this, name = "Click", "double" == repeat ? name = "Double" + name : "triple" == repeat && (name = "Triple" + name), dispatchKey(cm, addModifierNames(name = (1 == button ? "Left" : 2 == button ? "Middle" : "Right") + name, e), e, function(bound) {
+                var cm1, display1, moved, dragEnd, mouseMove, dragStart, option, value, contained, sel, pos = posFromMouse(this, e), button = e_button(e), repeat = pos ? (now = +new Date(), lastDoubleClick && lastDoubleClick.compare(now, pos, button) ? (lastClick = lastDoubleClick = null, "triple") : lastClick && lastClick.compare(now, pos, button) ? (lastDoubleClick = new PastClick(now, pos, button), lastClick = null, "double") : (lastClick = new PastClick(now, pos, button), lastDoubleClick = null, "single")) : "single";
+                window.focus(), 1 == button && this.state.selectingText && this.state.selectingText(e), pos && (cm = this, name = "Click", "double" == repeat ? name = "Double" + name : "triple" == repeat && (name = "Triple" + name), dispatchKey(cm, addModifierNames(name = (1 == button ? "Left" : 2 == button ? "Middle" : "Right") + name, e), e, function(bound) {
                     if ("string" == typeof bound && (bound = commands[bound]), !bound) return !1;
                     var done = !1;
                     try {
@@ -4877,26 +4877,19 @@ function(global, factory) {
                         cm.state.suppressEdits = !1;
                     }
                     return done;
-                }))) && (1 == button ? pos ? (ie ? setTimeout(bind(ensureFocus, this), 0) : this.curOp.focus = activeElt(), behavior = function(cm, repeat, event) {
-                    var option = cm.getOption("configureMouse"), value = option ? option(cm, repeat, event) : {};
-                    if (null == value.unit) {
-                        var rect = chromeOS ? event.shiftKey && event.metaKey : event.altKey;
-                        value.unit = rect ? "rectangle" : "single" == repeat ? "char" : "double" == repeat ? "word" : "line";
-                    }
-                    return (null == value.extend || cm.doc.extend) && (value.extend = cm.doc.extend || event.shiftKey), null == value.addNew && (value.addNew = mac ? event.metaKey : event.ctrlKey), null == value.moveOnDrag && (value.moveOnDrag = !(mac ? event.altKey : event.ctrlKey)), value;
-                }(this, repeat, e), sel = this.doc.sel, this.options.dragDrop && dragAndDrop && !this.isReadOnly() && "single" == repeat && (contained = sel.contains(pos)) > -1 && (0 > cmp((contained = sel.ranges[contained]).from(), pos) || pos.xRel > 0) && (cmp(contained.to(), pos) > 0 || pos.xRel < 0) ? (cm1 = this, display = cm1.display, moved = !1, dragEnd = operation(cm1, function(e) {
-                    webkit && (display.scroller.draggable = !1), cm1.state.draggingText = !1, cm1.state.delayingBlurEvent && (cm1.hasFocus() ? cm1.state.delayingBlurEvent = !1 : delayBlurEvent(cm1)), off(display.wrapper.ownerDocument, "mouseup", dragEnd), off(display.wrapper.ownerDocument, "mousemove", mouseMove), off(display.scroller, "dragstart", dragStart), off(display.scroller, "drop", dragEnd), moved || (e_preventDefault(e), behavior.addNew || extendSelection(cm1.doc, pos, null, null, behavior.extend), webkit && !safari || ie && 9 == ie_version ? setTimeout(function() {
-                        display.wrapper.ownerDocument.body.focus({
+                })) || (1 == button ? pos ? (cm1 = this, ie ? setTimeout(bind(ensureFocus, cm1), 0) : cm1.curOp.focus = activeElt(), null == (value = (option = cm1.getOption("configureMouse")) ? option(cm1, repeat, e) : {}).unit && (value.unit = (chromeOS ? e.shiftKey && e.metaKey : e.altKey) ? "rectangle" : "single" == repeat ? "char" : "double" == repeat ? "word" : "line"), (null == value.extend || cm1.doc.extend) && (value.extend = cm1.doc.extend || e.shiftKey), null == value.addNew && (value.addNew = mac ? e.metaKey : e.ctrlKey), null == value.moveOnDrag && (value.moveOnDrag = !(mac ? e.altKey : e.ctrlKey)), sel = cm1.doc.sel, cm1.options.dragDrop && dragAndDrop && !cm1.isReadOnly() && "single" == repeat && (contained = sel.contains(pos)) > -1 && (0 > cmp((contained = sel.ranges[contained]).from(), pos) || pos.xRel > 0) && (cmp(contained.to(), pos) > 0 || pos.xRel < 0) ? (display1 = cm1.display, moved = !1, dragEnd = operation(cm1, function(e) {
+                    webkit && (display1.scroller.draggable = !1), cm1.state.draggingText = !1, cm1.state.delayingBlurEvent && (cm1.hasFocus() ? cm1.state.delayingBlurEvent = !1 : delayBlurEvent(cm1)), off(display1.wrapper.ownerDocument, "mouseup", dragEnd), off(display1.wrapper.ownerDocument, "mousemove", mouseMove), off(display1.scroller, "dragstart", dragStart), off(display1.scroller, "drop", dragEnd), moved || (e_preventDefault(e), value.addNew || extendSelection(cm1.doc, pos, null, null, value.extend), webkit && !safari || ie && 9 == ie_version ? setTimeout(function() {
+                        display1.wrapper.ownerDocument.body.focus({
                             preventScroll: !0
-                        }), display.input.focus();
-                    }, 20) : display.input.focus());
+                        }), display1.input.focus();
+                    }, 20) : display1.input.focus());
                 }), mouseMove = function(e2) {
                     moved = moved || Math.abs(e.clientX - e2.clientX) + Math.abs(e.clientY - e2.clientY) >= 10;
                 }, dragStart = function() {
                     return moved = !0;
-                }, webkit && (display.scroller.draggable = !0), cm1.state.draggingText = dragEnd, dragEnd.copy = !behavior.moveOnDrag, on(display.wrapper.ownerDocument, "mouseup", dragEnd), on(display.wrapper.ownerDocument, "mousemove", mouseMove), on(display.scroller, "dragstart", dragStart), on(display.scroller, "drop", dragEnd), cm1.state.delayingBlurEvent = !0, setTimeout(function() {
-                    return display.input.focus();
-                }, 20), display.scroller.dragDrop && display.scroller.dragDrop()) : // Normal selection, as opposed to text dragging.
+                }, webkit && (display1.scroller.draggable = !0), cm1.state.draggingText = dragEnd, dragEnd.copy = !value.moveOnDrag, on(display1.wrapper.ownerDocument, "mouseup", dragEnd), on(display1.wrapper.ownerDocument, "mousemove", mouseMove), on(display1.scroller, "dragstart", dragStart), on(display1.scroller, "drop", dragEnd), cm1.state.delayingBlurEvent = !0, setTimeout(function() {
+                    return display1.input.focus();
+                }, 20), display1.scroller.dragDrop && display1.scroller.dragDrop()) : // Normal selection, as opposed to text dragging.
                 function(cm, event, start, behavior) {
                     ie && delayBlurEvent(cm);
                     var display = cm.display, doc = cm.doc;
@@ -4951,7 +4944,7 @@ function(global, factory) {
                                                     if (!order) return range;
                                                     var index = getBidiPartAt(order, anchor.ch, anchor.sticky), part = order[index];
                                                     if (part.from != anchor.ch && part.to != anchor.ch) return range;
-                                                    var boundary = index + (part.from == anchor.ch == (1 != part.level) ? 0 : 1);
+                                                    var boundary = index + +(part.from == anchor.ch != (1 != part.level));
                                                     if (0 == boundary || boundary == order.length) return range;
                                                     if (head.line != anchor.line) leftSide = (head.line - anchor.line) * ("ltr" == cm.doc.direction ? 1 : -1) > 0;
                                                     else {
@@ -4969,7 +4962,7 @@ function(global, factory) {
                                         counter == curCount && extend(e);
                                     }), 150);
                                 } else {
-                                    var outside = e.clientY < editorSize.top ? -20 : e.clientY > editorSize.bottom ? 20 : 0;
+                                    var outside = e.clientY < editorSize.top ? -20 : 20 * (e.clientY > editorSize.bottom);
                                     outside && setTimeout(operation(cm, function() {
                                         counter == curCount && (display.scroller.scrollTop += outside, extend(e));
                                     }), 50);
@@ -4978,8 +4971,8 @@ function(global, factory) {
                         }(e) : done(e);
                     }), up = operation(cm, done);
                     cm.state.selectingText = up, on(display.wrapper.ownerDocument, "mousemove", move), on(display.wrapper.ownerDocument, "mouseup", up);
-                }(this, e, pos, behavior)) : e_target(e) == display1.scroller && e_preventDefault(e) : 2 == button ? (pos && extendSelection(this.doc, pos), setTimeout(function() {
-                    return display1.input.focus();
+                }(cm1, e, pos, value)) : e_target(e) == display.scroller && e_preventDefault(e) : 2 == button ? (pos && extendSelection(this.doc, pos), setTimeout(function() {
+                    return display.input.focus();
                 }, 20)) : 3 == button && (captureRightClick ? this.display.input.onContextMenu(e) : delayBlurEvent(this)));
             }
         }
@@ -5453,7 +5446,7 @@ function(global, factory) {
                         var curNode = map[j + 2];
                         if (curNode == textNode || curNode == topNode) {
                             var line = lineNo(i < 0 ? lineView.line : lineView.rest[i]), ch = map[j] + offset;
-                            return (offset < 0 || curNode != textNode) && (ch = map[j + (offset ? 1 : 0)]), Pos(line, ch);
+                            return (offset < 0 || curNode != textNode) && (ch = map[j + +!!offset]), Pos(line, ch);
                         }
                     }
                 }
@@ -6038,7 +6031,7 @@ function(global, factory) {
                 if (range.empty()) range.head.line > end && (indentLine(this, range.head.line, how, !0), end = range.head.line, i == this.doc.sel.primIndex && ensureCursorVisible(this));
                 else {
                     var from = range.from(), to = range.to(), start = Math.max(end, from.line);
-                    end = Math.min(this.lastLine(), to.line - (to.ch ? 0 : 1)) + 1;
+                    end = Math.min(this.lastLine(), to.line - +!to.ch) + 1;
                     for(var j = start; j < end; ++j)indentLine(this, j, how);
                     var newRanges = this.doc.sel.ranges;
                     0 == from.ch && ranges.length == newRanges.length && newRanges[i].from().ch > 0 && replaceOneSelection(this.doc, i, new Range(from, newRanges[i].to()), sel_dontScroll);

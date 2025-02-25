@@ -1,5 +1,5 @@
 use rustc_hash::FxHashSet;
-use swc_atoms::JsWord;
+use swc_atoms::Atom;
 use swc_common::{util::take::Take, DUMMY_SP};
 use swc_ecma_ast::*;
 use swc_ecma_usage_analyzer::util::is_global_var_with_pure_property_access;
@@ -173,7 +173,7 @@ impl Optimizer<'_> {
             return;
         }
 
-        if let Some(v) = self.data.vars.get(&i.to_id()).cloned() {
+        if let Some(v) = self.data.vars.get(&i.to_id()) {
             if v.ref_count == 0
                 && v.usage_count == 0
                 && !v.reassigned
@@ -504,7 +504,7 @@ impl Optimizer<'_> {
                     // This will remove the declaration.
                     let class = decl.take().class().unwrap();
                     let mut side_effects =
-                        extract_class_side_effect(&self.ctx.expr_ctx, *class.class);
+                        extract_class_side_effect(self.ctx.expr_ctx, *class.class);
 
                     if !side_effects.is_empty() {
                         self.prepend_stmts.push(
@@ -828,7 +828,7 @@ impl Optimizer<'_> {
             PropOrSpread::Prop(p) => match &**p {
                 Prop::Shorthand(_) => false,
                 Prop::KeyValue(p) => {
-                    p.key.is_computed() || p.value.may_have_side_effects(&self.ctx.expr_ctx)
+                    p.key.is_computed() || p.value.may_have_side_effects(self.ctx.expr_ctx)
                 }
                 Prop::Assign(_) => true,
                 Prop::Getter(p) => p.key.is_computed(),
@@ -939,7 +939,7 @@ impl Optimizer<'_> {
             return None;
         }
 
-        let should_preserve_property = |sym: &JsWord| {
+        let should_preserve_property = |sym: &Atom| {
             if let "toString" = &**sym {
                 return true;
             }
@@ -985,7 +985,7 @@ fn can_remove_property(sym: &str) -> bool {
 
 #[derive(Default)]
 struct ThisPropertyVisitor {
-    properties: FxHashSet<JsWord>,
+    properties: FxHashSet<Atom>,
 
     should_abort: bool,
 }

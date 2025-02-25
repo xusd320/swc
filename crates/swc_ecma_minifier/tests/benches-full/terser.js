@@ -2043,7 +2043,7 @@
     };
     class AST_Token {
         constructor(type, value, line, col, pos, nlb, comments_before, comments_after, file){
-            this.flags = nlb ? 1 : 0, this.type = type, this.value = value, this.line = line, this.col = col, this.pos = pos, this.comments_before = comments_before, this.comments_after = comments_after, this.file = file, Object.seal(this);
+            this.flags = +!!nlb, this.type = type, this.value = value, this.line = line, this.col = col, this.pos = pos, this.comments_before = comments_before, this.comments_after = comments_after, this.file = file, Object.seal(this);
         }
         get nlb() {
             return has_tok_flag(this, 0b0001);
@@ -4548,10 +4548,7 @@
         } : function() {
             might_need_space = !0;
         }, indent = options.beautify ? function(half) {
-            if (options.beautify) {
-                var back;
-                print((back = half ? 0.5 : 0, " ".repeat(options.indent_start + indentation - back * options.indent_level)));
-            }
+            options.beautify && print(" ".repeat(options.indent_start + indentation - 0.5 * !!half * options.indent_level));
         } : noop, with_indent = options.beautify ? function(col, cont) {
             !0 === col && (col = next_indent());
             var save_indentation = indentation;
@@ -5501,7 +5498,7 @@
                 while (tw.parent(i++) !== in_destructuring)
             }
             var node = tw.parent(level);
-            if (def.export = node instanceof AST_Export ? 1 : 0) {
+            if (def.export = +(node instanceof AST_Export)) {
                 var exported = node.exported_definition;
                 (exported instanceof AST_Defun || exported instanceof AST_DefClass) && node.is_default && (def.export = 2);
             }
@@ -5790,7 +5787,7 @@
         return list_overhead(this.body);
     }, AST_EmptyStatement.prototype._size = ()=>1, AST_LabeledStatement.prototype._size = ()=>2, AST_Do.prototype._size = ()=>9, AST_While.prototype._size = ()=>7, AST_For.prototype._size = ()=>8, AST_ForIn.prototype._size = ()=>8, // AST_ForOf inherits ^
     AST_With.prototype._size = ()=>6, AST_Expansion.prototype._size = ()=>3;
-    const lambda_modifiers = (func)=>(func.is_generator ? 1 : 0) + (func.async ? 6 : 0);
+    const lambda_modifiers = (func)=>+!!func.is_generator + 6 * !!func.async;
     AST_Accessor.prototype._size = function() {
         return lambda_modifiers(this) + 4 + list_overhead(this.argnames) + list_overhead(this.body);
     }, AST_Function.prototype._size = function(info) {
@@ -5834,16 +5831,16 @@
     }, AST_Const.prototype._size = function() {
         return def_size(6, this);
     }, AST_VarDef.prototype._size = function() {
-        return this.value ? 1 : 0;
+        return +!!this.value;
     }, AST_NameMapping.prototype._size = function() {
         // foreign name isn't mangled
-        return this.name ? 4 : 0;
+        return 4 * !!this.name;
     }, AST_Import.prototype._size = function() {
         // import
         let size = 6;
         return this.imported_name && (size += 1), (this.imported_name || this.imported_names) && (size += 5), this.imported_names && (size += 2 + list_overhead(this.imported_names)), size;
     }, AST_ImportMeta.prototype._size = ()=>11, AST_Export.prototype._size = function() {
-        let size = 7 + (this.is_default ? 8 : 0);
+        let size = 7 + 8 * !!this.is_default;
         return this.exported_value && (size += this.exported_value._size()), this.exported_names && // Braces and commas
         (size += 2 + list_overhead(this.exported_names)), this.module_name && // "from "
         (size += 5), size;
@@ -5876,7 +5873,7 @@
     AST_ObjectKeyVal.prototype._size = function() {
         return key_size(this.key) + 1;
     };
-    /*#__INLINE__*/ const static_size = (is_static)=>is_static ? 7 : 0;
+    /*#__INLINE__*/ const static_size = (is_static)=>7 * !!is_static;
     /***********************************************************************
 
   A JavaScript tokenizer / parser / beautifier / compressor.
@@ -6036,9 +6033,9 @@
     }, AST_PrivateGetter.prototype._size = AST_PrivateSetter.prototype._size = function() {
         return AST_ConciseMethod.prototype._size.call(this) + 4;
     }, AST_Class.prototype._size = function() {
-        return (this.name ? 8 : 7) + (this.extends ? 8 : 0);
+        return (this.name ? 8 : 7) + 8 * !!this.extends;
     }, AST_ClassProperty.prototype._size = function() {
-        return static_size(this.static) + ("string" == typeof this.key ? this.key.length + 2 : 0) + (this.value ? 1 : 0);
+        return static_size(this.static) + ("string" == typeof this.key ? this.key.length + 2 : 0) + +!!this.value;
     }, AST_ClassPrivateProperty.prototype._size = function() {
         return AST_ClassProperty.prototype._size.call(this) + 1;
     }, AST_Symbol.prototype._size = function() {
@@ -8507,7 +8504,7 @@
                 //    https://github.com/mishoo/UglifyJS2/issues/1838
                 // that's an invalid AST.
                 // We fix it at this stage by moving the `var` outside the `for`.
-                if (node instanceof AST_For) return descend(node, this), node.init instanceof AST_BlockStatement && (block = node.init, node.init = block.body.pop(), block.body.push(node)), node.init instanceof AST_SimpleStatement ? node.init = node.init.body : is_empty(node.init) && (node.init = null), block ? in_list ? MAP.splice(block.body) : block : node;
+                if (node instanceof AST_For) return descend(node, this), node.init instanceof AST_BlockStatement && (node.init = (block = node.init).body.pop(), block.body.push(node)), node.init instanceof AST_SimpleStatement ? node.init = node.init.body : is_empty(node.init) && (node.init = null), block ? in_list ? MAP.splice(block.body) : block : node;
                 if (node instanceof AST_LabeledStatement && node.body instanceof AST_For) {
                     if (descend(node, this), node.body instanceof AST_BlockStatement) {
                         var block = node.body;
@@ -18920,9 +18917,9 @@
                         return value.length ? value.map(symdef) : void 0;
                     case "variables":
                     case "globals":
-                        var callback, result;
-                        return value.size ? (callback = symdef, result = [], value.forEach(function(def) {
-                            result.push(callback(def));
+                        var result;
+                        return value.size ? (result = [], value.forEach(function(def) {
+                            result.push(symdef(def));
                         }), result) : void 0;
                 }
                 if (!skip_keys.has(key) && !(value instanceof AST_Token) && !(value instanceof Map)) {

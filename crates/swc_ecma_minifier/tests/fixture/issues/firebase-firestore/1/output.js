@@ -522,7 +522,7 @@
                 }
             }
             function et(t, e) {
-                return t < e ? -1 : t > e ? 1 : 0;
+                return t < e ? -1 : +(t > e);
             }
             /** Helper to compare arrays using isEqual(). */ function nt(t, e, n) {
                 return t.length === e.length && t.every((t, s)=>n(t, e[s]));
@@ -795,7 +795,7 @@
                         if (n < i) return -1;
                         if (n > i) return 1;
                     }
-                    return t.length < e.length ? -1 : t.length > e.length ? 1 : 0;
+                    return t.length < e.length ? -1 : +(t.length > e.length);
                 }
             }
             /**
@@ -2543,7 +2543,7 @@
                     if (this.isRed() && this.left.isRed() || this.right.isRed()) throw L();
                     const t = this.left.check();
                     if (t !== this.right.check()) throw L();
-                    return t + (this.isRed() ? 0 : 1);
+                    return t + +!this.isRed();
                 }
             }
             // end LLRBNode
@@ -3089,7 +3089,7 @@
                      */ // Visible for testing.
                 ot(t, e) {
                     if (!this.ht(t)) return;
-                    const n = this.gt(t, e.key) ? 2 /* Modified */  : 0; /* Added */ 
+                    const n = 2 /* Modified */  * !!this.gt(t, e.key); /* Added */ 
                     this.ut(t).H(e.key, n), this.nt = this.nt.insert(e.key, e), this.st = this.st.insert(e.key, this.yt(e.key).add(t));
                 }
                 /**
@@ -6313,13 +6313,13 @@
                                 });
                                 return null !== o && (n.structuredQuery.limit = o), e.startAt && (n.structuredQuery.startAt = ls(e.startAt)), e.endAt && (n.structuredQuery.endAt = ls(e.endAt)), n;
                             }(t, s)
-                        }).targetId = e.targetId, e.resumeToken.approximateByteSize() > 0 ? n.resumeToken = (e1 = e.resumeToken, t.D ? e1.toBase64() : e1.toUint8Array()) : e.snapshotVersion.compareTo(rt.min()) > 0 && // TODO(wuandy): Consider removing above check because it is most likely true.
+                        }).targetId = e.targetId, e.resumeToken.approximateByteSize() > 0 ? (e1 = e.resumeToken, n.resumeToken = t.D ? e1.toBase64() : e1.toUint8Array()) : e.snapshotVersion.compareTo(rt.min()) > 0 && (e2 = e.snapshotVersion.toTimestamp(), // TODO(wuandy): Consider removing above check because it is most likely true.
                         // Right now, many tests depend on this behaviour though (leaving min() out
                         // of serialization).
-                        (n.readTime = (e2 = e.snapshotVersion.toTimestamp(), t.D ? `${new Date(1e3 * e2.seconds).toISOString().replace(/\.\d*/, "").replace("Z", "")}.${("000000000" + e2.nanoseconds).slice(-9)}Z` : {
+                        n.readTime = t.D ? `${new Date(1e3 * e2.seconds).toISOString().replace(/\.\d*/, "").replace("Z", "")}.${("000000000" + e2.nanoseconds).slice(-9)}Z` : {
                             seconds: "" + e2.seconds,
                             nanos: e2.nanoseconds
-                        })), n;
+                        }), n;
                     }(this.N, t);
                     const n = function(t, e) {
                         const n = function(t, e) {
@@ -6683,7 +6683,7 @@
                  */ function Co(t) {
                 var t1, e, n;
                 return t.Yr || // Create stream (but note that it is not started yet).
-                (t.Yr = (t1 = /**
+                (t1 = /**
                                  * @license
                                  * Copyright 2018 Google LLC
                                  *
@@ -6702,7 +6702,7 @@
                     Si: mo.bind(null, t),
                     Ci: go.bind(null, t),
                     Rr: yo.bind(null, t)
-                }, t1.$r(), new to(e, t1.sr, t1.credentials, t1.N, n)), t.Gr.push(async (e)=>{
+                }, t1.$r(), t.Yr = new to(e, t1.sr, t1.credentials, t1.N, n), t.Gr.push(async (e)=>{
                     e ? (t.Yr.dr(), fo(t) ? lo(t) : t.Hr.set("Unknown" /* Unknown */ )) : (await t.Yr.stop(), t.Jr = void 0);
                 })), t.Yr;
             }
@@ -7068,7 +7068,7 @@
                 }
                 ho(t, e) {
                     return(// Always raise the first event when we're synced
-                    !t.fromCache || (!this.options.fo || !("Offline" /* Offline */  !== e)) && (!t.docs.isEmpty() || "Offline" /* Offline */  === e));
+                    !t.fromCache || (!this.options.fo || "Offline" /* Offline */  === e) && (!t.docs.isEmpty() || "Offline" /* Offline */  === e));
                 // Raise data from cache if we have any documents or we are offline
                 }
                 uo(t) {
@@ -7675,13 +7675,12 @@
                 }(t.localStore, r));
             }
             async function Tc(t, e) {
-                var e1;
                 if (!t.currentUser.isEqual(e)) {
                     $("SyncEngine", "User change. New user:", e.toKey());
                     const t1 = await hr(t.localStore, e);
-                    t.currentUser = e, e1 = "'waitForPendingWrites' promise is rejected due to a user change.", t.Ko.forEach((t)=>{
+                    t.currentUser = e, t.Ko.forEach((t)=>{
                         t.forEach((t)=>{
-                            t.reject(new j(K.CANCELLED, e1));
+                            t.reject(new j(K.CANCELLED, "'waitForPendingWrites' promise is rejected due to a user change."));
                         });
                     }), t.Ko.clear(), // TODO(b/114226417): Consider calling this only in the primary tab.
                     t.sharedClientState.handleUserChange(e, t1.removedBatchIds, t1.addedBatchIds), await pc(t, t1.Wn);

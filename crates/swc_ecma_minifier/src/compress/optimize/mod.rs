@@ -3,10 +3,9 @@
 use std::iter::once;
 
 use rustc_hash::{FxHashMap, FxHashSet};
-use swc_atoms::JsWord;
+use swc_atoms::Atom;
 use swc_common::{
-    collections::AHashMap, iter::IdentifyLast, pass::Repeated, util::take::Take, Spanned,
-    SyntaxContext, DUMMY_SP,
+    iter::IdentifyLast, pass::Repeated, util::take::Take, Spanned, SyntaxContext, DUMMY_SP,
 };
 use swc_ecma_ast::*;
 use swc_ecma_transforms_optimization::debug_assert_valid;
@@ -75,8 +74,36 @@ pub(super) fn optimizer<'a>(
             unresolved_ctxt: SyntaxContext::empty().apply_mark(marks.unresolved_mark),
             is_unresolved_ref_safe: false,
             in_strict: options.module,
+            remaining_depth: 6,
         },
-        ..Ctx::default()
+        has_const_ann: false,
+        dont_use_prepend_nor_append: false,
+        in_bool_ctx: false,
+        in_asm: false,
+        is_callee: false,
+        var_kind: None,
+        in_try_block: false,
+        in_cond: false,
+        is_delete_arg: false,
+        is_update_arg: false,
+        is_lhs_of_assign: false,
+        is_exact_lhs_of_assign: false,
+        executed_multiple_time: false,
+        in_bang_arg: false,
+        in_var_decl_of_for_in_or_of_loop: false,
+        dont_use_negated_iife: false,
+        is_exported: false,
+        top_level: false,
+        in_fn_like: false,
+        in_block: false,
+        in_obj_of_non_computed_member: false,
+        in_tpl_expr: false,
+        is_this_aware_callee: false,
+        is_nested_if_return_merging: false,
+        dont_invoke_iife: false,
+        in_with_stmt: false,
+        in_param: false,
+        scope: SyntaxContext::default(),
     };
 
     Optimizer {
@@ -99,7 +126,7 @@ pub(super) fn optimizer<'a>(
 /// Syntactic context.
 ///
 /// This should not be modified directly. Use `.with_ctx()` instead.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Clone)]
 struct Ctx {
     expr_ctx: ExprCtx,
 
@@ -202,7 +229,7 @@ struct Optimizer<'a> {
 
     vars: Vars,
 
-    typeofs: Box<AHashMap<Id, JsWord>>,
+    typeofs: Box<FxHashMap<Id, Atom>>,
     /// This information is created by analyzing identifier usages.
     ///
     /// This is calculated multiple time, but only once per one
@@ -226,7 +253,7 @@ struct Vars {
     lits: FxHashMap<Id, Box<Expr>>,
 
     /// Used for `hoist_props`.
-    hoisted_props: Box<FxHashMap<(Id, JsWord), Ident>>,
+    hoisted_props: Box<FxHashMap<(Id, Atom), Ident>>,
 
     /// Literals which are cheap to clone, but not sure if we can inline without
     /// making output bigger.
@@ -319,7 +346,9 @@ impl From<&Function> for FnMetadata {
 
 impl Optimizer<'_> {
     fn may_remove_ident(&self, id: &Ident) -> bool {
-        if let Some(VarUsageInfo { exported: true, .. }) = self.data.vars.get(&id.clone().to_id()) {
+        if let Some(VarUsageInfo { exported: true, .. }) =
+            self.data.vars.get(&id.clone().to_id()).map(|v| &**v)
+        {
             return false;
         }
 
@@ -350,7 +379,7 @@ impl Optimizer<'_> {
         self.options.top_level()
     }
 
-    fn ident_reserved(&self, sym: &JsWord) -> bool {
+    fn ident_reserved(&self, sym: &Atom) -> bool {
         if let Some(MangleOptions { reserved, .. }) = self.mangle_options {
             reserved.contains(sym)
         } else {
@@ -718,7 +747,7 @@ impl Optimizer<'_> {
                 }
 
                 let exprs: Vec<Box<Expr>> =
-                    extract_class_side_effect(&self.ctx.expr_ctx, *cls.class.take())
+                    extract_class_side_effect(self.ctx.expr_ctx, *cls.class.take())
                         .into_iter()
                         .filter_map(|mut e| self.ignore_return_value(&mut e))
                         .map(Box::new)
@@ -930,11 +959,33 @@ impl Optimizer<'_> {
             }
 
             Expr::Assign(AssignExpr {
-                op, left, right, ..
-            }) if left.is_simple() && !op.may_short_circuit() => {
+                op: op!("="),
+                left: AssignTarget::Simple(SimpleAssignTarget::Ident(i)),
+                right,
+                ..
+            }) => {
+                let old = i.id.to_id();
+                self.store_var_for_inlining(&mut i.id, right, true);
+
+                if i.is_dummy() && self.options.unused {
+                    report_change!("inline: Removed variable ({}{:?})", old.0, old.1);
+                    self.vars.removed.insert(old);
+                }
+
+                if right.is_invalid() {
+                    return None;
+                }
+            }
+
+            Expr::Assign(AssignExpr {
+                op,
+                left: left @ AssignTarget::Simple(_),
+                right,
+                ..
+            }) if !op.may_short_circuit() => {
                 if let AssignTarget::Simple(expr) = left {
                     if let SimpleAssignTarget::Member(m) = expr {
-                        if !m.obj.may_have_side_effects(&self.ctx.expr_ctx)
+                        if !m.obj.may_have_side_effects(self.ctx.expr_ctx)
                             && (m.obj.is_object()
                                 || m.obj.is_fn_expr()
                                 || m.obj.is_arrow()
@@ -959,25 +1010,6 @@ impl Optimizer<'_> {
                     }
                 }
                 return Some(e.take());
-            }
-
-            Expr::Assign(AssignExpr {
-                op: op!("="),
-                left: AssignTarget::Simple(SimpleAssignTarget::Ident(i)),
-                right,
-                ..
-            }) => {
-                let old = i.id.to_id();
-                self.store_var_for_inlining(&mut i.id, right, true);
-
-                if i.is_dummy() && self.options.unused {
-                    report_change!("inline: Removed variable ({}{:?})", old.0, old.1);
-                    self.vars.removed.insert(old);
-                }
-
-                if right.is_invalid() {
-                    return None;
-                }
             }
 
             // We drop `f.g` in
@@ -1274,7 +1306,7 @@ impl Optimizer<'_> {
                     return exprs.pop().map(|v| *v);
                 } else {
                     let is_last_undefined =
-                        is_pure_undefined(&self.ctx.expr_ctx, exprs.last().unwrap());
+                        is_pure_undefined(self.ctx.expr_ctx, exprs.last().unwrap());
 
                     // (foo(), void 0) => void foo()
                     if is_last_undefined {
@@ -1572,7 +1604,7 @@ impl VisitMut for Optimizer<'_> {
         n.visit_mut_children_with(self);
 
         if let Some(value) = &n.value {
-            if is_pure_undefined(&self.ctx.expr_ctx, value) {
+            if is_pure_undefined(self.ctx.expr_ctx, value) {
                 n.value = None;
             }
         }
@@ -1600,11 +1632,11 @@ impl VisitMut for Optimizer<'_> {
         self.optimize_bin_and_or(n);
 
         if n.op == op!(bin, "+") {
-            if let Known(Type::Str) = n.left.get_type() {
+            if let Known(Type::Str) = n.left.get_type(self.ctx.expr_ctx) {
                 self.optimize_expr_in_str_ctx(&mut n.right);
             }
 
-            if let Known(Type::Str) = n.right.get_type() {
+            if let Known(Type::Str) = n.right.get_type(self.ctx.expr_ctx) {
                 self.optimize_expr_in_str_ctx(&mut n.left);
             }
         }
@@ -2668,7 +2700,7 @@ impl VisitMut for Optimizer<'_> {
         debug_assert_eq!(self.append_stmts.len(), append_len);
 
         if let Stmt::Expr(ExprStmt { expr, .. }) = s {
-            if is_pure_undefined(&self.ctx.expr_ctx, expr) {
+            if is_pure_undefined(self.ctx.expr_ctx, expr) {
                 *s = EmptyStmt { span: DUMMY_SP }.into();
                 return;
             }
@@ -2691,7 +2723,7 @@ impl VisitMut for Optimizer<'_> {
             if self.options.unused {
                 let can_be_removed = !is_directive
                     && !expr.is_ident()
-                    && !expr.may_have_side_effects(&self.ctx.expr_ctx);
+                    && !expr.may_have_side_effects(self.ctx.expr_ctx);
 
                 if can_be_removed {
                     self.changed = true;
@@ -2957,7 +2989,7 @@ impl VisitMut for Optimizer<'_> {
         if n.kind == VarDeclKind::Let {
             n.decls.iter_mut().for_each(|var| {
                 if let Some(e) = &var.init {
-                    if is_pure_undefined(&self.ctx.expr_ctx, e) {
+                    if is_pure_undefined(self.ctx.expr_ctx, e) {
                         self.changed = true;
                         report_change!(
                             "Dropping explicit initializer which evaluates to `undefined`"
@@ -3061,7 +3093,7 @@ impl VisitMut for Optimizer<'_> {
             for v in vars.iter_mut() {
                 if v.init
                     .as_deref()
-                    .map(|e| !e.is_ident() && !e.may_have_side_effects(&self.ctx.expr_ctx))
+                    .map(|e| !e.is_ident() && !e.may_have_side_effects(self.ctx.expr_ctx))
                     .unwrap_or(true)
                 {
                     self.drop_unused_var_declarator(v, &mut None);
@@ -3206,7 +3238,7 @@ impl VisitMut for Optimizer<'_> {
         if let Some(arg) = &mut n.arg {
             self.compress_undefined(arg);
 
-            if !n.delegate && is_pure_undefined(&self.ctx.expr_ctx, arg) {
+            if !n.delegate && is_pure_undefined(self.ctx.expr_ctx, arg) {
                 n.arg = None;
             }
         }

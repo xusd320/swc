@@ -304,7 +304,7 @@
                 return !function(imageWrapper, threshold, targetWrapper) {
                     targetWrapper || // eslint-disable-next-line no-param-reassign
                     (targetWrapper = imageWrapper);
-                    for(var imageData = imageWrapper.data, length = imageData.length, targetData = targetWrapper.data; length--;)targetData[length] = imageData[length] < threshold ? 1 : 0;
+                    for(var imageData = imageWrapper.data, length = imageData.length, targetData = targetWrapper.data; length--;)targetData[length] = +(imageData[length] < threshold);
                 }(imageWrapper, threshold, targetWrapper), threshold;
             } // local thresholding
             function cv_utils_cluster(points, threshold, property) {
@@ -504,7 +504,7 @@
             function assertNumberPositive(val) {
                 if (val < 0) throw Error("expected positive number, received ".concat(val));
             }
-            var ImageWrapper = /*#__PURE__*/ function() {
+            /* harmony default export */ __webpack_exports__.a = /*#__PURE__*/ function() {
                 // Represents a basic image combining the data and size. In addition, some methods for
                 // manipulation are contained within.
                 function ImageWrapper(size, data) {
@@ -649,7 +649,6 @@
                     }
                 ]), ImageWrapper;
             }();
-            /* harmony default export */ __webpack_exports__.a = ImageWrapper;
         /***/ },
         /* 12 */ /***/ function(module1, exports1, __webpack_require__) {
             module1.exports = __webpack_require__(228);
@@ -698,40 +697,17 @@
             };
         /***/ },
         /* 15 */ /***/ function(module1, exports1) {
-            /**
-                 * Checks if `value` is classified as an `Array` object.
-                 *
-                 * @static
-                 * @memberOf _
-                 * @since 0.1.0
-                 * @category Lang
-                 * @param {*} value The value to check.
-                 * @returns {boolean} Returns `true` if `value` is an array, else `false`.
-                 * @example
-                 *
-                 * _.isArray([1, 2, 3]);
-                 * // => true
-                 *
-                 * _.isArray(document.body.children);
-                 * // => false
-                 *
-                 * _.isArray('abc');
-                 * // => false
-                 *
-                 * _.isArray(_.noop);
-                 * // => false
-                 */ var isArray = Array.isArray;
-            module1.exports = isArray;
+            module1.exports = Array.isArray;
         /***/ },
         /* 16 */ /***/ function(module1, exports1, __webpack_require__) {
-            var baseMerge = __webpack_require__(90), merge = __webpack_require__(145)(function(object, source, srcIndex) {
+            var baseMerge = __webpack_require__(90);
+            module1.exports = __webpack_require__(145)(function(object, source, srcIndex) {
                 baseMerge(object, source, srcIndex);
             });
-            module1.exports = merge;
         /***/ },
         /* 17 */ /***/ function(module1, exports1, __webpack_require__) {
-            var freeGlobal = __webpack_require__(45), freeSelf = "object" == typeof self && self && self.Object === Object && self, root = freeGlobal || freeSelf || Function("return this")();
-            module1.exports = root;
+            var freeGlobal = __webpack_require__(45), freeSelf = "object" == typeof self && self && self.Object === Object && self;
+            module1.exports = freeGlobal || freeSelf || Function("return this")();
         /***/ },
         /* 18 */ /***/ function(module1, exports1) {
             module1.exports = /**
@@ -1230,12 +1206,10 @@
             };
         /***/ },
         /* 27 */ /***/ function(module1, exports1, __webpack_require__) {
-            /** Built-in value references. */ var Symbol1 = __webpack_require__(17).Symbol;
-            module1.exports = Symbol1;
+            module1.exports = __webpack_require__(17).Symbol;
         /***/ },
         /* 28 */ /***/ function(module1, exports1, __webpack_require__) {
-            /* Built-in method references that are verified to be native. */ var nativeCreate = __webpack_require__(35)(Object, "create");
-            module1.exports = nativeCreate;
+            module1.exports = __webpack_require__(35)(Object, "create");
         /***/ },
         /* 29 */ /***/ function(module1, exports1, __webpack_require__) {
             var isKeyable = __webpack_require__(117);
@@ -1252,12 +1226,12 @@
             };
         /***/ },
         /* 30 */ /***/ function(module1, exports1, __webpack_require__) {
-            var baseIsArguments = __webpack_require__(132), isObjectLike = __webpack_require__(18), objectProto = Object.prototype, hasOwnProperty = objectProto.hasOwnProperty, propertyIsEnumerable = objectProto.propertyIsEnumerable, isArguments = baseIsArguments(function() {
+            var baseIsArguments = __webpack_require__(132), isObjectLike = __webpack_require__(18), objectProto = Object.prototype, hasOwnProperty = objectProto.hasOwnProperty, propertyIsEnumerable = objectProto.propertyIsEnumerable;
+            module1.exports = baseIsArguments(function() {
                 return arguments;
             }()) ? baseIsArguments : function(value) {
                 return isObjectLike(value) && hasOwnProperty.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
             };
-            module1.exports = isArguments;
         /***/ },
         /* 31 */ /***/ function(module1, exports1) {
             /** Used to detect unsigned integer values. */ var reIsUint = /^(?:0|[1-9]\d*)$/;
@@ -1489,13 +1463,11 @@
             };
         /***/ },
         /* 44 */ /***/ function(module1, exports1, __webpack_require__) {
-            /* Built-in method references that are verified to be native. */ var Map1 = __webpack_require__(35)(__webpack_require__(17), "Map");
-            module1.exports = Map1;
+            module1.exports = __webpack_require__(35)(__webpack_require__(17), "Map");
         /***/ },
         /* 45 */ /***/ function(module1, exports1, __webpack_require__) {
             /* WEBPACK VAR INJECTION */ (function(global) {
-                /** Detect free variable `global` from Node.js. */ var freeGlobal = "object" == typeof global && global && global.Object === Object && global;
-                module1.exports = freeGlobal;
+                module1.exports = "object" == typeof global && global && global.Object === Object && global;
             /* WEBPACK VAR INJECTION */ }).call(this, __webpack_require__(46));
         /***/ },
         /* 46 */ /***/ function(module1, exports1) {
@@ -1546,17 +1518,16 @@
             };
         /***/ },
         /* 49 */ /***/ function(module1, exports1, __webpack_require__) {
-            var getNative = __webpack_require__(35), defineProperty = function() {
+            var getNative = __webpack_require__(35);
+            module1.exports = function() {
                 try {
                     var func = getNative(Object, "defineProperty");
                     return func({}, "", {}), func;
                 } catch (e) {}
             }();
-            module1.exports = defineProperty;
         /***/ },
         /* 50 */ /***/ function(module1, exports1, __webpack_require__) {
-            /** Built-in value references. */ var getPrototype = __webpack_require__(131)(Object.getPrototypeOf, Object);
-            module1.exports = getPrototype;
+            module1.exports = __webpack_require__(131)(Object.getPrototypeOf, Object);
         /***/ },
         /* 51 */ /***/ function(module1, exports1) {
             /** Used for built-in method references. */ var objectProto = Object.prototype;
@@ -1573,13 +1544,13 @@
         /***/ },
         /* 52 */ /***/ function(module1, exports1, __webpack_require__) {
             /* WEBPACK VAR INJECTION */ (function(module1) {
-                var root = __webpack_require__(17), stubFalse = __webpack_require__(134), freeExports = exports1 && !exports1.nodeType && exports1, freeModule = freeExports && "object" == typeof module1 && module1 && !module1.nodeType && module1, Buffer = freeModule && freeModule.exports === freeExports ? root.Buffer : void 0, nativeIsBuffer = Buffer ? Buffer.isBuffer : void 0;
-                module1.exports = nativeIsBuffer || stubFalse;
+                var root = __webpack_require__(17), stubFalse = __webpack_require__(134), freeExports = exports1 && !exports1.nodeType && exports1, freeModule = freeExports && "object" == typeof module1 && module1 && !module1.nodeType && module1, Buffer = freeModule && freeModule.exports === freeExports ? root.Buffer : void 0;
+                module1.exports = (Buffer ? Buffer.isBuffer : void 0) || stubFalse;
             /* WEBPACK VAR INJECTION */ }).call(this, __webpack_require__(38)(module1));
         /***/ },
         /* 53 */ /***/ function(module1, exports1, __webpack_require__) {
-            var baseIsTypedArray = __webpack_require__(136), baseUnary = __webpack_require__(137), nodeUtil = __webpack_require__(138), nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray, isTypedArray = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
-            module1.exports = isTypedArray;
+            var baseIsTypedArray = __webpack_require__(136), baseUnary = __webpack_require__(137), nodeUtil = __webpack_require__(138), nodeIsTypedArray = nodeUtil && nodeUtil.isTypedArray;
+            module1.exports = nodeIsTypedArray ? baseUnary(nodeIsTypedArray) : baseIsTypedArray;
         /***/ },
         /* 54 */ /***/ function(module1, exports1) {
             module1.exports = /**
@@ -1677,8 +1648,8 @@
             };
         /***/ },
         /* 59 */ /***/ function(module1, exports1, __webpack_require__) {
-            var baseSetToString = __webpack_require__(148), setToString = __webpack_require__(150)(baseSetToString);
-            module1.exports = setToString;
+            var baseSetToString = __webpack_require__(148);
+            module1.exports = __webpack_require__(150)(baseSetToString);
         /***/ },
         /* 60 */ /***/ function(module1, exports1, __webpack_require__) {
             var arrayLikeToArray = __webpack_require__(61);
@@ -1981,10 +1952,10 @@
             };
         /***/ },
         /* 85 */ /***/ function(module1, exports1, __webpack_require__) {
-            var basePick = __webpack_require__(229), pick = __webpack_require__(243)(function(object, paths) {
+            var basePick = __webpack_require__(229);
+            module1.exports = __webpack_require__(243)(function(object, paths) {
                 return null == object ? {} : basePick(object, paths);
             });
-            module1.exports = pick;
         /***/ },
         /* 86 */ /***/ function(module1, exports1, __webpack_require__) {
             var getPrototypeOf = __webpack_require__(2), setPrototypeOf = __webpack_require__(41), isNativeFunction = __webpack_require__(248), construct = __webpack_require__(249);
@@ -2481,8 +2452,7 @@
             };
         /***/ },
         /* 106 */ /***/ function(module1, exports1, __webpack_require__) {
-            /** Used to detect overreaching core-js shims. */ var coreJsData = __webpack_require__(17)["__core-js_shared__"];
-            module1.exports = coreJsData;
+            module1.exports = __webpack_require__(17)["__core-js_shared__"];
         /***/ },
         /* 107 */ /***/ function(module1, exports1) {
             /** Used to resolve the decompiled source of functions. */ var funcToString = Function.prototype.toString;
@@ -2573,7 +2543,7 @@
                  * @returns {boolean} Returns `true` if the entry was removed, else `false`.
                  */ function(key) {
                 var result = this.has(key) && delete this.__data__[key];
-                return this.size -= result ? 1 : 0, result;
+                return this.size -= +!!result, result;
             };
         /***/ },
         /* 113 */ /***/ function(module1, exports1, __webpack_require__) {
@@ -2623,7 +2593,7 @@
                  * @returns {Object} Returns the hash instance.
                  */ function(key, value) {
                 var data = this.__data__;
-                return this.size += this.has(key) ? 0 : 1, data[key] = nativeCreate && void 0 === value ? "__lodash_hash_undefined__" : value, this;
+                return this.size += +!this.has(key), data[key] = nativeCreate && void 0 === value ? "__lodash_hash_undefined__" : value, this;
             };
         /***/ },
         /* 116 */ /***/ function(module1, exports1, __webpack_require__) {
@@ -2638,7 +2608,7 @@
                  * @returns {boolean} Returns `true` if the entry was removed, else `false`.
                  */ function(key) {
                 var result = getMapData(this, key).delete(key);
-                return this.size -= result ? 1 : 0, result;
+                return this.size -= +!!result, result;
             };
         /***/ },
         /* 117 */ /***/ function(module1, exports1) {
@@ -2694,22 +2664,11 @@
                  * @returns {Object} Returns the map cache instance.
                  */ function(key, value) {
                 var data = getMapData(this, key), size = data.size;
-                return data.set(key, value), this.size += data.size == size ? 0 : 1, this;
+                return data.set(key, value), this.size += +(data.size != size), this;
             };
         /***/ },
         /* 121 */ /***/ function(module1, exports1, __webpack_require__) {
-            /**
-                 * The base implementation of `baseForOwn` which iterates over `object`
-                 * properties returned by `keysFunc` and invokes `iteratee` for each property.
-                 * Iteratee functions may exit iteration early by explicitly returning `false`.
-                 *
-                 * @private
-                 * @param {Object} object The object to iterate over.
-                 * @param {Function} iteratee The function invoked per iteration.
-                 * @param {Function} keysFunc The function to get the keys of `object`.
-                 * @returns {Object} Returns `object`.
-                 */ var baseFor = __webpack_require__(122)();
-            module1.exports = baseFor;
+            module1.exports = __webpack_require__(122)();
         /***/ },
         /* 122 */ /***/ function(module1, exports1) {
             module1.exports = /**
@@ -2804,8 +2763,7 @@
             };
         /***/ },
         /* 127 */ /***/ function(module1, exports1, __webpack_require__) {
-            /** Built-in value references. */ var Uint8Array1 = __webpack_require__(17).Uint8Array;
-            module1.exports = Uint8Array1;
+            module1.exports = __webpack_require__(17).Uint8Array;
         /***/ },
         /* 128 */ /***/ function(module1, exports1) {
             module1.exports = /**
@@ -2834,7 +2792,8 @@
             };
         /***/ },
         /* 130 */ /***/ function(module1, exports1, __webpack_require__) {
-            var isObject = __webpack_require__(14), objectCreate = Object.create, baseCreate = function() {
+            var isObject = __webpack_require__(14), objectCreate = Object.create;
+            module1.exports = function() {
                 function object() {}
                 return function(proto) {
                     if (!isObject(proto)) return {};
@@ -2844,7 +2803,6 @@
                     return object.prototype = void 0, result;
                 };
             }();
-            module1.exports = baseCreate;
         /***/ },
         /* 131 */ /***/ function(module1, exports1) {
             module1.exports = /**
@@ -2983,7 +2941,8 @@
         /***/ },
         /* 138 */ /***/ function(module1, exports1, __webpack_require__) {
             /* WEBPACK VAR INJECTION */ (function(module1) {
-                var freeGlobal = __webpack_require__(45), freeExports = exports1 && !exports1.nodeType && exports1, freeModule = freeExports && "object" == typeof module1 && module1 && !module1.nodeType && module1, freeProcess = freeModule && freeModule.exports === freeExports && freeGlobal.process, nodeUtil = function() {
+                var freeGlobal = __webpack_require__(45), freeExports = exports1 && !exports1.nodeType && exports1, freeModule = freeExports && "object" == typeof module1 && module1 && !module1.nodeType && module1, freeProcess = freeModule && freeModule.exports === freeExports && freeGlobal.process;
+                module1.exports = function() {
                     try {
                         // Use `util.types` for Node.js 10+.
                         var types = freeModule && freeModule.require && freeModule.require("util").types;
@@ -2992,7 +2951,6 @@
                         return freeProcess && freeProcess.binding && freeProcess.binding("util");
                     } catch (e) {}
                 }();
-                module1.exports = nodeUtil;
             /* WEBPACK VAR INJECTION */ }).call(this, __webpack_require__(38)(module1));
         /***/ },
         /* 139 */ /***/ function(module1, exports1, __webpack_require__) {
@@ -3163,7 +3121,8 @@
             };
         /***/ },
         /* 148 */ /***/ function(module1, exports1, __webpack_require__) {
-            var constant = __webpack_require__(149), defineProperty = __webpack_require__(49), identity = __webpack_require__(57), baseSetToString = defineProperty ? function(func, string) {
+            var constant = __webpack_require__(149), defineProperty = __webpack_require__(49), identity = __webpack_require__(57);
+            module1.exports = defineProperty ? function(func, string) {
                 return defineProperty(func, "toString", {
                     configurable: !0,
                     enumerable: !1,
@@ -3171,7 +3130,6 @@
                     writable: !0
                 });
             } : identity;
-            module1.exports = baseSetToString;
         /***/ },
         /* 149 */ /***/ function(module1, exports1) {
             module1.exports = /**
@@ -4047,9 +4005,9 @@
                 "use strict";
                 var undefined, Op = Object.prototype, hasOwn = Op.hasOwnProperty, $Symbol = "function" == typeof Symbol ? Symbol : {}, iteratorSymbol = $Symbol.iterator || "@@iterator", asyncIteratorSymbol = $Symbol.asyncIterator || "@@asyncIterator", toStringTagSymbol = $Symbol.toStringTag || "@@toStringTag";
                 function wrap(innerFn, outerFn, self1, tryLocsList) {
-                    var state, generator = Object.create((outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator).prototype), context = new Context(tryLocsList || []);
-                    return(// .throw, and .return methods.
-                    generator._invoke = (state = GenStateSuspendedStart, function(method, arg) {
+                    var context, state, generator = Object.create((outerFn && outerFn.prototype instanceof Generator ? outerFn : Generator).prototype);
+                    return context = new Context(tryLocsList || []), state = GenStateSuspendedStart, // .throw, and .return methods.
+                    generator._invoke = function(method, arg) {
                         if (state === GenStateExecuting) throw Error("Generator is already running");
                         if (state === GenStateCompleted) {
                             if ("throw" === method) throw arg;
@@ -4114,7 +4072,7 @@
                             "throw" === record.type && (state = GenStateCompleted, // context.dispatchException(context.arg) call above.
                             context.method = "throw", context.arg = record.arg);
                         }
-                    }), generator);
+                    }, generator;
                 }
                 // record like context.tryEntries[i].completion. This interface could
                 // have been (and was previously) designed to take a closure to be
@@ -4480,13 +4438,13 @@
             };
         /***/ },
         /* 233 */ /***/ function(module1, exports1, __webpack_require__) {
-            var memoizeCapped = __webpack_require__(234), rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, reEscapeChar = /\\(\\)?/g, stringToPath = memoizeCapped(function(string) {
+            var memoizeCapped = __webpack_require__(234), rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g, reEscapeChar = /\\(\\)?/g;
+            module1.exports = memoizeCapped(function(string) {
                 var result = [];
                 return 46 === string.charCodeAt(0) && result.push(""), string.replace(rePropName, function(match, number, quote, subString) {
                     result.push(quote ? subString.replace(reEscapeChar, "$1") : number || match);
                 }), result;
             });
-            module1.exports = stringToPath;
         /***/ },
         /* 234 */ /***/ function(module1, exports1, __webpack_require__) {
             var memoize = __webpack_require__(235);
@@ -5160,7 +5118,7 @@
                         value: function() {
                             var offset = arguments.length > 0 && void 0 !== arguments[0] ? arguments[0] : this._nextUnset(this._row), end = arguments.length > 1 && void 0 !== arguments[1] ? arguments[1] : this._row.length, isWhite = !(arguments.length > 2) || void 0 === arguments[2] || arguments[2], counters = [], counterPos = 0;
                             counters[0] = 0;
-                            for(var i = offset; i < end; i++)this._row[i] ^ (isWhite ? 1 : 0) ? counters[counterPos]++ : (counters[++counterPos] = 1, isWhite = !isWhite);
+                            for(var i = offset; i < end; i++)this._row[i] ^ +!!isWhite ? counters[counterPos]++ : (counters[++counterPos] = 1, isWhite = !isWhite);
                             return counters;
                         }
                     },
@@ -5169,7 +5127,7 @@
                         value: function(start, counters) {
                             var numCounters = counters.length, end = this._row.length, isWhite = !this._row[start], counterPos = 0;
                             array_helper.a.init(counters, 0);
-                            for(var i = start; i < end; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counters[counterPos]++;
+                            for(var i = start; i < end; i++)if (this._row[i] ^ +!!isWhite) counters[counterPos]++;
                             else {
                                 if (++counterPos === numCounters) break;
                                 counters[counterPos] = 1, isWhite = !isWhite;
@@ -6100,7 +6058,7 @@
                                 0,
                                 0,
                                 0
-                            ], isWhite = !this._row[start], counterPos = 0, i = start; i < this._row.length; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            ], isWhite = !this._row[start], counterPos = 0, i = start; i < this._row.length; i++)if (this._row[i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     correction && this._correct(counter, correction);
@@ -6142,7 +6100,7 @@
                                     bar: 1,
                                     space: 1
                                 }
-                            }, isWhite = !1, counterPos = 0, i = offset; i < this._row.length; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            }, isWhite = !1, counterPos = 0, i = offset; i < this._row.length; i++)if (this._row[i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     for(var sum = counter.reduce(function(prev, next) {
@@ -6480,7 +6438,7 @@
                             }, counterPos = 0;
                             offset || (offset = this._nextSet(this._row));
                             for(var found = !1, i = offset; i < this._row.length; i++)// console.warn(`* loop i=${offset} len=${this._row.length} isWhite=${isWhite} counterPos=${counterPos}`);
-                            if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos] += 1;
+                            if (this._row[i] ^ +!!isWhite) counter[counterPos] += 1;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     var error = this._matchPattern(counter, pattern); // console.warn('* matchPattern', error, counter, pattern);
@@ -6514,7 +6472,7 @@
                             }, isWhite = !this._row[start], counterPos = 0;
                             coderange || // console.warn('* decodeCode before length');
                             (coderange = CODE_PATTERN.length);
-                            for(var i = start; i < this._row.length; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            for(var i = start; i < this._row.length; i++)if (this._row[i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     for(var code = 0; code < coderange; code++){
@@ -6753,7 +6711,7 @@
                                 0,
                                 0,
                                 0
-                            ]), counterPos = 0, isWhite = !1, i = offset; i < this._row.length; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            ]), counterPos = 0, isWhite = !1, i = offset; i < this._row.length; i++)if (this._row[i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     // find start pattern
@@ -7576,7 +7534,7 @@
                                 end: 0
                             }, epsilon = this.AVG_CODE_ERROR;
                             isWhite = isWhite || !1, tryHarder = tryHarder || !1, offset || (offset = this._nextSet(this._row));
-                            for(var i = offset; i < this._row.length; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            for(var i = offset; i < this._row.length; i++)if (this._row[i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     var sum = counter.reduce(function(prev, next) {
@@ -7821,7 +7779,7 @@
                             }, sum = 0, error = 0, epsilon = this.AVG_CODE_ERROR;
                             offset || (offset = this._nextSet(this._row));
                             for(var i = 0; i < pattern.length; i++)counter[i] = 0;
-                            for(var _i = offset; _i < this._row.length; _i++)if (this._row[_i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            for(var _i = offset; _i < this._row.length; _i++)if (this._row[_i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     sum = 0;
@@ -8032,7 +7990,7 @@
                                 0,
                                 0,
                                 0
-                            ]), counterPos = 0, isWhite = !1, i = offset; i < this._row.length; i++)if (this._row[i] ^ (isWhite ? 1 : 0)) counter[counterPos]++;
+                            ]), counterPos = 0, isWhite = !1, i = offset; i < this._row.length; i++)if (this._row[i] ^ +!!isWhite) counter[counterPos]++;
                             else {
                                 if (counterPos === counter.length - 1) {
                                     // find start pattern
@@ -9480,7 +9438,7 @@
                             size: 800,
                             src: config.src
                         },
-                        numOfWorkers: config.debug ? 0 : 1,
+                        numOfWorkers: +!config.debug,
                         locator: {
                             halfSample: !1
                         }

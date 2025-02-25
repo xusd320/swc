@@ -10,7 +10,7 @@ use super::{
     inferrer::ReturnTypeInferrer,
     type_ann,
     util::{
-        ast_ext::PatExt,
+        ast_ext::{ExprExit, PatExt},
         types::{ts_keyword_type, ts_lit_type},
     },
     FastDts,
@@ -20,12 +20,12 @@ impl FastDts {
     pub(crate) fn transform_expr_to_ts_type(&mut self, expr: &Expr) -> Option<Box<TsType>> {
         match expr {
             Expr::Ident(ident) if ident.sym == "undefined" => {
-                Some(ts_keyword_type(TsKeywordTypeKind::TsAnyKeyword))
+                Some(ts_keyword_type(TsKeywordTypeKind::TsUndefinedKeyword))
             }
             Expr::Lit(lit) => match lit {
                 Lit::Str(string) => Some(ts_lit_type(TsLit::Str(string.clone()))),
                 Lit::Bool(b) => Some(ts_lit_type(TsLit::Bool(*b))),
-                Lit::Null(_) => Some(ts_keyword_type(TsKeywordTypeKind::TsAnyKeyword)),
+                Lit::Null(_) => Some(ts_keyword_type(TsKeywordTypeKind::TsNullKeyword)),
                 Lit::Num(number) => Some(ts_lit_type(TsLit::Number(number.clone()))),
                 Lit::BigInt(big_int) => Some(ts_lit_type(TsLit::BigInt(big_int.clone()))),
                 Lit::Regex(_) | Lit::JSXText(_) => None,
@@ -274,7 +274,7 @@ impl FastDts {
                 elements.push(TsTupleElement {
                     span: DUMMY_SP,
                     label: None,
-                    ty: ts_keyword_type(TsKeywordTypeKind::TsAnyKeyword),
+                    ty: ts_keyword_type(TsKeywordTypeKind::TsUndefinedKeyword),
                 });
                 continue;
             };
@@ -312,6 +312,51 @@ impl FastDts {
             PropName::Num(num) => (Lit::Num(num.clone()).into(), true),
             PropName::Computed(computed) => (*computed.expr.clone(), true),
             PropName::BigInt(big_int) => (Lit::BigInt(big_int.clone()).into(), true),
+        }
+    }
+
+    pub(crate) fn check_ts_signature(&mut self, signature: &TsTypeElement) {
+        match signature {
+            TsTypeElement::TsPropertySignature(ts_property_signature) => {
+                self.report_signature_property_key(
+                    &ts_property_signature.key,
+                    ts_property_signature.computed,
+                );
+            }
+            TsTypeElement::TsGetterSignature(ts_getter_signature) => {
+                self.report_signature_property_key(
+                    &ts_getter_signature.key,
+                    ts_getter_signature.computed,
+                );
+            }
+            TsTypeElement::TsSetterSignature(ts_setter_signature) => {
+                self.report_signature_property_key(
+                    &ts_setter_signature.key,
+                    ts_setter_signature.computed,
+                );
+            }
+            TsTypeElement::TsMethodSignature(ts_method_signature) => {
+                self.report_signature_property_key(
+                    &ts_method_signature.key,
+                    ts_method_signature.computed,
+                );
+            }
+            _ => {}
+        }
+    }
+
+    pub(crate) fn report_signature_property_key(&mut self, key: &Expr, computed: bool) {
+        if !computed {
+            return;
+        }
+
+        let is_not_allowed = match key {
+            Expr::Ident(_) | Expr::Member(_) | Expr::OptChain(_) => key.get_root_ident().is_none(),
+            _ => !Self::is_literal(key),
+        };
+
+        if is_not_allowed {
+            self.signature_computed_property_name(key.span());
         }
     }
 

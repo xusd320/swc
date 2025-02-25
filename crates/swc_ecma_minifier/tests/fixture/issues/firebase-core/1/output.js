@@ -243,9 +243,6 @@
             function w(a, b) {
                 return -1 != a.indexOf(b);
             }
-            function ua(a, b) {
-                return a < b ? -1 : a > b ? 1 : 0;
-            }
             a: {
                 var va = l.navigator;
                 if (va) {
@@ -802,7 +799,7 @@
                                     const G = m[4];
                                     null != G && (c.za = G, c.h.info("SVER=" + c.za));
                                     const Da = m[5];
-                                    null != Da && "number" == typeof Da && 0 < Da && (d = 1.5 * Da, c.K = d, c.h.info("backChannelRequestTimeoutMs_=" + d)), d = c;
+                                    null != Da && "number" == typeof Da && 0 < Da && (c.K = d = 1.5 * Da, c.h.info("backChannelRequestTimeoutMs_=" + d)), d = c;
                                     const ca = a.g;
                                     if (ca) {
                                         const Ea = ca.g ? ca.g.getResponseHeader("X-Client-Wire-Protocol") : null;
@@ -1413,7 +1410,7 @@
                         }
                     }
                 }
-                return a = a.l.splice(0, c), b.D = a, d;
+                return b.D = a = a.l.splice(0, c), d;
             }
             function Gc(a) {
                 a.g || a.u || (a.Y = 1, zb(a.Ga, a), a.A = 0);
@@ -1450,7 +1447,7 @@
                             var b1, e = a.C;
                             D(d = Sb(), new Vb(d, c, b, e)), Hc(a);
                         } else Gc(a);
-                    } else if (3 == (e = b.o) || 0 == e && 0 < a.I || !(1 == d && (b1 = b, !(Cc(a.i) >= a.i.j - (a.m ? 1 : 0)) && (a.m ? (a.l = b1.D.concat(a.l), !0) : 1 != a.G && 2 != a.G && !(a.C >= (a.Xa ? 0 : a.Ya)) && (a.m = K(q(a.Ha, a, b1), Od(a, a.C)), a.C++, !0))) || 2 == d && Bc(a))) switch(c && 0 < c.length && ((b = a.i).i = b.i.concat(c)), e){
+                    } else if (3 == (e = b.o) || 0 == e && 0 < a.I || !(1 == d && (b1 = b, !(Cc(a.i) >= a.i.j - +!!a.m) && (a.m ? (a.l = b1.D.concat(a.l), !0) : 1 != a.G && 2 != a.G && !(a.C >= (a.Xa ? 0 : a.Ya)) && (a.m = K(q(a.Ha, a, b1), Od(a, a.C)), a.C++, !0))) || 2 == d && Bc(a))) switch(c && 0 < c.length && ((b = a.i).i = b.i.concat(c)), e){
                         case 1:
                             Q(a, 5);
                             break;
@@ -1568,12 +1565,12 @@
                     this.g.setRequestHeader(h, f);
                 }, this), this.J && (this.g.responseType = this.J), "withCredentials" in this.g && this.g.withCredentials !== this.L && (this.g.withCredentials = this.L);
                 try {
-                    var a1, a2;
-                    Ad(this), 0 < this.B && ((this.K = (a1 = this.g, y && (a2 = function() {
+                    var a1;
+                    Ad(this), 0 < this.B && ((this.K = (a1 = this.g, y && (Object.prototype.hasOwnProperty.call(Ga, 9) ? Ga[9] : Ga[9] = function() {
                         let a = 0;
                         const b = ta(String(Na)).split("."), c = ta("9").split("."), d = Math.max(b.length, c.length);
                         for(let h = 0; 0 == a && h < d; h++){
-                            var e = b[h] || "", f = c[h] || "";
+                            var a1, b1, a2, b2, a3, b3, e = b[h] || "", f = c[h] || "";
                             do {
                                 if (e = /(\d*)(\D*)(.*)/.exec(e) || [
                                     "",
@@ -1586,11 +1583,11 @@
                                     "",
                                     ""
                                 ], 0 == e[0].length && 0 == f[0].length) break;
-                                a = ua(0 == e[1].length ? 0 : parseInt(e[1], 10), 0 == f[1].length ? 0 : parseInt(f[1], 10)) || ua(0 == e[2].length, 0 == f[2].length) || ua(e[2], f[2]), e = e[3], f = f[3];
+                                a1 = 0 == e[1].length ? 0 : parseInt(e[1], 10), b1 = 0 == f[1].length ? 0 : parseInt(f[1], 10), a = (a1 < b1 ? -1 : +(a1 > b1)) || (a2 = 0 == e[2].length, b2 = 0 == f[2].length, a2 < b2 ? -1 : +(a2 > b2)) || (a3 = e[2], b3 = f[2], a3 < b3 ? -1 : +(a3 > b3)), e = e[3], f = f[3];
                             }while (0 == a)
                         }
                         return 0 <= a;
-                    }, Object.prototype.hasOwnProperty.call(Ga, 9) ? Ga[9] : Ga[9] = a2(9)) && "number" == typeof a1.timeout && void 0 !== a1.ontimeout)) ? (this.g.timeout = this.B, this.g.ontimeout = q(this.pa, this)) : this.A = Gb(this.pa, this.B, this)), this.v = !0, this.g.send(a), this.v = !1;
+                    }(9)) && "number" == typeof a1.timeout && void 0 !== a1.ontimeout)) ? (this.g.timeout = this.B, this.g.ontimeout = q(this.pa, this)) : this.A = Gb(this.pa, this.B, this)), this.v = !0, this.g.send(a), this.v = !1;
                 } catch (f) {
                     zd(this, f);
                 }
@@ -2171,10 +2168,8 @@
                 }(arr, 0) || function() {
                     throw TypeError("Invalid attempt to destructure non-iterable instance");
                 }(), visible = ref[0], setVisible = ref[1], setRef = _react.useCallback(function(el) {
-                    var callback, ref, id, observer, elements;
-                    unobserve.current && (unobserve.current(), unobserve.current = void 0), !isDisabled && !visible && el && el.tagName && (unobserve.current = (callback = function(isVisible) {
-                        return isVisible && setVisible(isVisible);
-                    }, id = (ref = function(options) {
+                    var ref, id, observer, elements;
+                    unobserve.current && (unobserve.current(), unobserve.current = void 0), !isDisabled && !visible && el && el.tagName && (id = (ref = function(options) {
                         var id = options.rootMargin || "", instance = observers.get(id);
                         if (instance) return instance;
                         var elements = new Map(), observer = new IntersectionObserver(function(entries) {
@@ -2191,9 +2186,11 @@
                     } //# sourceMappingURL=use-intersection.js.map
                     ({
                         rootMargin: rootMargin
-                    })).id, observer = ref.observer, (elements = ref.elements).set(el, callback), observer.observe(el), function() {
+                    })).id, observer = ref.observer, (elements = ref.elements).set(el, function(isVisible) {
+                        return isVisible && setVisible(isVisible);
+                    }), observer.observe(el), unobserve.current = function() {
                         elements.delete(el), observer.unobserve(el), 0 === elements.size && (observer.disconnect(), observers.delete(id));
-                    }));
+                    });
                 }, [
                     isDisabled,
                     rootMargin,

@@ -2523,7 +2523,7 @@
                     }, resPattern = option.format || intl_base_IntlBase.getResultantPattern(option.skeleton, dependable.dateObject, option.type, !1, '');
                     if (formatOptions.dateSeperator = intl_base_IntlBase.getDateSeparator(dependable.dateObject), util_isUndefined(resPattern)) throwError('Format options or type given must be invalid');
                     else {
-                        resPattern = intl_base_IntlBase.ConvertDateToWeekFormat(resPattern), formatOptions.pattern = resPattern, formatOptions.numMapper = ParserBase.getNumberMapper(dependable.parserObject, ParserBase.getNumberingSystem(cldr));
+                        formatOptions.pattern = resPattern = intl_base_IntlBase.ConvertDateToWeekFormat(resPattern), formatOptions.numMapper = ParserBase.getNumberMapper(dependable.parserObject, ParserBase.getNumberingSystem(cldr));
                         for(var patternMatch = resPattern.match(abbreviateRegexGlobal) || [], _i = 0; _i < patternMatch.length; _i++){
                             var str = patternMatch[_i], len = str.length, char = str[0];
                             switch('K' === char && (char = 'h'), char){
@@ -2541,9 +2541,7 @@
                                     formatOptions.designator = util_getValue('dayPeriods.format.wide', dateObject);
                                     break;
                                 case 'G':
-                                    // eslint-disable-next-line
-                                    var eText = len <= 3 ? 'eraAbbr' : 4 === len ? 'eraNames' : 'eraNarrow';
-                                    formatOptions.era = util_getValue('eras.' + eText, dependable.dateObject);
+                                    formatOptions.era = util_getValue('eras.' + (len <= 3 ? 'eraAbbr' : 4 === len ? 'eraNames' : 'eraNarrow'), dependable.dateObject);
                                     break;
                                 case 'z':
                                     formatOptions.timeZone = util_getValue('dates.timeZoneNames', dependable.parserObject);
@@ -2608,7 +2606,7 @@
                                 // eslint-disable-next-line
                                 var dec = 0 > value.getFullYear() ? 0 : 1, retu = options.era[dec];
                                 util_isNullOrUndefined(retu) && // eslint-disable-next-line
-                                (retu = options.era[dec ? 0 : 1]), ret += retu || '';
+                                (retu = options.era[+!dec]), ret += retu || '';
                                 break;
                             case '\'':
                                 ret += '\'\'' === match ? '\'' : match.replace(/'/g, '');
@@ -2657,7 +2655,7 @@
      * @returns {string} ?
      * @private
      */ DateFormat.getTimeZoneValue = function(tVal, pattern) {
-                    var _this = this, curPattern = pattern.split(';')[tVal > 0 ? 1 : 0], no = Math.abs(tVal);
+                    var _this = this, curPattern = pattern.split(';')[+(tVal > 0)], no = Math.abs(tVal);
                     return curPattern.replace(/HH?|mm/g, function(str) {
                         var len = str.length, ishour = -1 !== str.indexOf('H');
                         return _this.checkTwodigitNumber(Math.floor(ishour ? no / 60 : no % 60), len);
@@ -2705,8 +2703,7 @@
                     if (match && match[4]) {
                         var pattern_1 = match[4], p = pattern_1.lastIndexOf(',');
                         if (-1 !== p) {
-                            var temp = pattern_1.split('.')[0];
-                            ret.primary = temp.length - p - 1;
+                            ret.primary = pattern_1.split('.')[0].length - p - 1;
                             var s = pattern_1.lastIndexOf(',', p - 1);
                             -1 !== s && (ret.secondary = p - 1 - s);
                         }
@@ -2963,7 +2960,7 @@
                     }
                     if (!util_isUndefined(desig)) {
                         var hour = res.getHours();
-                        'pm' === desig ? res.setHours(hour + (12 === hour ? 0 : 12)) : 12 === hour && res.setHours(0);
+                        'pm' === desig ? res.setHours(hour + 12 * (12 !== hour)) : 12 === hour && res.setHours(0);
                     }
                     if (!util_isUndefined(tzone)) {
                         var tzValue = tzone - res.getTimezoneOffset();
@@ -3444,7 +3441,7 @@
      * @returns {DateFormatOptions} ?
      */ function compareBlazorDateFormats(formatOptions, culture) {
                     var format = formatOptions.format || formatOptions.skeleton, curFormatMapper = util_getValue((culture || 'en-US') + '.' + format, blazorCultureFormats);
-                    return curFormatMapper || (curFormatMapper = util_getValue('en-US.' + format, blazorCultureFormats)), curFormatMapper && (curFormatMapper = ConvertDateToWeekFormat(curFormatMapper), formatOptions.format = curFormatMapper.replace(/tt/, 'a')), formatOptions;
+                    return curFormatMapper || (curFormatMapper = util_getValue('en-US.' + format, blazorCultureFormats)), curFormatMapper && (formatOptions.format = (curFormatMapper = ConvertDateToWeekFormat(curFormatMapper)).replace(/tt/, 'a')), formatOptions;
                 }
                 /**
      * Returns proper numeric skeleton
@@ -4345,9 +4342,7 @@
      * @param  {string} key Key to search in the response header
      * @returns {string} ?
      */ Ajax.prototype.getResponseHeader = function(key) {
-                    // eslint-disable-next-line
-                    responseHeaders = {};
-                    for(var responseHeaders, header, headers = headerRegex.exec(this.httpRequest.getAllResponseHeaders()); headers;)responseHeaders[headers[1].toLowerCase()] = headers[2], headers = headerRegex.exec(this.httpRequest.getAllResponseHeaders());
+                    for(var header, responseHeaders = {}, headers = headerRegex.exec(this.httpRequest.getAllResponseHeaders()); headers;)responseHeaders[headers[1].toLowerCase()] = headers[2], headers = headerRegex.exec(this.httpRequest.getAllResponseHeaders());
                     return util_isNullOrUndefined(// eslint-disable-next-line
                     header = responseHeaders[key.toLowerCase()]) ? null : header;
                 }, Ajax);
@@ -5421,10 +5416,7 @@
      */ Animation.prototype.animate = function(element, options) {
                     options = options || {};
                     var model = this.getModel(options);
-                    if ('string' == typeof element) for(var elements = Array.prototype.slice.call(selectAll(element, document)), _i = 0; _i < elements.length; _i++){
-                        var element_1 = elements[_i];
-                        model.element = element_1, Animation_1.delayAnimation(model);
-                    }
+                    if ('string' == typeof element) for(var elements = Array.prototype.slice.call(selectAll(element, document)), _i = 0; _i < elements.length; _i++)model.element = elements[_i], Animation_1.delayAnimation(model);
                     else model.element = element, Animation_1.delayAnimation(model);
                 }, /**
      * Stop the animation effect on animated element.
@@ -6886,7 +6878,7 @@
          * @returns {void} ?
          */ _this.moveEvent = function(evt) {
                         var point = _this.updateChangeTouches(evt);
-                        _this.movedPoint = point, _this.isTouchMoved = !(point.clientX === _this.startPoint.clientX && point.clientY === _this.startPoint.clientY);
+                        _this.movedPoint = point, _this.isTouchMoved = point.clientX !== _this.startPoint.clientX || point.clientY !== _this.startPoint.clientY;
                         var eScrollArgs = {};
                         _this.isTouchMoved && (clearTimeout(_this.timeOutTapHold), _this.calcScrollPoints(evt), eScrollArgs = util_extend(eScrollArgs, {}, {
                             startEvents: _this.startEventData,
@@ -6947,7 +6939,7 @@
                     }, _this.modeclear = function() {
                         _this.modeClear = setTimeout(function() {
                             _this.touchAction = !0;
-                        }, 'function' != typeof _this.tap ? 0 : 20), _this.lastTapTime = new Date().getTime(), EventHandler.remove(_this.element, Browser.touchMoveEvent, _this.moveEvent), EventHandler.remove(_this.element, Browser.touchEndEvent, _this.endEvent), EventHandler.remove(_this.element, Browser.touchCancelEvent, _this.cancelEvent);
+                        }, 20 * ('function' == typeof _this.tap)), _this.lastTapTime = new Date().getTime(), EventHandler.remove(_this.element, Browser.touchMoveEvent, _this.moveEvent), EventHandler.remove(_this.element, Browser.touchEndEvent, _this.endEvent), EventHandler.remove(_this.element, Browser.touchCancelEvent, _this.cancelEvent);
                     }, _this.bind(), _this;
                 }
                 return touch_extends(Touch, _super), // triggers when property changed
@@ -6993,11 +6985,9 @@
      * @param {MouseEventArgs | TouchEventArgs} evt ?
      * @returns {void} ?
      */ Touch.prototype.tapHoldEvent = function(evt) {
-                    var eTapArgs;
-                    this.tapCount = 0, this.touchAction = !0, EventHandler.remove(this.element, Browser.touchMoveEvent, this.moveEvent), EventHandler.remove(this.element, Browser.touchEndEvent, this.endEvent), // eslint-disable-next-line
-                    eTapArgs = {
+                    this.tapCount = 0, this.touchAction = !0, EventHandler.remove(this.element, Browser.touchMoveEvent, this.moveEvent), EventHandler.remove(this.element, Browser.touchEndEvent, this.endEvent), this.trigger('tapHold', {
                         originalEvent: evt
-                    }, this.trigger('tapHold', eTapArgs), EventHandler.remove(this.element, Browser.touchCancelEvent, this.cancelEvent);
+                    }), EventHandler.remove(this.element, Browser.touchCancelEvent, this.cancelEvent);
                 }, Touch.prototype.calcPoints = function(evt) {
                     var point = this.updateChangeTouches(evt);
                     this.defaultArgs = {
@@ -7899,13 +7889,13 @@
                 }
                 function setClearButton(isClear, element, inputObject, initial, internalCreateElement) {
                     var button, container, makeElement = (0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .isNullOrUndefined */ .le)(internalCreateElement) ? _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .createElement */ .az : internalCreateElement;
-                    isClear ? inputObject.clearButton = (button = ((0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .isNullOrUndefined */ .le)(makeElement) ? _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .createElement */ .az : makeElement)('span', {
+                    isClear ? (button = ((0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .isNullOrUndefined */ .le)(makeElement) ? _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .createElement */ .az : makeElement)('span', {
                         className: CLASSNAMES.CLEARICON
                     }), container = inputObject.container, (0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .isNullOrUndefined */ .le)(initial) ? (inputObject.container.classList.contains(CLASSNAMES.FLOATINPUT) ? inputObject.container.querySelector('.' + CLASSNAMES.FLOATTEXT) : element).insertAdjacentElement('afterend', button) : container.appendChild(button), !(0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .isNullOrUndefined */ .le)(container) && container.classList.contains(CLASSNAMES.FLOATINPUT) && (0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .addClass */ .cn)([
                         container
                     ], CLASSNAMES.INPUTGROUP), (0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .addClass */ .cn)([
                         button
-                    ], CLASSNAMES.CLEARICONHIDE), wireClearBtnEvents(element, button, container), button.setAttribute('aria-label', 'close'), button) : ((0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .remove */ .Od)(inputObject.clearButton), inputObject.clearButton = null);
+                    ], CLASSNAMES.CLEARICONHIDE), wireClearBtnEvents(element, button, container), button.setAttribute('aria-label', 'close'), inputObject.clearButton = button) : ((0, _syncfusion_ej2_base__WEBPACK_IMPORTED_MODULE_0__ /* .remove */ .Od)(inputObject.clearButton), inputObject.clearButton = null);
                 }
                 /**
      * Removing the multiple attributes from the given element such as "disabled","id" , etc.
@@ -9249,34 +9239,33 @@
  * @param {OffsetPosition} pos - specifies the position
  * @returns {OffsetPosition} - returns the postion
  */ function(posX, posY, pos) {
-                    var value, value1, value2, value3, value4, value5, value6, value7, value8;
                     switch(elementRect = element.getBoundingClientRect(), posY + posX){
                         case 'topcenter':
-                            setPosx(getElementHCenter(), pos), value = getElementTop(), pos.top = value;
+                            setPosx(getElementHCenter(), pos), pos.top = getElementTop();
                             break;
                         case 'topright':
-                            setPosx(getElementRight(), pos), value1 = getElementTop(), pos.top = value1;
+                            setPosx(getElementRight(), pos), pos.top = getElementTop();
                             break;
                         case 'centercenter':
-                            setPosx(getElementHCenter(), pos), value2 = getElementVCenter(), pos.top = value2;
+                            setPosx(getElementHCenter(), pos), pos.top = getElementVCenter();
                             break;
                         case 'centerright':
-                            setPosx(getElementRight(), pos), value3 = getElementVCenter(), pos.top = value3;
+                            setPosx(getElementRight(), pos), pos.top = getElementVCenter();
                             break;
                         case 'centerleft':
-                            setPosx(getElementLeft(), pos), value4 = getElementVCenter(), pos.top = value4;
+                            setPosx(getElementLeft(), pos), pos.top = getElementVCenter();
                             break;
                         case 'bottomcenter':
-                            setPosx(getElementHCenter(), pos), value5 = getElementBottom(), pos.top = value5;
+                            setPosx(getElementHCenter(), pos), pos.top = getElementBottom();
                             break;
                         case 'bottomright':
-                            setPosx(getElementRight(), pos), value6 = getElementBottom(), pos.top = value6;
+                            setPosx(getElementRight(), pos), pos.top = getElementBottom();
                             break;
                         case 'bottomleft':
-                            setPosx(getElementLeft(), pos), value7 = getElementBottom(), pos.top = value7;
+                            setPosx(getElementLeft(), pos), pos.top = getElementBottom();
                             break;
                         default:
-                            setPosx(getElementLeft(), pos), value8 = getElementTop(), pos.top = value8;
+                            setPosx(getElementLeft(), pos), pos.top = getElementTop();
                     }
                     return pos;
                 }(positionX.toLowerCase(), positionY.toLowerCase(), {
@@ -9770,7 +9759,7 @@
  */ function getScrollableParent(element, fixedParent) {
                 for(var eleStyle = getComputedStyle(element), scrollParents = [], overflowRegex = /(auto|scroll)/, parent = element.parentElement; parent && 'HTML' !== parent.tagName;){
                     var parentStyle = getComputedStyle(parent);
-                    !('absolute' === eleStyle.position && 'static' === parentStyle.position) && overflowRegex.test(parentStyle.overflow + parentStyle.overflowY + parentStyle.overflowX) && scrollParents.push(parent), parent = parent.parentElement;
+                    ('absolute' !== eleStyle.position || 'static' !== parentStyle.position) && overflowRegex.test(parentStyle.overflow + parentStyle.overflowY + parentStyle.overflowX) && scrollParents.push(parent), parent = parent.parentElement;
                 }
                 return fixedParent || scrollParents.push(document), scrollParents;
             }
@@ -11631,7 +11620,7 @@
                         };
                         this.parent.trigger(constant /* actionBegin */ .m2, actionBeginArgs, function(actionBeginArgs) {
                             if (!actionBeginArgs.cancel) {
-                                if (!(_this.range.startOffset === _this.range.endOffset && _this.range.startContainer === _this.range.endContainer)) {
+                                if (_this.range.startOffset !== _this.range.endOffset || _this.range.startContainer !== _this.range.endContainer) {
                                     if (_this.range.deleteContents(), '#text' === _this.range.startContainer.nodeName && 0 === _this.range.startContainer.textContent.length && _this.range.startContainer.parentElement !== _this.parent.inputElement) 'BR' === _this.parent.enterKey ? _this.range.startContainer.parentElement.innerHTML = '&#8203;' : _this.range.startContainer.parentElement.innerHTML = '<br>';
                                     else if (_this.range.startContainer === _this.parent.inputElement && '' === _this.range.startContainer.innerHTML) {
                                         _this.range.startContainer.innerHTML = '<br>';
@@ -11701,7 +11690,7 @@
                                         currentParent = currentNode === _this.parent.inputElement ? previousNode : currentNode;
                                     }
                                     _this.removeBRElement(currentParent);
-                                    for(var currentParentLastChild = currentParent.lastChild; !(0, ej2_base /* isNullOrUndefined */ .le)(currentParentLastChild) && !('#text' === currentParentLastChild.nodeName || 'BR' === currentParentLastChild.nodeName);)currentParentLastChild = currentParentLastChild.lastChild;
+                                    for(var currentParentLastChild = currentParent.lastChild; !(0, ej2_base /* isNullOrUndefined */ .le)(currentParentLastChild) && '#text' !== currentParentLastChild.nodeName && 'BR' !== currentParentLastChild.nodeName;)currentParentLastChild = currentParentLastChild.lastChild;
                                     var isLastNodeLength = _this.range.startContainer === currentParentLastChild ? _this.range.startContainer.textContent.length : currentParent.textContent.length;
                                     if (currentParent !== _this.parent.inputElement && _this.parent.formatter.editorManager.domNode.isBlockNode(currentParent) && _this.range.startOffset === _this.range.endOffset && _this.range.startOffset === isLastNodeLength) {
                                         var focusBRElem = _this.parent.createElement('br');
@@ -16128,16 +16117,7 @@
                         this.pasteInsertHTML(nodes, node, range, nodeSelection, nodeCutter, docElement, isCollapsed, closestParentNode, editNode);
                         return;
                     }
-                    if (editNode === range.startContainer || (isCollapsed || closestParentNode.nodeType === Node.ELEMENT_NODE && -1 !== TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase())) && ('table' !== node.nodeName.toLowerCase() || !closestParentNode || -1 !== TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase()))) {
-                        if (range.deleteContents(), isCursor && '' === range.startContainer.textContent && 'BR' !== range.startContainer.nodeName && (range.startContainer.innerHTML = ''), ej2_base /* Browser.isIE */ .AR.isIE) {
-                            var frag = docElement.createDocumentFragment();
-                            frag.appendChild(node), range.insertNode(frag);
-                        } else if (1 === range.startContainer.nodeType && 'hr' === range.startContainer.nodeName.toLowerCase() && 'hr' === range.endContainer.nodeName.toLowerCase()) {
-                            var paraElem = range.startContainer.nextElementSibling;
-                            paraElem && (paraElem.querySelector('br') && (0, ej2_base /* detach */ .og)(paraElem.querySelector('br')), paraElem.appendChild(node));
-                        } else 'BR' === range.startContainer.nodeName ? range.startContainer.parentElement.insertBefore(node, range.startContainer) : range.insertNode(node);
-                        3 !== node.nodeType && node.childNodes.length > 0 ? nodeSelection.setSelectionText(docElement, node, node, 1, 1) : 'IMG' === node.nodeName ? this.imageFocus(node, nodeSelection, docElement) : 3 !== node.nodeType ? nodeSelection.setSelectionContents(docElement, node) : nodeSelection.setSelectionText(docElement, node, node, node.textContent.length, node.textContent.length);
-                    } else {
+                    if (editNode !== range.startContainer && (!isCollapsed && (closestParentNode.nodeType !== Node.ELEMENT_NODE || -1 === TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase())) || 'table' === node.nodeName.toLowerCase() && closestParentNode && -1 === TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase()))) {
                         var preNode = nodeCutter.GetSpliceNode(range, closestParentNode), sibNode = preNode.previousSibling, parentNode = preNode.parentNode;
                         if (1 === nodes.length || 'table' === node.nodeName.toLowerCase() && 0 === preNode.childElementCount) nodeSelection.setSelectionContents(docElement, preNode), range = nodeSelection.getRange(docElement);
                         else {
@@ -16158,6 +16138,15 @@
                             null !== previousNode && (parentNode = previousNode), parentNode.firstChild && (parentNode !== editNode || 'TABLE' === node.nodeName && isCursor && parentNode === range.startContainer && parentNode === range.endContainer) ? '' === parentNode.textContent.trim() && parentNode !== editNode ? (InsertMethods.AppendBefore(node, parentNode, !1), (0, ej2_base /* detach */ .og)(parentNode)) : InsertMethods.AppendBefore(node, parentNode.firstChild, !1) : parentNode.appendChild(node);
                         }
                         'IMG' === node.nodeName ? this.imageFocus(node, nodeSelection, docElement) : 3 !== node.nodeType ? nodeSelection.setSelectionText(docElement, node, node, 0, node.childNodes.length) : nodeSelection.setSelectionText(docElement, node, node, 0, node.textContent.length);
+                    } else {
+                        if (range.deleteContents(), isCursor && '' === range.startContainer.textContent && 'BR' !== range.startContainer.nodeName && (range.startContainer.innerHTML = ''), ej2_base /* Browser.isIE */ .AR.isIE) {
+                            var frag = docElement.createDocumentFragment();
+                            frag.appendChild(node), range.insertNode(frag);
+                        } else if (1 === range.startContainer.nodeType && 'hr' === range.startContainer.nodeName.toLowerCase() && 'hr' === range.endContainer.nodeName.toLowerCase()) {
+                            var paraElem = range.startContainer.nextElementSibling;
+                            paraElem && (paraElem.querySelector('br') && (0, ej2_base /* detach */ .og)(paraElem.querySelector('br')), paraElem.appendChild(node));
+                        } else 'BR' === range.startContainer.nodeName ? range.startContainer.parentElement.insertBefore(node, range.startContainer) : range.insertNode(node);
+                        3 !== node.nodeType && node.childNodes.length > 0 ? nodeSelection.setSelectionText(docElement, node, node, 1, 1) : 'IMG' === node.nodeName ? this.imageFocus(node, nodeSelection, docElement) : 3 !== node.nodeType ? nodeSelection.setSelectionContents(docElement, node) : nodeSelection.setSelectionText(docElement, node, node, node.textContent.length, node.textContent.length);
                     }
                 }, InsertHtml.pasteInsertHTML = function(nodes, node, range, nodeSelection, nodeCutter, docElement, isCollapsed, closestParentNode, editNode) {
                     var lasNode, sibNode, isSingleNode, preNode, lastSelectionNode, isCursor = range.startOffset === range.endOffset && range.startContainer === range.endContainer;
@@ -16165,7 +16154,7 @@
                         var currentBlockNode = this.getImmediateBlockNode(nodes[nodes.length - 1], editNode);
                         nodeSelection.setSelectionText(docElement, currentBlockNode, currentBlockNode, 0, 0), range = nodeSelection.getRange(docElement);
                     }
-                    editNode === range.startContainer || (isCollapsed || closestParentNode.nodeType === Node.ELEMENT_NODE && -1 !== TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase())) && ('table' !== node.nodeName.toLowerCase() || !closestParentNode || -1 !== TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase())) || (preNode = nodeCutter.GetSpliceNode(range, closestParentNode), sibNode = (0, ej2_base /* isNullOrUndefined */ .le)(preNode.previousSibling) ? preNode.parentNode.previousSibling : preNode.previousSibling, 1 === nodes.length ? (nodeSelection.setSelectionContents(docElement, preNode), range = nodeSelection.getRange(docElement), isSingleNode = !0) : (lasNode = nodeCutter.GetSpliceNode(range, nodes[nodes.length - 1].parentElement), lasNode = (0, ej2_base /* isNullOrUndefined */ .le)(lasNode) ? preNode : lasNode, nodeSelection.setSelectionText(docElement, preNode, lasNode, 0, 3 === lasNode.nodeType ? lasNode.textContent.length : lasNode.childNodes.length), range = nodeSelection.getRange(docElement), isSingleNode = !1));
+                    editNode !== range.startContainer && (!isCollapsed && (closestParentNode.nodeType !== Node.ELEMENT_NODE || -1 === TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase())) || 'table' === node.nodeName.toLowerCase() && closestParentNode && -1 === TABLE_BLOCK_TAGS.indexOf(closestParentNode.tagName.toLocaleLowerCase())) && (preNode = nodeCutter.GetSpliceNode(range, closestParentNode), sibNode = (0, ej2_base /* isNullOrUndefined */ .le)(preNode.previousSibling) ? preNode.parentNode.previousSibling : preNode.previousSibling, 1 === nodes.length ? (nodeSelection.setSelectionContents(docElement, preNode), range = nodeSelection.getRange(docElement), isSingleNode = !0) : (lasNode = nodeCutter.GetSpliceNode(range, nodes[nodes.length - 1].parentElement), lasNode = (0, ej2_base /* isNullOrUndefined */ .le)(lasNode) ? preNode : lasNode, nodeSelection.setSelectionText(docElement, preNode, lasNode, 0, 3 === lasNode.nodeType ? lasNode.textContent.length : lasNode.childNodes.length), range = nodeSelection.getRange(docElement), isSingleNode = !1));
                     var containsBlockNode = !1;
                     this.removingComments(node);
                     for(var allChildNodes = node.childNodes, i = 0; i < allChildNodes.length; i++)if (BLOCK_TAGS.indexOf(allChildNodes[i].nodeName.toLocaleLowerCase()) >= 0) {
@@ -16249,8 +16238,7 @@
                     while (node && 0 > BLOCK_TAGS.indexOf(node.nodeName.toLocaleLowerCase()))
                     return node;
                 }, InsertHtml.removingComments = function(elm) {
-                    var innerElement = elm.innerHTML;
-                    innerElement = innerElement.replace(/<!--[\s\S]*?-->/g, ''), elm.innerHTML = innerElement;
+                    elm.innerHTML = elm.innerHTML.replace(/<!--[\s\S]*?-->/g, '');
                 }, InsertHtml.findDetachEmptyElem = function(element) {
                     return (0, ej2_base /* isNullOrUndefined */ .le)(element.parentElement) ? null : '' === element.parentElement.textContent.trim() && 'true' !== element.parentElement.contentEditable ? this.findDetachEmptyElem(element.parentElement) : element;
                 }, InsertHtml.removeEmptyElements = function(element) {
@@ -16860,7 +16848,7 @@
                     };
                 }, TableCommand.prototype.insertRow = function(e) {
                     var isBelow = 'InsertRowBefore' !== e.item.subCommand, selectedCell = e.item.selection.range.startContainer;
-                    if ('TH' === selectedCell.nodeName || 'TD' === selectedCell.nodeName || (selectedCell = (0, ej2_base /* closest */ .oq)(selectedCell.parentElement, 'td,th')), 'th' !== selectedCell.nodeName.toLowerCase() || 'InsertRowBefore' !== e.item.subCommand) {
+                    if ('TH' !== selectedCell.nodeName && 'TD' !== selectedCell.nodeName && (selectedCell = (0, ej2_base /* closest */ .oq)(selectedCell.parentElement, 'td,th')), 'th' !== selectedCell.nodeName.toLowerCase() || 'InsertRowBefore' !== e.item.subCommand) {
                         if (this.curTable = (0, ej2_base /* closest */ .oq)(this.parent.nodeSelection.range.startContainer.parentElement, 'table'), 0 === this.curTable.querySelectorAll('.e-cell-select').length) {
                             var lastRow = this.curTable.rows[this.curTable.rows.length - 1], cloneRow = lastRow.cloneNode(!0);
                             cloneRow.removeAttribute('rowspan'), this.insertAfter(cloneRow, lastRow);
@@ -16884,7 +16872,7 @@
                     }
                 }, TableCommand.prototype.insertColumn = function(e) {
                     var curCell, selectedCell = e.item.selection.range.startContainer;
-                    'TH' === selectedCell.nodeName || 'TD' === selectedCell.nodeName || (selectedCell = (0, ej2_base /* closest */ .oq)(selectedCell.parentElement, 'td,th'));
+                    'TH' !== selectedCell.nodeName && 'TD' !== selectedCell.nodeName && (selectedCell = (0, ej2_base /* closest */ .oq)(selectedCell.parentElement, 'td,th'));
                     for(var curRow = (0, ej2_base /* closest */ .oq)(selectedCell, 'tr'), allRows = (0, ej2_base /* closest */ .oq)(curRow, 'table').rows, colIndex = Array.prototype.slice.call(curRow.querySelectorAll(':scope > td, :scope > th')).indexOf(selectedCell), previousWidth = parseInt(e.item.width, 10) / curRow.querySelectorAll(':scope > td, :scope > th').length, currentWidth = parseInt(e.item.width, 10) / (curRow.querySelectorAll(':scope > td, :scope > th').length + 1), currentTabElm = (0, ej2_base /* closest */ .oq)(curRow, 'table'), thTdElm = (0, ej2_base /* closest */ .oq)(curRow, 'table').querySelectorAll('th,td'), i = 0; i < thTdElm.length; i++)thTdElm[i].dataset.oldWidth = thTdElm[i].offsetWidth / currentTabElm.offsetWidth * 100 + '%';
                     for(var i = 0; i < allRows.length; i++){
                         var colTemplate = (curCell = allRows[i].querySelectorAll(':scope > td, :scope > th')[colIndex]).cloneNode(!0);
@@ -17418,7 +17406,7 @@
                     return isFormatted.getFormattedNode(currentNode, format, endNode);
                 }, SelectionCommands.removeFormat = function(nodes, index, formatNode, isCursor, isFormat, isFontStyle, range, nodeCutter, format, value, domSelection, endNode, domNode) {
                     var fontStyle, bgStyle, splitNode = null, startText = '#text' === range.startContainer.nodeName ? range.startContainer.textContent.substring(range.startOffset, range.startContainer.textContent.length) : range.startContainer.textContent;
-                    if (!(range.startContainer === range.endContainer && 0 === range.startOffset && range.endOffset === range.startContainer.length)) {
+                    if (range.startContainer !== range.endContainer || 0 !== range.startOffset || range.endOffset !== range.startContainer.length) {
                         var nodeIndex = [], cloneNode = nodes[index];
                         do nodeIndex.push(domSelection.getIndex(cloneNode)), cloneNode = cloneNode.parentNode;
                         while (cloneNode && cloneNode !== formatNode)
@@ -17471,7 +17459,7 @@
                         } else nodeCutter.position = range.startOffset;
                     } else if (null === formatNode && isFormat || isFontStyle) {
                         if ('BR' !== nodes[index].nodeName && (nodes[index] = nodeCutter.GetSpliceNode(range, nodes[index]), nodes[index].textContent = nodeCutter.TrimLineBreak(nodes[index].textContent)), 'uppercase' === format || 'lowercase' === format) nodes[index].textContent = 'uppercase' === format ? nodes[index].textContent.toLocaleUpperCase() : nodes[index].textContent.toLocaleLowerCase();
-                        else if (!(!0 === isFontStyle && '' === value)) {
+                        else if (!0 !== isFontStyle || '' !== value) {
                             var element = this.GetFormatNode(format, value);
                             if ('fontsize' === format || 'fontcolor' === format) {
                                 for(var liElement = nodes[index].parentElement, parentElement = nodes[index].parentElement; !(0, ej2_base /* isNullOrUndefined */ .le)(parentElement) && 'li' !== parentElement.tagName.toLowerCase();)liElement = parentElement = parentElement.parentElement;
@@ -17484,7 +17472,7 @@
                     } else nodes[index] = nodeCutter.GetSpliceNode(range, nodes[index]);
                     return nodes[index];
                 }, SelectionCommands.applyStyles = function(nodes, index, element) {
-                    return 'BR' === nodes[index].nodeName && 'BR' === this.enterAction || (nodes[index] = index === nodes.length - 1 || 'BR' === nodes[index].nodeName ? InsertMethods.Wrap(nodes[index], element) : InsertMethods.WrapBefore(nodes[index], element, !0), nodes[index] = this.getChildNode(nodes[index], element)), nodes[index];
+                    return ('BR' !== nodes[index].nodeName || 'BR' !== this.enterAction) && (nodes[index] = index === nodes.length - 1 || 'BR' === nodes[index].nodeName ? InsertMethods.Wrap(nodes[index], element) : InsertMethods.WrapBefore(nodes[index], element, !0), nodes[index] = this.getChildNode(nodes[index], element)), nodes[index];
                 }, SelectionCommands.getInsertNode = function(docElement, range, format, value) {
                     var element = this.GetFormatNode(format, value);
                     if (element.innerHTML = '&#8203;', ej2_base /* Browser.isIE */ .AR.isIE) {
@@ -17603,7 +17591,7 @@
                     var nodeSelection = new selection /* NodeSelection */ .q(), nodeCutter = new NodeCutter(), range = nodeSelection.getRange(docElement), isCollapsed = range.collapsed, nodes = nodeSelection.getInsertNodeCollection(range), save = nodeSelection.save(range, docElement);
                     if (!isCollapsed) {
                         var preNode = void 0;
-                        if (preNode = 'BR' === nodes[0].nodeName && (0, ej2_base /* closest */ .oq)(nodes[0], 'table') ? nodeCutter.GetSpliceNode(range, (0, ej2_base /* closest */ .oq)(nodes[0], 'table')) : nodeCutter.GetSpliceNode(range, nodes[nodes.length > 1 && 'IMG' === nodes[0].nodeName ? 1 : 0]), 1 === nodes.length) nodeSelection.setSelectionContents(docElement, preNode), range = nodeSelection.getRange(docElement);
+                        if (preNode = 'BR' === nodes[0].nodeName && (0, ej2_base /* closest */ .oq)(nodes[0], 'table') ? nodeCutter.GetSpliceNode(range, (0, ej2_base /* closest */ .oq)(nodes[0], 'table')) : nodeCutter.GetSpliceNode(range, nodes[+(nodes.length > 1 && 'IMG' === nodes[0].nodeName)]), 1 === nodes.length) nodeSelection.setSelectionContents(docElement, preNode), range = nodeSelection.getRange(docElement);
                         else {
                             for(var i = 1, lastText = nodes[nodes.length - i]; nodes.length <= i && 'BR' === nodes[nodes.length - i].nodeName;)i++, lastText = nodes[nodes.length - i];
                             var lasNode = nodeCutter.GetSpliceNode(range, lastText);
@@ -17646,7 +17634,7 @@
                     return parentNodes;
                 }, ClearFormat.unWrap = function(docElement, parentNodes, nodeCutter, nodeSelection) {
                     for(var index1 = 0; index1 < parentNodes.length; index1++)if (this.NONVALID_TAGS.indexOf(parentNodes[index1].nodeName.toLowerCase()) > -1 && parentNodes[index1].parentNode && this.NONVALID_PARENT_TAGS.indexOf(parentNodes[index1].parentNode.nodeName.toLowerCase()) > -1 && (nodeSelection.setSelectionText(docElement, parentNodes[index1], parentNodes[index1], 0, parentNodes[index1].childNodes.length), InsertMethods.unwrap(nodeCutter.GetSpliceNode(nodeSelection.getRange(docElement), parentNodes[index1].parentNode))), 'p' !== parentNodes[index1].nodeName.toLocaleLowerCase()) {
-                        !(0 > this.NONVALID_PARENT_TAGS.indexOf(parentNodes[index1].nodeName.toLowerCase())) || 'p' === parentNodes[index1].parentNode.nodeName.toLocaleLowerCase() || ('blockquote' === parentNodes[index1].nodeName.toLocaleLowerCase() || 'li' === parentNodes[index1].nodeName.toLocaleLowerCase()) && this.IGNORE_PARENT_TAGS.indexOf(parentNodes[index1].childNodes[0].nodeName.toLocaleLowerCase()) > -1 || 1 === parentNodes[index1].childNodes.length && 'p' === parentNodes[index1].childNodes[0].nodeName.toLocaleLowerCase() || InsertMethods.Wrap(parentNodes[index1], docElement.createElement(this.defaultTag));
+                        0 > this.NONVALID_PARENT_TAGS.indexOf(parentNodes[index1].nodeName.toLowerCase()) && 'p' !== parentNodes[index1].parentNode.nodeName.toLocaleLowerCase() && !(('blockquote' === parentNodes[index1].nodeName.toLocaleLowerCase() || 'li' === parentNodes[index1].nodeName.toLocaleLowerCase()) && this.IGNORE_PARENT_TAGS.indexOf(parentNodes[index1].childNodes[0].nodeName.toLocaleLowerCase()) > -1) && (1 !== parentNodes[index1].childNodes.length || 'p' !== parentNodes[index1].childNodes[0].nodeName.toLocaleLowerCase()) && InsertMethods.Wrap(parentNodes[index1], docElement.createElement(this.defaultTag));
                         var childNodes = InsertMethods.unwrap(parentNodes[index1]);
                         1 === childNodes.length && 'p' === childNodes[0].parentNode.nodeName.toLocaleLowerCase() && (InsertMethods.Wrap(parentNodes[index1], docElement.createElement(this.defaultTag)), InsertMethods.unwrap(parentNodes[index1]));
                         for(var index2 = 0; index2 < childNodes.length; index2++)if (this.NONVALID_TAGS.indexOf(childNodes[index2].nodeName.toLowerCase()) > -1) this.unWrap(docElement, [
@@ -18137,8 +18125,7 @@
                     }
                     return styleClassObject;
                 }, MsWordPaste.prototype.removingComments = function(elm) {
-                    var innerElement = elm.innerHTML;
-                    innerElement = innerElement.replace(/<!--[\s\S]*?-->/g, ''), elm.innerHTML = innerElement;
+                    elm.innerHTML = elm.innerHTML.replace(/<!--[\s\S]*?-->/g, '');
                 }, MsWordPaste.prototype.cleanUp = function(node, listNodes) {
                     for(var prevflagState, tempCleaner = [], allNodes = node.querySelectorAll('*'), index = 0; index < allNodes.length; index++){
                         if (-1 === this.ignorableNodes.indexOf(allNodes[index].nodeName) || 3 === allNodes[index].nodeType && '' === allNodes[index].textContent.trim()) {
@@ -19267,7 +19254,7 @@
                 }, HtmlEditor.prototype.onToolbarClick = function(args) {
                     var save, selectNodeEle, selectParentEle, item = args.item, closestElement = (0, ej2_base /* closest */ .oq)(args.originalEvent.target, '.e-rte-quick-popup');
                     if (closestElement && !closestElement.classList.contains('e-rte-inline-popup')) {
-                        if (!('SourceCode' === item.subCommand || 'Preview' === item.subCommand || 'FontColor' === item.subCommand || 'BackgroundColor' === item.subCommand)) {
+                        if ('SourceCode' !== item.subCommand && 'Preview' !== item.subCommand && 'FontColor' !== item.subCommand && 'BackgroundColor' !== item.subCommand) {
                             (0, common_util /* isIDevice */ .FA)() && 'Images' === item.command && this.nodeSelectionObj.restore();
                             var range = this.nodeSelectionObj.getRange(this.parent.contentModule.getDocument());
                             save = this.nodeSelectionObj.save(range, this.parent.contentModule.getDocument()), selectNodeEle = this.nodeSelectionObj.getNodeCollection(range), selectParentEle = this.nodeSelectionObj.getParentNodeCollection(range);
@@ -19293,7 +19280,7 @@
                         });
                     } else {
                         var linkDialog = document.getElementById(this.parent.getID() + '_rtelink'), imageDialog = document.getElementById(this.parent.getID() + '_image');
-                        if (!('SourceCode' === item.subCommand || 'Preview' === item.subCommand || 'FontColor' === item.subCommand || 'BackgroundColor' === item.subCommand)) {
+                        if ('SourceCode' !== item.subCommand && 'Preview' !== item.subCommand && 'FontColor' !== item.subCommand && 'BackgroundColor' !== item.subCommand) {
                             var range = this.nodeSelectionObj.getRange(this.parent.contentModule.getDocument());
                             (0, ej2_base /* isNullOrUndefined */ .le)(linkDialog) && (0, ej2_base /* isNullOrUndefined */ .le)(imageDialog) && (save = this.nodeSelectionObj.save(range, this.parent.contentModule.getDocument())), selectNodeEle = this.nodeSelectionObj.getNodeCollection(range), selectParentEle = this.nodeSelectionObj.getParentNodeCollection(range);
                         }
@@ -22161,10 +22148,7 @@
                 }, PasteCleanup.prototype.popupClose = function(popupObj, uploadObj, imgElem, e) {
                     var _this = this;
                     this.parent.inputElement.contentEditable = 'true', e.element = imgElem, this.parent.trigger(constant /* imageUploadSuccess */ .AL, e, function(e) {
-                        if (!(0, ej2_base /* isNullOrUndefined */ .le)(_this.parent.insertImageSettings.path)) {
-                            var url = _this.parent.insertImageSettings.path + e.file.name;
-                            imgElem.src = url, imgElem.setAttribute('alt', e.file.name);
-                        }
+                        (0, ej2_base /* isNullOrUndefined */ .le)(_this.parent.insertImageSettings.path) || (imgElem.src = _this.parent.insertImageSettings.path + e.file.name, imgElem.setAttribute('alt', e.file.name));
                     }), popupObj.close(), imgElem.style.opacity = '1', uploadObj.destroy(), this.toolbarEnableDisable(!1);
                 }, PasteCleanup.prototype.refreshPopup = function(imageElement, popupObj) {
                     (this.parent.iframeSettings.enable ? this.parent.element.offsetTop + imageElement.offsetTop : imageElement.offsetTop) > this.parent.element.offsetTop + this.parent.element.offsetHeight ? (popupObj.relateTo = this.parent.inputElement, popupObj.offsetY = this.parent.iframeSettings.enable ? -30 : -65, popupObj.element.style.display = 'block') : popupObj && (popupObj.refreshPosition(imageElement), popupObj.element.style.display = 'block');
@@ -24883,7 +24867,7 @@
                     var pos = {
                         top: 0,
                         left: 0
-                    }, tooltipEleWidth = this.tooltipEle.offsetWidth, tooltipEleHeight = this.tooltipEle.offsetHeight, arrowEle = (0, ej2_base /* select */ .Ys)('.' + ARROW_TIP, this.tooltipEle), tipWidth = arrowEle ? arrowEle.offsetWidth : 0, tipHeight = arrowEle ? arrowEle.offsetHeight : 0, tipAdjust = this.showTipPointer ? 0 : 8, tipHeightAdjust = tipHeight / 2 + 2 + (this.tooltipEle.offsetHeight - this.tooltipEle.clientHeight), tipWidthAdjust = tipWidth / 2 + 2 + (this.tooltipEle.offsetWidth - this.tooltipEle.clientWidth);
+                    }, tooltipEleWidth = this.tooltipEle.offsetWidth, tooltipEleHeight = this.tooltipEle.offsetHeight, arrowEle = (0, ej2_base /* select */ .Ys)('.' + ARROW_TIP, this.tooltipEle), tipWidth = arrowEle ? arrowEle.offsetWidth : 0, tipHeight = arrowEle ? arrowEle.offsetHeight : 0, tipAdjust = 8 * !this.showTipPointer, tipHeightAdjust = tipHeight / 2 + 2 + (this.tooltipEle.offsetHeight - this.tooltipEle.clientHeight), tipWidthAdjust = tipWidth / 2 + 2 + (this.tooltipEle.offsetWidth - this.tooltipEle.clientWidth);
                     switch(this.mouseTrail && (tipAdjust += 2), position){
                         case 'RightTop':
                             pos.left += tipWidth + tipAdjust, pos.top -= tooltipEleHeight - tipHeightAdjust;
@@ -25188,8 +25172,7 @@
                     ], POPUP_OPEN), this.adjustArrow(event.target, this.position, this.tooltipPositionX, this.tooltipPositionY);
                     var pos = this.calculateTooltipOffset(this.position), x = eventPageX + pos.left + this.offsetX, y = eventPageY + pos.top + this.offsetY, elePos = this.checkCollision(event.target, x, y);
                     if (this.tooltipPositionX !== elePos.horizontal || this.tooltipPositionY !== elePos.vertical) {
-                        var newpos = 0 === this.position.indexOf('Bottom') || 0 === this.position.indexOf('Top') ? elePos.vertical + elePos.horizontal : elePos.horizontal + elePos.vertical;
-                        elePos.position = newpos, this.adjustArrow(event.target, elePos.position, elePos.horizontal, elePos.vertical);
+                        elePos.position = 0 === this.position.indexOf('Bottom') || 0 === this.position.indexOf('Top') ? elePos.vertical + elePos.horizontal : elePos.horizontal + elePos.vertical, this.adjustArrow(event.target, elePos.position, elePos.horizontal, elePos.vertical);
                         var colpos = this.calculateTooltipOffset(elePos.position);
                         elePos.left = eventPageX + colpos.left - this.offsetX, elePos.top = eventPageY + colpos.top - this.offsetY;
                     }
@@ -26378,14 +26361,14 @@
                 }, Slider.prototype.sliderBarUp = function(event) {
                     this.changeEvent('changed', event), this.handleFocusOut(), this.firstHandle.classList.remove(slider_classNames.sliderActiveHandle), 'Range' === this.type && (this.initialTooltip = !1, this.secondHandle.classList.remove(slider_classNames.sliderActiveHandle)), this.closeTooltip(), this.isMaterial && (this.getHandle().classList.remove('e-large-thumb-size'), this.isMaterialTooltip && this.tooltipElement.classList.remove(slider_classNames.materialTooltipActive)), ej2_base /* EventHandler.remove */ .bi.remove(document, 'mousemove touchmove', this.sliderBarMove), ej2_base /* EventHandler.remove */ .bi.remove(document, 'mouseup touchend', this.sliderBarUp);
                 }, Slider.prototype.sliderBarMove = function(evt) {
-                    'touchmove' !== evt.type && evt.preventDefault(), pos = 'mousemove' === evt.type ? {
+                    'touchmove' !== evt.type && evt.preventDefault();
+                    var pos = 'mousemove' === evt.type ? {
                         x: evt.clientX,
                         y: evt.clientY
                     } : {
                         x: evt.changedTouches[0].clientX,
                         y: evt.changedTouches[0].clientY
-                    };
-                    var pos, handlepos = this.xyToPosition(pos), handleVal = this.positionToValue(handlepos);
+                    }, handlepos = this.xyToPosition(pos), handleVal = this.positionToValue(handlepos);
                     if (handlepos = Math.round(handlepos), 'Range' !== this.type && 1 === this.activeHandle) {
                         if (!(this.limits.enabled && this.limits.startHandleFixed)) {
                             if (this.limits.enabled) {
@@ -27591,7 +27574,7 @@
                     else {
                         switch(max){
                             case r:
-                                h = (g - b) / d + (g < b ? 6 : 0);
+                                h = (g - b) / d + 6 * (g < b);
                                 break;
                             case g:
                                 h = (b - r) / d + 2;
@@ -27994,7 +27977,7 @@
 
      */ ToolbarRenderer.prototype.renderColorPickerDropDown = function(args, item, colorPicker, defaultColor) {
                     var range, _this = this, proxy = this, css = classes /* CLS_RTE_ELEMENTS */ .i7 + ' ' + classes /* CLS_TB_BTN */ .Fs + (this.parent.inlineMode ? ' ' + classes /* CLS_INLINE_DROPDOWN */ .ZV : '');
-                    css += ' ' + ('backgroundcolor' === item ? classes /* CLS_BACKGROUND_COLOR_DROPDOWN */ .Z8 : classes /* CLS_FONT_COLOR_DROPDOWN */ .UQ) + ' ' + this.parent.cssClass;
+                    css += ' ' + ('backgroundcolor' === item ? classes /* CLS_BACKGROUND_COLOR_DROPDOWN */ .Z8 : classes /* CLS_FONT_COLOR_DROPDOWN */ .UQ), css += ' ' + this.parent.cssClass;
                     var content = proxy.parent.createElement('span', {
                         className: classes /* CLS_COLOR_CONTENT */ .uN
                     }), inlineEle = proxy.parent.createElement('span', {
@@ -30011,7 +29994,7 @@
  * @returns {boolean} - returns the boolean value
  * @hidden
  */ function isEditableValueEmpty(value) {
-                return '<p><br></p>' === value || '&lt;p&gt;&lt;br&gt;&lt;/p&gt;' === value || '<div><br></div>' === value || '&lt;div&gt;&lt;br&gt;&lt;/div&gt;' === value || '<br>' === value || '&lt;br&gt;' === value || '' === value;
+                return '<p><br></p>' === value || '&lt;p&gt;&lt;br&gt;&lt;/p&gt;' === value || '<div><br></div>' === value || '&lt;div&gt;&lt;br&gt;&lt;/div&gt;' === value || '<br>' === value || '&lt;br&gt;' === value || '' === value || !1;
             }
             /**
  * @param {string} value - specifies the string value
@@ -32573,7 +32556,7 @@
                                 widthCompare = currentTd.offsetWidth - (currentTd.offsetWidth - currentTd.clientWidth) - 2 * currentTDPad;
                             } else widthCompare = rteWidth;
                             if (_this.resizeBtnStat.column) {
-                                var width = parseFloat(_this.columnEle.offsetWidth.toString()), cellRow = 'TH' === _this.curTable.rows[0].cells[0].nodeName ? 1 : 0, currentTableWidth = parseFloat(_this.curTable.style.width.split('%')[0]), currentColumnCellWidth = parseFloat(_this.curTable.rows[cellRow].cells[_this.colIndex].style.width.split('%')[0]);
+                                var width = parseFloat(_this.columnEle.offsetWidth.toString()), cellRow = +('TH' === _this.curTable.rows[0].cells[0].nodeName), currentTableWidth = parseFloat(_this.curTable.style.width.split('%')[0]), currentColumnCellWidth = parseFloat(_this.curTable.rows[cellRow].cells[_this.colIndex].style.width.split('%')[0]);
                                 if ('first' === _this.currentColumnResize) // Below the value '100' is the 100% width of the parent element.
                                 {
                                     if (mouseX -= 0.75, _this.removeResizeElement(), (0 !== mouseX && 5 < currentColumnCellWidth || mouseX < 0) && currentTableWidth <= 100 && 100 >= _this.convertPixelToPercentage(tableWidth - mouseX, widthCompare)) {

@@ -1023,6 +1023,13 @@ pub trait Visit {
     fn visit_opt_ts_entity_name(&mut self, node: &Option<TsEntityName>) {
         <Option<TsEntityName> as VisitWith<Self>>::visit_children_with(node, self)
     }
+    #[doc = "Visit a node of type `Option < TsImportCallOptions >`.\n\nBy default, this method \
+             calls [`Option < TsImportCallOptions >::visit_children_with`]. If you want to \
+             recurse, you need to call it manually."]
+    #[inline]
+    fn visit_opt_ts_import_call_options(&mut self, node: &Option<TsImportCallOptions>) {
+        <Option<TsImportCallOptions> as VisitWith<Self>>::visit_children_with(node, self)
+    }
     #[doc = "Visit a node of type `Option < TsNamespaceBody >`.\n\nBy default, this method calls \
              [`Option < TsNamespaceBody >::visit_children_with`]. If you want to recurse, you need \
              to call it manually."]
@@ -1517,6 +1524,13 @@ pub trait Visit {
     #[inline]
     fn visit_ts_getter_signature(&mut self, node: &TsGetterSignature) {
         <TsGetterSignature as VisitWith<Self>>::visit_children_with(node, self)
+    }
+    #[doc = "Visit a node of type `TsImportCallOptions`.\n\nBy default, this method calls \
+             [`TsImportCallOptions::visit_children_with`]. If you want to recurse, you need to \
+             call it manually."]
+    #[inline]
+    fn visit_ts_import_call_options(&mut self, node: &TsImportCallOptions) {
+        <TsImportCallOptions as VisitWith<Self>>::visit_children_with(node, self)
     }
     #[doc = "Visit a node of type `TsImportEqualsDecl`.\n\nBy default, this method calls \
              [`TsImportEqualsDecl::visit_children_with`]. If you want to recurse, you need to call \
@@ -2759,6 +2773,11 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options(&mut self, node: &Option<TsImportCallOptions>) {
+        <V as Visit>::visit_opt_ts_import_call_options(&mut **self, node)
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body(&mut self, node: &Option<TsNamespaceBody>) {
         <V as Visit>::visit_opt_ts_namespace_body(&mut **self, node)
     }
@@ -3119,6 +3138,11 @@ where
     #[inline]
     fn visit_ts_getter_signature(&mut self, node: &TsGetterSignature) {
         <V as Visit>::visit_ts_getter_signature(&mut **self, node)
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options(&mut self, node: &TsImportCallOptions) {
+        <V as Visit>::visit_ts_import_call_options(&mut **self, node)
     }
 
     #[inline]
@@ -4221,6 +4245,11 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options(&mut self, node: &Option<TsImportCallOptions>) {
+        <V as Visit>::visit_opt_ts_import_call_options(&mut **self, node)
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body(&mut self, node: &Option<TsNamespaceBody>) {
         <V as Visit>::visit_opt_ts_namespace_body(&mut **self, node)
     }
@@ -4581,6 +4610,11 @@ where
     #[inline]
     fn visit_ts_getter_signature(&mut self, node: &TsGetterSignature) {
         <V as Visit>::visit_ts_getter_signature(&mut **self, node)
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options(&mut self, node: &TsImportCallOptions) {
+        <V as Visit>::visit_ts_import_call_options(&mut **self, node)
     }
 
     #[inline]
@@ -6146,6 +6180,18 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options(&mut self, node: &Option<TsImportCallOptions>) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                Visit::visit_opt_ts_import_call_options(visitor, node)
+            }
+            swc_visit::Either::Right(visitor) => {
+                Visit::visit_opt_ts_import_call_options(visitor, node)
+            }
+        }
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body(&mut self, node: &Option<TsNamespaceBody>) {
         match self {
             swc_visit::Either::Left(visitor) => Visit::visit_opt_ts_namespace_body(visitor, node),
@@ -6739,6 +6785,14 @@ where
         match self {
             swc_visit::Either::Left(visitor) => Visit::visit_ts_getter_signature(visitor, node),
             swc_visit::Either::Right(visitor) => Visit::visit_ts_getter_signature(visitor, node),
+        }
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options(&mut self, node: &TsImportCallOptions) {
+        match self {
+            swc_visit::Either::Left(visitor) => Visit::visit_ts_import_call_options(visitor, node),
+            swc_visit::Either::Right(visitor) => Visit::visit_ts_import_call_options(visitor, node),
         }
     }
 
@@ -8511,6 +8565,14 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options(&mut self, node: &Option<TsImportCallOptions>) {
+        if self.enabled {
+            <V as Visit>::visit_opt_ts_import_call_options(&mut self.visitor, node)
+        } else {
+        }
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body(&mut self, node: &Option<TsNamespaceBody>) {
         if self.enabled {
             <V as Visit>::visit_opt_ts_namespace_body(&mut self.visitor, node)
@@ -9085,6 +9147,14 @@ where
     fn visit_ts_getter_signature(&mut self, node: &TsGetterSignature) {
         if self.enabled {
             <V as Visit>::visit_ts_getter_signature(&mut self.visitor, node)
+        } else {
+        }
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options(&mut self, node: &TsImportCallOptions) {
+        if self.enabled {
+            <V as Visit>::visit_ts_import_call_options(&mut self.visitor, node)
         } else {
         }
     }
@@ -13833,6 +13903,25 @@ impl<V: ?Sized + Visit> VisitWith<V> for TsGetterSignature {
         }
     }
 }
+impl<V: ?Sized + Visit> VisitWith<V> for TsImportCallOptions {
+    #[doc = "Calls [Visit`::visit_ts_import_call_options`] with `self`."]
+    fn visit_with(&self, visitor: &mut V) {
+        <V as Visit>::visit_ts_import_call_options(visitor, self)
+    }
+
+    fn visit_children_with(&self, visitor: &mut V) {
+        match self {
+            TsImportCallOptions { span, with } => {
+                {
+                    <swc_common::Span as VisitWith<V>>::visit_with(span, visitor)
+                };
+                {
+                    <Box<ObjectLit> as VisitWith<V>>::visit_with(with, visitor)
+                };
+            }
+        }
+    }
+}
 impl<V: ?Sized + Visit> VisitWith<V> for TsImportEqualsDecl {
     #[doc = "Calls [Visit`::visit_ts_import_equals_decl`] with `self`."]
     fn visit_with(&self, visitor: &mut V) {
@@ -13874,6 +13963,7 @@ impl<V: ?Sized + Visit> VisitWith<V> for TsImportType {
                 arg,
                 qualifier,
                 type_args,
+                attributes,
             } => {
                 {
                     <swc_common::Span as VisitWith<V>>::visit_with(span, visitor)
@@ -13888,6 +13978,9 @@ impl<V: ?Sized + Visit> VisitWith<V> for TsImportType {
                     <Option<Box<TsTypeParamInstantiation>> as VisitWith<V>>::visit_with(
                         type_args, visitor,
                     )
+                };
+                {
+                    <Option<TsImportCallOptions> as VisitWith<V>>::visit_with(attributes, visitor)
                 };
             }
         }
@@ -14259,6 +14352,7 @@ impl<V: ?Sized + Visit> VisitWith<V> for TsModuleDecl {
                 span,
                 declare,
                 global,
+                namespace,
                 id,
                 body,
             } => {
@@ -15836,6 +15930,21 @@ impl<V: ?Sized + Visit> VisitWith<V> for Option<TsEntityName> {
     fn visit_children_with(&self, visitor: &mut V) {
         match self {
             Some(inner) => <TsEntityName as VisitWith<V>>::visit_with(inner, visitor),
+            None => {}
+        }
+    }
+}
+impl<V: ?Sized + Visit> VisitWith<V> for Option<TsImportCallOptions> {
+    #[doc = "Calls [Visit`::visit_opt_ts_import_call_options`] with `self`. (Extra impl)"]
+    #[inline]
+    fn visit_with(&self, visitor: &mut V) {
+        <V as Visit>::visit_opt_ts_import_call_options(visitor, self)
+    }
+
+    #[inline]
+    fn visit_children_with(&self, visitor: &mut V) {
+        match self {
+            Some(inner) => <TsImportCallOptions as VisitWith<V>>::visit_with(inner, visitor),
             None => {}
         }
     }
@@ -17965,6 +18074,19 @@ pub trait VisitAstPath {
             node, self, __ast_path,
         )
     }
+    #[doc = "Visit a node of type `Option < TsImportCallOptions >`.\n\nBy default, this method \
+             calls [`Option < TsImportCallOptions >::visit_children_with_ast_path`]. If you want \
+             to recurse, you need to call it manually."]
+    #[inline]
+    fn visit_opt_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast Option<TsImportCallOptions>,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <Option<TsImportCallOptions> as VisitWithAstPath<Self>>::visit_children_with_ast_path(
+            node, self, __ast_path,
+        )
+    }
     #[doc = "Visit a node of type `Option < TsNamespaceBody >`.\n\nBy default, this method calls \
              [`Option < TsNamespaceBody >::visit_children_with_ast_path`]. If you want to recurse, \
              you need to call it manually."]
@@ -18791,6 +18913,19 @@ pub trait VisitAstPath {
         __ast_path: &mut AstNodePath<'r>,
     ) {
         <TsGetterSignature as VisitWithAstPath<Self>>::visit_children_with_ast_path(
+            node, self, __ast_path,
+        )
+    }
+    #[doc = "Visit a node of type `TsImportCallOptions`.\n\nBy default, this method calls \
+             [`TsImportCallOptions::visit_children_with_ast_path`]. If you want to recurse, you \
+             need to call it manually."]
+    #[inline]
+    fn visit_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast TsImportCallOptions,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <TsImportCallOptions as VisitWithAstPath<Self>>::visit_children_with_ast_path(
             node, self, __ast_path,
         )
     }
@@ -20971,6 +21106,15 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast Option<TsImportCallOptions>,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <V as VisitAstPath>::visit_opt_ts_import_call_options(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body<'ast: 'r, 'r>(
         &mut self,
         node: &'ast Option<TsNamespaceBody>,
@@ -21572,6 +21716,15 @@ where
         __ast_path: &mut AstNodePath<'r>,
     ) {
         <V as VisitAstPath>::visit_ts_getter_signature(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast TsImportCallOptions,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <V as VisitAstPath>::visit_ts_import_call_options(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -23500,6 +23653,15 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast Option<TsImportCallOptions>,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <V as VisitAstPath>::visit_opt_ts_import_call_options(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body<'ast: 'r, 'r>(
         &mut self,
         node: &'ast Option<TsNamespaceBody>,
@@ -24101,6 +24263,15 @@ where
         __ast_path: &mut AstNodePath<'r>,
     ) {
         <V as VisitAstPath>::visit_ts_getter_signature(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast TsImportCallOptions,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <V as VisitAstPath>::visit_ts_import_call_options(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -27048,6 +27219,22 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast Option<TsImportCallOptions>,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                VisitAstPath::visit_opt_ts_import_call_options(visitor, node, __ast_path)
+            }
+            swc_visit::Either::Right(visitor) => {
+                VisitAstPath::visit_opt_ts_import_call_options(visitor, node, __ast_path)
+            }
+        }
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body<'ast: 'r, 'r>(
         &mut self,
         node: &'ast Option<TsNamespaceBody>,
@@ -28131,6 +28318,22 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 VisitAstPath::visit_ts_getter_signature(visitor, node, __ast_path)
+            }
+        }
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast TsImportCallOptions,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                VisitAstPath::visit_ts_import_call_options(visitor, node, __ast_path)
+            }
+            swc_visit::Either::Right(visitor) => {
+                VisitAstPath::visit_ts_import_call_options(visitor, node, __ast_path)
             }
         }
     }
@@ -31006,6 +31209,22 @@ where
     }
 
     #[inline]
+    fn visit_opt_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast Option<TsImportCallOptions>,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        if self.enabled {
+            <V as VisitAstPath>::visit_opt_ts_import_call_options(
+                &mut self.visitor,
+                node,
+                __ast_path,
+            )
+        } else {
+        }
+    }
+
+    #[inline]
     fn visit_opt_ts_namespace_body<'ast: 'r, 'r>(
         &mut self,
         node: &'ast Option<TsNamespaceBody>,
@@ -31833,6 +32052,18 @@ where
     ) {
         if self.enabled {
             <V as VisitAstPath>::visit_ts_getter_signature(&mut self.visitor, node, __ast_path)
+        } else {
+        }
+    }
+
+    #[inline]
+    fn visit_ts_import_call_options<'ast: 'r, 'r>(
+        &mut self,
+        node: &'ast TsImportCallOptions,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        if self.enabled {
+            <V as VisitAstPath>::visit_ts_import_call_options(&mut self.visitor, node, __ast_path)
         } else {
         }
     }
@@ -42928,6 +43159,53 @@ impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for TsGetterSignature {
 }
 #[cfg(any(docsrs, feature = "path"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "path")))]
+impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for TsImportCallOptions {
+    #[doc = "Calls [VisitAstPath`::visit_ts_import_call_options`] with `self`."]
+    fn visit_with_ast_path<'ast: 'r, 'r>(
+        &'ast self,
+        visitor: &mut V,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <V as VisitAstPath>::visit_ts_import_call_options(visitor, self, __ast_path)
+    }
+
+    fn visit_children_with_ast_path<'ast: 'r, 'r>(
+        &'ast self,
+        visitor: &mut V,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        match self {
+            TsImportCallOptions { span, with } => {
+                {
+                    let mut __ast_path =
+                        __ast_path.with_guard(AstParentNodeRef::TsImportCallOptions(
+                            self,
+                            self::fields::TsImportCallOptionsField::Span,
+                        ));
+                    <swc_common::Span as VisitWithAstPath<V>>::visit_with_ast_path(
+                        span,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
+                {
+                    let mut __ast_path =
+                        __ast_path.with_guard(AstParentNodeRef::TsImportCallOptions(
+                            self,
+                            self::fields::TsImportCallOptionsField::With,
+                        ));
+                    <Box<ObjectLit> as VisitWithAstPath<V>>::visit_with_ast_path(
+                        with,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
+            }
+        }
+    }
+}
+#[cfg(any(docsrs, feature = "path"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
 impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for TsImportEqualsDecl {
     #[doc = "Calls [VisitAstPath`::visit_ts_import_equals_decl`] with `self`."]
     fn visit_with_ast_path<'ast: 'r, 'r>(
@@ -43014,6 +43292,7 @@ impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for TsImportType {
                 arg,
                 qualifier,
                 type_args,
+                attributes,
             } => {
                 {
                     let mut __ast_path = __ast_path.with_guard(AstParentNodeRef::TsImportType(
@@ -43054,6 +43333,17 @@ impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for TsImportType {
                         self::fields::TsImportTypeField::TypeArgs,
                     ));
                     < Option < Box < TsTypeParamInstantiation > > as VisitWithAstPath < V > > :: visit_with_ast_path (type_args , visitor , & mut * __ast_path)
+                };
+                {
+                    let mut __ast_path = __ast_path.with_guard(AstParentNodeRef::TsImportType(
+                        self,
+                        self::fields::TsImportTypeField::Attributes,
+                    ));
+                    <Option<TsImportCallOptions> as VisitWithAstPath<V>>::visit_with_ast_path(
+                        attributes,
+                        visitor,
+                        &mut *__ast_path,
+                    )
                 };
             }
         }
@@ -43917,6 +44207,7 @@ impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for TsModuleDecl {
                 span,
                 declare,
                 global,
+                namespace,
                 id,
                 body,
             } => {
@@ -47515,6 +47806,33 @@ impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for Option<TsEntityName> {
 }
 #[cfg(any(docsrs, feature = "path"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "path")))]
+impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for Option<TsImportCallOptions> {
+    #[doc = "Calls [VisitAstPath`::visit_opt_ts_import_call_options`] with `self`. (Extra impl)"]
+    #[inline]
+    fn visit_with_ast_path<'ast: 'r, 'r>(
+        &'ast self,
+        visitor: &mut V,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        <V as VisitAstPath>::visit_opt_ts_import_call_options(visitor, self, __ast_path)
+    }
+
+    #[inline]
+    fn visit_children_with_ast_path<'ast: 'r, 'r>(
+        &'ast self,
+        visitor: &mut V,
+        __ast_path: &mut AstNodePath<'r>,
+    ) {
+        match self {
+            Some(inner) => <TsImportCallOptions as VisitWithAstPath<V>>::visit_with_ast_path(
+                inner, visitor, __ast_path,
+            ),
+            None => {}
+        }
+    }
+}
+#[cfg(any(docsrs, feature = "path"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
 impl<V: ?Sized + VisitAstPath> VisitWithAstPath<V> for Option<TsNamespaceBody> {
     #[doc = "Calls [VisitAstPath`::visit_opt_ts_namespace_body`] with `self`. (Extra impl)"]
     #[inline]
@@ -49293,6 +49611,13 @@ pub trait VisitMut {
     fn visit_mut_opt_ts_entity_name(&mut self, node: &mut Option<TsEntityName>) {
         <Option<TsEntityName> as VisitMutWith<Self>>::visit_mut_children_with(node, self)
     }
+    #[doc = "Visit a node of type `Option < TsImportCallOptions >`.\n\nBy default, this method \
+             calls [`Option < TsImportCallOptions >::visit_mut_children_with`]. If you want to \
+             recurse, you need to call it manually."]
+    #[inline]
+    fn visit_mut_opt_ts_import_call_options(&mut self, node: &mut Option<TsImportCallOptions>) {
+        <Option<TsImportCallOptions> as VisitMutWith<Self>>::visit_mut_children_with(node, self)
+    }
     #[doc = "Visit a node of type `Option < TsNamespaceBody >`.\n\nBy default, this method calls \
              [`Option < TsNamespaceBody >::visit_mut_children_with`]. If you want to recurse, you \
              need to call it manually."]
@@ -49798,6 +50123,13 @@ pub trait VisitMut {
     #[inline]
     fn visit_mut_ts_getter_signature(&mut self, node: &mut TsGetterSignature) {
         <TsGetterSignature as VisitMutWith<Self>>::visit_mut_children_with(node, self)
+    }
+    #[doc = "Visit a node of type `TsImportCallOptions`.\n\nBy default, this method calls \
+             [`TsImportCallOptions::visit_mut_children_with`]. If you want to recurse, you need to \
+             call it manually."]
+    #[inline]
+    fn visit_mut_ts_import_call_options(&mut self, node: &mut TsImportCallOptions) {
+        <TsImportCallOptions as VisitMutWith<Self>>::visit_mut_children_with(node, self)
     }
     #[doc = "Visit a node of type `TsImportEqualsDecl`.\n\nBy default, this method calls \
              [`TsImportEqualsDecl::visit_mut_children_with`]. If you want to recurse, you need to \
@@ -51042,6 +51374,11 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(&mut self, node: &mut Option<TsImportCallOptions>) {
+        <V as VisitMut>::visit_mut_opt_ts_import_call_options(&mut **self, node)
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(&mut self, node: &mut Option<TsNamespaceBody>) {
         <V as VisitMut>::visit_mut_opt_ts_namespace_body(&mut **self, node)
     }
@@ -51402,6 +51739,11 @@ where
     #[inline]
     fn visit_mut_ts_getter_signature(&mut self, node: &mut TsGetterSignature) {
         <V as VisitMut>::visit_mut_ts_getter_signature(&mut **self, node)
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(&mut self, node: &mut TsImportCallOptions) {
+        <V as VisitMut>::visit_mut_ts_import_call_options(&mut **self, node)
     }
 
     #[inline]
@@ -52504,6 +52846,11 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(&mut self, node: &mut Option<TsImportCallOptions>) {
+        <V as VisitMut>::visit_mut_opt_ts_import_call_options(&mut **self, node)
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(&mut self, node: &mut Option<TsNamespaceBody>) {
         <V as VisitMut>::visit_mut_opt_ts_namespace_body(&mut **self, node)
     }
@@ -52864,6 +53211,11 @@ where
     #[inline]
     fn visit_mut_ts_getter_signature(&mut self, node: &mut TsGetterSignature) {
         <V as VisitMut>::visit_mut_ts_getter_signature(&mut **self, node)
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(&mut self, node: &mut TsImportCallOptions) {
+        <V as VisitMut>::visit_mut_ts_import_call_options(&mut **self, node)
     }
 
     #[inline]
@@ -54561,6 +54913,18 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(&mut self, node: &mut Option<TsImportCallOptions>) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                VisitMut::visit_mut_opt_ts_import_call_options(visitor, node)
+            }
+            swc_visit::Either::Right(visitor) => {
+                VisitMut::visit_mut_opt_ts_import_call_options(visitor, node)
+            }
+        }
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(&mut self, node: &mut Option<TsNamespaceBody>) {
         match self {
             swc_visit::Either::Left(visitor) => {
@@ -55215,6 +55579,18 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 VisitMut::visit_mut_ts_getter_signature(visitor, node)
+            }
+        }
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(&mut self, node: &mut TsImportCallOptions) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                VisitMut::visit_mut_ts_import_call_options(visitor, node)
+            }
+            swc_visit::Either::Right(visitor) => {
+                VisitMut::visit_mut_ts_import_call_options(visitor, node)
             }
         }
     }
@@ -57098,6 +57474,14 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(&mut self, node: &mut Option<TsImportCallOptions>) {
+        if self.enabled {
+            <V as VisitMut>::visit_mut_opt_ts_import_call_options(&mut self.visitor, node)
+        } else {
+        }
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(&mut self, node: &mut Option<TsNamespaceBody>) {
         if self.enabled {
             <V as VisitMut>::visit_mut_opt_ts_namespace_body(&mut self.visitor, node)
@@ -57672,6 +58056,14 @@ where
     fn visit_mut_ts_getter_signature(&mut self, node: &mut TsGetterSignature) {
         if self.enabled {
             <V as VisitMut>::visit_mut_ts_getter_signature(&mut self.visitor, node)
+        } else {
+        }
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(&mut self, node: &mut TsImportCallOptions) {
+        if self.enabled {
+            <V as VisitMut>::visit_mut_ts_import_call_options(&mut self.visitor, node)
         } else {
         }
     }
@@ -62467,6 +62859,25 @@ impl<V: ?Sized + VisitMut> VisitMutWith<V> for TsGetterSignature {
         }
     }
 }
+impl<V: ?Sized + VisitMut> VisitMutWith<V> for TsImportCallOptions {
+    #[doc = "Calls [VisitMut`::visit_mut_ts_import_call_options`] with `self`."]
+    fn visit_mut_with(&mut self, visitor: &mut V) {
+        <V as VisitMut>::visit_mut_ts_import_call_options(visitor, self)
+    }
+
+    fn visit_mut_children_with(&mut self, visitor: &mut V) {
+        match self {
+            TsImportCallOptions { span, with } => {
+                {
+                    <swc_common::Span as VisitMutWith<V>>::visit_mut_with(span, visitor)
+                };
+                {
+                    <Box<ObjectLit> as VisitMutWith<V>>::visit_mut_with(with, visitor)
+                };
+            }
+        }
+    }
+}
 impl<V: ?Sized + VisitMut> VisitMutWith<V> for TsImportEqualsDecl {
     #[doc = "Calls [VisitMut`::visit_mut_ts_import_equals_decl`] with `self`."]
     fn visit_mut_with(&mut self, visitor: &mut V) {
@@ -62508,6 +62919,7 @@ impl<V: ?Sized + VisitMut> VisitMutWith<V> for TsImportType {
                 arg,
                 qualifier,
                 type_args,
+                attributes,
             } => {
                 {
                     <swc_common::Span as VisitMutWith<V>>::visit_mut_with(span, visitor)
@@ -62521,6 +62933,11 @@ impl<V: ?Sized + VisitMut> VisitMutWith<V> for TsImportType {
                 {
                     <Option<Box<TsTypeParamInstantiation>> as VisitMutWith<V>>::visit_mut_with(
                         type_args, visitor,
+                    )
+                };
+                {
+                    <Option<TsImportCallOptions> as VisitMutWith<V>>::visit_mut_with(
+                        attributes, visitor,
                     )
                 };
             }
@@ -62901,6 +63318,7 @@ impl<V: ?Sized + VisitMut> VisitMutWith<V> for TsModuleDecl {
                 span,
                 declare,
                 global,
+                namespace,
                 id,
                 body,
             } => {
@@ -64484,6 +64902,21 @@ impl<V: ?Sized + VisitMut> VisitMutWith<V> for Option<TsEntityName> {
     fn visit_mut_children_with(&mut self, visitor: &mut V) {
         match self {
             Some(inner) => <TsEntityName as VisitMutWith<V>>::visit_mut_with(inner, visitor),
+            None => {}
+        }
+    }
+}
+impl<V: ?Sized + VisitMut> VisitMutWith<V> for Option<TsImportCallOptions> {
+    #[doc = "Calls [VisitMut`::visit_mut_opt_ts_import_call_options`] with `self`. (Extra impl)"]
+    #[inline]
+    fn visit_mut_with(&mut self, visitor: &mut V) {
+        <V as VisitMut>::visit_mut_opt_ts_import_call_options(visitor, self)
+    }
+
+    #[inline]
+    fn visit_mut_children_with(&mut self, visitor: &mut V) {
+        match self {
+            Some(inner) => <TsImportCallOptions as VisitMutWith<V>>::visit_mut_with(inner, visitor),
             None => {}
         }
     }
@@ -66378,6 +66811,19 @@ pub trait VisitMutAstPath {
             node, self, __ast_path,
         )
     }
+    #[doc = "Visit a node of type `Option < TsImportCallOptions >`.\n\nBy default, this method \
+             calls [`Option < TsImportCallOptions >::visit_mut_children_with_ast_path`]. If you \
+             want to recurse, you need to call it manually."]
+    #[inline]
+    fn visit_mut_opt_ts_import_call_options(
+        &mut self,
+        node: &mut Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) {
+        <Option<TsImportCallOptions> as VisitMutWithAstPath<Self>>::visit_mut_children_with_ast_path(
+            node, self, __ast_path,
+        )
+    }
     #[doc = "Visit a node of type `Option < TsNamespaceBody >`.\n\nBy default, this method calls \
              [`Option < TsNamespaceBody >::visit_mut_children_with_ast_path`]. If you want to \
              recurse, you need to call it manually."]
@@ -67126,6 +67572,19 @@ pub trait VisitMutAstPath {
         __ast_path: &mut AstKindPath,
     ) {
         <TsGetterSignature as VisitMutWithAstPath<Self>>::visit_mut_children_with_ast_path(
+            node, self, __ast_path,
+        )
+    }
+    #[doc = "Visit a node of type `TsImportCallOptions`.\n\nBy default, this method calls \
+             [`TsImportCallOptions::visit_mut_children_with_ast_path`]. If you want to recurse, \
+             you need to call it manually."]
+    #[inline]
+    fn visit_mut_ts_import_call_options(
+        &mut self,
+        node: &mut TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) {
+        <TsImportCallOptions as VisitMutWithAstPath<Self>>::visit_mut_children_with_ast_path(
             node, self, __ast_path,
         )
     }
@@ -68872,6 +69331,15 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(
+        &mut self,
+        node: &mut Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) {
+        <V as VisitMutAstPath>::visit_mut_opt_ts_import_call_options(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(
         &mut self,
         node: &mut Option<TsNamespaceBody>,
@@ -69345,6 +69813,15 @@ where
         __ast_path: &mut AstKindPath,
     ) {
         <V as VisitMutAstPath>::visit_mut_ts_getter_signature(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(
+        &mut self,
+        node: &mut TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) {
+        <V as VisitMutAstPath>::visit_mut_ts_import_call_options(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -70809,6 +71286,15 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(
+        &mut self,
+        node: &mut Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) {
+        <V as VisitMutAstPath>::visit_mut_opt_ts_import_call_options(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(
         &mut self,
         node: &mut Option<TsNamespaceBody>,
@@ -71282,6 +71768,15 @@ where
         __ast_path: &mut AstKindPath,
     ) {
         <V as VisitMutAstPath>::visit_mut_ts_getter_signature(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(
+        &mut self,
+        node: &mut TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) {
+        <V as VisitMutAstPath>::visit_mut_ts_import_call_options(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -73783,6 +74278,22 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(
+        &mut self,
+        node: &mut Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                VisitMutAstPath::visit_mut_opt_ts_import_call_options(visitor, node, __ast_path)
+            }
+            swc_visit::Either::Right(visitor) => {
+                VisitMutAstPath::visit_mut_opt_ts_import_call_options(visitor, node, __ast_path)
+            }
+        }
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(
         &mut self,
         node: &mut Option<TsNamespaceBody>,
@@ -74758,6 +75269,22 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 VisitMutAstPath::visit_mut_ts_getter_signature(visitor, node, __ast_path)
+            }
+        }
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(
+        &mut self,
+        node: &mut TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                VisitMutAstPath::visit_mut_ts_import_call_options(visitor, node, __ast_path)
+            }
+            swc_visit::Either::Right(visitor) => {
+                VisitMutAstPath::visit_mut_ts_import_call_options(visitor, node, __ast_path)
             }
         }
     }
@@ -77273,6 +77800,22 @@ where
     }
 
     #[inline]
+    fn visit_mut_opt_ts_import_call_options(
+        &mut self,
+        node: &mut Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) {
+        if self.enabled {
+            <V as VisitMutAstPath>::visit_mut_opt_ts_import_call_options(
+                &mut self.visitor,
+                node,
+                __ast_path,
+            )
+        } else {
+        }
+    }
+
+    #[inline]
     fn visit_mut_opt_ts_namespace_body(
         &mut self,
         node: &mut Option<TsNamespaceBody>,
@@ -78028,6 +78571,22 @@ where
     ) {
         if self.enabled {
             <V as VisitMutAstPath>::visit_mut_ts_getter_signature(
+                &mut self.visitor,
+                node,
+                __ast_path,
+            )
+        } else {
+        }
+    }
+
+    #[inline]
+    fn visit_mut_ts_import_call_options(
+        &mut self,
+        node: &mut TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) {
+        if self.enabled {
+            <V as VisitMutAstPath>::visit_mut_ts_import_call_options(
                 &mut self.visitor,
                 node,
                 __ast_path,
@@ -86980,6 +87539,41 @@ impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for TsGetterSignature {
 }
 #[cfg(any(docsrs, feature = "path"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "path")))]
+impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for TsImportCallOptions {
+    #[doc = "Calls [VisitMutAstPath`::visit_mut_ts_import_call_options`] with `self`."]
+    fn visit_mut_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
+        <V as VisitMutAstPath>::visit_mut_ts_import_call_options(visitor, self, __ast_path)
+    }
+
+    fn visit_mut_children_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
+        match self {
+            TsImportCallOptions { span, with } => {
+                {
+                    let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportCallOptions(
+                        self::fields::TsImportCallOptionsField::Span,
+                    ));
+                    <swc_common::Span as VisitMutWithAstPath<V>>::visit_mut_with_ast_path(
+                        span,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
+                {
+                    let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportCallOptions(
+                        self::fields::TsImportCallOptionsField::With,
+                    ));
+                    <Box<ObjectLit> as VisitMutWithAstPath<V>>::visit_mut_with_ast_path(
+                        with,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
+            }
+        }
+    }
+}
+#[cfg(any(docsrs, feature = "path"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
 impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for TsImportEqualsDecl {
     #[doc = "Calls [VisitMutAstPath`::visit_mut_ts_import_equals_decl`] with `self`."]
     fn visit_mut_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
@@ -87044,6 +87638,7 @@ impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for TsImportType {
                 arg,
                 qualifier,
                 type_args,
+                attributes,
             } => {
                 {
                     let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportType(
@@ -87080,6 +87675,16 @@ impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for TsImportType {
                         self::fields::TsImportTypeField::TypeArgs,
                     ));
                     < Option < Box < TsTypeParamInstantiation > > as VisitMutWithAstPath < V > > :: visit_mut_with_ast_path (type_args , visitor , & mut * __ast_path)
+                };
+                {
+                    let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportType(
+                        self::fields::TsImportTypeField::Attributes,
+                    ));
+                    <Option<TsImportCallOptions> as VisitMutWithAstPath<V>>::visit_mut_with_ast_path(
+                        attributes,
+                        visitor,
+                        &mut *__ast_path,
+                    )
                 };
             }
         }
@@ -87756,6 +88361,7 @@ impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for TsModuleDecl {
                 span,
                 declare,
                 global,
+                namespace,
                 id,
                 body,
             } => {
@@ -90546,6 +91152,28 @@ impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for Option<TsEntityName
 }
 #[cfg(any(docsrs, feature = "path"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "path")))]
+impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for Option<TsImportCallOptions> {
+    #[doc = "Calls [VisitMutAstPath`::visit_mut_opt_ts_import_call_options`] with `self`. (Extra \
+             impl)"]
+    #[inline]
+    fn visit_mut_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
+        <V as VisitMutAstPath>::visit_mut_opt_ts_import_call_options(visitor, self, __ast_path)
+    }
+
+    #[inline]
+    fn visit_mut_children_with_ast_path(&mut self, visitor: &mut V, __ast_path: &mut AstKindPath) {
+        match self {
+            Some(inner) => {
+                <TsImportCallOptions as VisitMutWithAstPath<V>>::visit_mut_with_ast_path(
+                    inner, visitor, __ast_path,
+                )
+            }
+            None => {}
+        }
+    }
+}
+#[cfg(any(docsrs, feature = "path"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
 impl<V: ?Sized + VisitMutAstPath> VisitMutWithAstPath<V> for Option<TsNamespaceBody> {
     #[doc = "Calls [VisitMutAstPath`::visit_mut_opt_ts_namespace_body`] with `self`. (Extra impl)"]
     #[inline]
@@ -92107,6 +92735,16 @@ pub trait Fold {
     fn fold_opt_ts_entity_name(&mut self, node: Option<TsEntityName>) -> Option<TsEntityName> {
         <Option<TsEntityName> as FoldWith<Self>>::fold_children_with(node, self)
     }
+    #[doc = "Visit a node of type `Option < TsImportCallOptions >`.\n\nBy default, this method \
+             calls [`Option < TsImportCallOptions >::fold_children_with`]. If you want to recurse, \
+             you need to call it manually."]
+    #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+    ) -> Option<TsImportCallOptions> {
+        <Option<TsImportCallOptions> as FoldWith<Self>>::fold_children_with(node, self)
+    }
     #[doc = "Visit a node of type `Option < TsNamespaceBody >`.\n\nBy default, this method calls \
              [`Option < TsNamespaceBody >::fold_children_with`]. If you want to recurse, you need \
              to call it manually."]
@@ -92621,6 +93259,13 @@ pub trait Fold {
     #[inline]
     fn fold_ts_getter_signature(&mut self, node: TsGetterSignature) -> TsGetterSignature {
         <TsGetterSignature as FoldWith<Self>>::fold_children_with(node, self)
+    }
+    #[doc = "Visit a node of type `TsImportCallOptions`.\n\nBy default, this method calls \
+             [`TsImportCallOptions::fold_children_with`]. If you want to recurse, you need to call \
+             it manually."]
+    #[inline]
+    fn fold_ts_import_call_options(&mut self, node: TsImportCallOptions) -> TsImportCallOptions {
+        <TsImportCallOptions as FoldWith<Self>>::fold_children_with(node, self)
     }
     #[doc = "Visit a node of type `TsImportEqualsDecl`.\n\nBy default, this method calls \
              [`TsImportEqualsDecl::fold_children_with`]. If you want to recurse, you need to call \
@@ -93891,6 +94536,14 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+    ) -> Option<TsImportCallOptions> {
+        <V as Fold>::fold_opt_ts_import_call_options(&mut **self, node)
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -94275,6 +94928,11 @@ where
     #[inline]
     fn fold_ts_getter_signature(&mut self, node: TsGetterSignature) -> TsGetterSignature {
         <V as Fold>::fold_ts_getter_signature(&mut **self, node)
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(&mut self, node: TsImportCallOptions) -> TsImportCallOptions {
+        <V as Fold>::fold_ts_import_call_options(&mut **self, node)
     }
 
     #[inline]
@@ -95407,6 +96065,14 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+    ) -> Option<TsImportCallOptions> {
+        <V as Fold>::fold_opt_ts_import_call_options(&mut **self, node)
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -95791,6 +96457,11 @@ where
     #[inline]
     fn fold_ts_getter_signature(&mut self, node: TsGetterSignature) -> TsGetterSignature {
         <V as Fold>::fold_ts_getter_signature(&mut **self, node)
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(&mut self, node: TsImportCallOptions) -> TsImportCallOptions {
+        <V as Fold>::fold_ts_import_call_options(&mut **self, node)
     }
 
     #[inline]
@@ -97372,6 +98043,21 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+    ) -> Option<TsImportCallOptions> {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                Fold::fold_opt_ts_import_call_options(visitor, node)
+            }
+            swc_visit::Either::Right(visitor) => {
+                Fold::fold_opt_ts_import_call_options(visitor, node)
+            }
+        }
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -97981,6 +98667,14 @@ where
         match self {
             swc_visit::Either::Left(visitor) => Fold::fold_ts_getter_signature(visitor, node),
             swc_visit::Either::Right(visitor) => Fold::fold_ts_getter_signature(visitor, node),
+        }
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(&mut self, node: TsImportCallOptions) -> TsImportCallOptions {
+        match self {
+            swc_visit::Either::Left(visitor) => Fold::fold_ts_import_call_options(visitor, node),
+            swc_visit::Either::Right(visitor) => Fold::fold_ts_import_call_options(visitor, node),
         }
     }
 
@@ -99927,6 +100621,18 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+    ) -> Option<TsImportCallOptions> {
+        if self.enabled {
+            <V as Fold>::fold_opt_ts_import_call_options(&mut self.visitor, node)
+        } else {
+            node
+        }
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -100596,6 +101302,15 @@ where
     fn fold_ts_getter_signature(&mut self, node: TsGetterSignature) -> TsGetterSignature {
         if self.enabled {
             <V as Fold>::fold_ts_getter_signature(&mut self.visitor, node)
+        } else {
+            node
+        }
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(&mut self, node: TsImportCallOptions) -> TsImportCallOptions {
+        if self.enabled {
+            <V as Fold>::fold_ts_import_call_options(&mut self.visitor, node)
         } else {
             node
         }
@@ -105406,6 +106121,22 @@ impl<V: ?Sized + Fold> FoldWith<V> for TsGetterSignature {
         }
     }
 }
+impl<V: ?Sized + Fold> FoldWith<V> for TsImportCallOptions {
+    #[doc = "Calls [Fold`::fold_ts_import_call_options`] with `self`."]
+    fn fold_with(self, visitor: &mut V) -> Self {
+        <V as Fold>::fold_ts_import_call_options(visitor, self)
+    }
+
+    fn fold_children_with(self, visitor: &mut V) -> Self {
+        match self {
+            TsImportCallOptions { span, with } => {
+                let span = { <swc_common::Span as FoldWith<V>>::fold_with(span, visitor) };
+                let with = { <Box<ObjectLit> as FoldWith<V>>::fold_with(with, visitor) };
+                TsImportCallOptions { span, with }
+            }
+        }
+    }
+}
 impl<V: ?Sized + Fold> FoldWith<V> for TsImportEqualsDecl {
     #[doc = "Calls [Fold`::fold_ts_import_equals_decl`] with `self`."]
     fn fold_with(self, visitor: &mut V) -> Self {
@@ -105448,6 +106179,7 @@ impl<V: ?Sized + Fold> FoldWith<V> for TsImportType {
                 arg,
                 qualifier,
                 type_args,
+                attributes,
             } => {
                 let span = { <swc_common::Span as FoldWith<V>>::fold_with(span, visitor) };
                 let arg = { <Str as FoldWith<V>>::fold_with(arg, visitor) };
@@ -105458,11 +106190,15 @@ impl<V: ?Sized + Fold> FoldWith<V> for TsImportType {
                         type_args, visitor,
                     )
                 };
+                let attributes = {
+                    <Option<TsImportCallOptions> as FoldWith<V>>::fold_with(attributes, visitor)
+                };
                 TsImportType {
                     span,
                     arg,
                     qualifier,
                     type_args,
+                    attributes,
                 }
             }
         }
@@ -105827,6 +106563,7 @@ impl<V: ?Sized + Fold> FoldWith<V> for TsModuleDecl {
                 span,
                 declare,
                 global,
+                namespace,
                 id,
                 body,
             } => {
@@ -105837,6 +106574,7 @@ impl<V: ?Sized + Fold> FoldWith<V> for TsModuleDecl {
                     span,
                     declare,
                     global,
+                    namespace,
                     id,
                     body,
                 }
@@ -107357,6 +108095,18 @@ impl<V: ?Sized + Fold> FoldWith<V> for Option<TsEntityName> {
     #[inline]
     fn fold_children_with(self, visitor: &mut V) -> Self {
         self.map(|inner| <TsEntityName as FoldWith<V>>::fold_with(inner, visitor))
+    }
+}
+impl<V: ?Sized + Fold> FoldWith<V> for Option<TsImportCallOptions> {
+    #[doc = "Calls [Fold`::fold_opt_ts_import_call_options`] with `self`. (Extra impl)"]
+    #[inline]
+    fn fold_with(self, visitor: &mut V) -> Self {
+        <V as Fold>::fold_opt_ts_import_call_options(visitor, self)
+    }
+
+    #[inline]
+    fn fold_children_with(self, visitor: &mut V) -> Self {
+        self.map(|inner| <TsImportCallOptions as FoldWith<V>>::fold_with(inner, visitor))
     }
 }
 impl<V: ?Sized + Fold> FoldWith<V> for Option<TsNamespaceBody> {
@@ -109196,6 +109946,19 @@ pub trait FoldAstPath {
             node, self, __ast_path,
         )
     }
+    #[doc = "Visit a node of type `Option < TsImportCallOptions >`.\n\nBy default, this method \
+             calls [`Option < TsImportCallOptions >::fold_children_with_ast_path`]. If you want to \
+             recurse, you need to call it manually."]
+    #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) -> Option<TsImportCallOptions> {
+        <Option<TsImportCallOptions> as FoldWithAstPath<Self>>::fold_children_with_ast_path(
+            node, self, __ast_path,
+        )
+    }
     #[doc = "Visit a node of type `Option < TsNamespaceBody >`.\n\nBy default, this method calls \
              [`Option < TsNamespaceBody >::fold_children_with_ast_path`]. If you want to recurse, \
              you need to call it manually."]
@@ -109928,6 +110691,19 @@ pub trait FoldAstPath {
         __ast_path: &mut AstKindPath,
     ) -> TsGetterSignature {
         <TsGetterSignature as FoldWithAstPath<Self>>::fold_children_with_ast_path(
+            node, self, __ast_path,
+        )
+    }
+    #[doc = "Visit a node of type `TsImportCallOptions`.\n\nBy default, this method calls \
+             [`TsImportCallOptions::fold_children_with_ast_path`]. If you want to recurse, you \
+             need to call it manually."]
+    #[inline]
+    fn fold_ts_import_call_options(
+        &mut self,
+        node: TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) -> TsImportCallOptions {
+        <TsImportCallOptions as FoldWithAstPath<Self>>::fold_children_with_ast_path(
             node, self, __ast_path,
         )
     }
@@ -111802,6 +112578,15 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) -> Option<TsImportCallOptions> {
+        <V as FoldAstPath>::fold_opt_ts_import_call_options(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -112323,6 +113108,15 @@ where
         __ast_path: &mut AstKindPath,
     ) -> TsGetterSignature {
         <V as FoldAstPath>::fold_ts_getter_signature(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(
+        &mut self,
+        node: TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) -> TsImportCallOptions {
+        <V as FoldAstPath>::fold_ts_import_call_options(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -113971,6 +114765,15 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) -> Option<TsImportCallOptions> {
+        <V as FoldAstPath>::fold_opt_ts_import_call_options(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -114492,6 +115295,15 @@ where
         __ast_path: &mut AstKindPath,
     ) -> TsGetterSignature {
         <V as FoldAstPath>::fold_ts_getter_signature(&mut **self, node, __ast_path)
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(
+        &mut self,
+        node: TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) -> TsImportCallOptions {
+        <V as FoldAstPath>::fold_ts_import_call_options(&mut **self, node, __ast_path)
     }
 
     #[inline]
@@ -117129,6 +117941,22 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) -> Option<TsImportCallOptions> {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                FoldAstPath::fold_opt_ts_import_call_options(visitor, node, __ast_path)
+            }
+            swc_visit::Either::Right(visitor) => {
+                FoldAstPath::fold_opt_ts_import_call_options(visitor, node, __ast_path)
+            }
+        }
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -118104,6 +118932,22 @@ where
             }
             swc_visit::Either::Right(visitor) => {
                 FoldAstPath::fold_ts_getter_signature(visitor, node, __ast_path)
+            }
+        }
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(
+        &mut self,
+        node: TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) -> TsImportCallOptions {
+        match self {
+            swc_visit::Either::Left(visitor) => {
+                FoldAstPath::fold_ts_import_call_options(visitor, node, __ast_path)
+            }
+            swc_visit::Either::Right(visitor) => {
+                FoldAstPath::fold_ts_import_call_options(visitor, node, __ast_path)
             }
         }
     }
@@ -120841,6 +121685,19 @@ where
     }
 
     #[inline]
+    fn fold_opt_ts_import_call_options(
+        &mut self,
+        node: Option<TsImportCallOptions>,
+        __ast_path: &mut AstKindPath,
+    ) -> Option<TsImportCallOptions> {
+        if self.enabled {
+            <V as FoldAstPath>::fold_opt_ts_import_call_options(&mut self.visitor, node, __ast_path)
+        } else {
+            node
+        }
+    }
+
+    #[inline]
     fn fold_opt_ts_namespace_body(
         &mut self,
         node: Option<TsNamespaceBody>,
@@ -121655,6 +122512,19 @@ where
     ) -> TsGetterSignature {
         if self.enabled {
             <V as FoldAstPath>::fold_ts_getter_signature(&mut self.visitor, node, __ast_path)
+        } else {
+            node
+        }
+    }
+
+    #[inline]
+    fn fold_ts_import_call_options(
+        &mut self,
+        node: TsImportCallOptions,
+        __ast_path: &mut AstKindPath,
+    ) -> TsImportCallOptions {
+        if self.enabled {
+            <V as FoldAstPath>::fold_ts_import_call_options(&mut self.visitor, node, __ast_path)
         } else {
             node
         }
@@ -131314,6 +132184,42 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsGetterSignature {
 }
 #[cfg(any(docsrs, feature = "path"))]
 #[cfg_attr(docsrs, doc(cfg(feature = "path")))]
+impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsImportCallOptions {
+    #[doc = "Calls [FoldAstPath`::fold_ts_import_call_options`] with `self`."]
+    fn fold_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
+        <V as FoldAstPath>::fold_ts_import_call_options(visitor, self, __ast_path)
+    }
+
+    fn fold_children_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
+        match self {
+            TsImportCallOptions { span, with } => {
+                let span = {
+                    let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportCallOptions(
+                        self::fields::TsImportCallOptionsField::Span,
+                    ));
+                    <swc_common::Span as FoldWithAstPath<V>>::fold_with_ast_path(
+                        span,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
+                let with = {
+                    let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportCallOptions(
+                        self::fields::TsImportCallOptionsField::With,
+                    ));
+                    <Box<ObjectLit> as FoldWithAstPath<V>>::fold_with_ast_path(
+                        with,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
+                TsImportCallOptions { span, with }
+            }
+        }
+    }
+}
+#[cfg(any(docsrs, feature = "path"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
 impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsImportEqualsDecl {
     #[doc = "Calls [FoldAstPath`::fold_ts_import_equals_decl`] with `self`."]
     fn fold_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
@@ -131381,6 +132287,7 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsImportType {
                 arg,
                 qualifier,
                 type_args,
+                attributes,
             } => {
                 let span = {
                     let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportType(
@@ -131414,11 +132321,22 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsImportType {
                     ));
                     < Option < Box < TsTypeParamInstantiation > > as FoldWithAstPath < V > > :: fold_with_ast_path (type_args , visitor , & mut * __ast_path)
                 };
+                let attributes = {
+                    let mut __ast_path = __ast_path.with_guard(AstParentKind::TsImportType(
+                        self::fields::TsImportTypeField::Attributes,
+                    ));
+                    <Option<TsImportCallOptions> as FoldWithAstPath<V>>::fold_with_ast_path(
+                        attributes,
+                        visitor,
+                        &mut *__ast_path,
+                    )
+                };
                 TsImportType {
                     span,
                     arg,
                     qualifier,
                     type_args,
+                    attributes,
                 }
             }
         }
@@ -132157,6 +133075,7 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsModuleDecl {
                 span,
                 declare,
                 global,
+                namespace,
                 id,
                 body,
             } => {
@@ -132194,6 +133113,7 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for TsModuleDecl {
                     span,
                     declare,
                     global,
+                    namespace,
                     id,
                     body,
                 }
@@ -135087,6 +136007,24 @@ impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for Option<TsEntityName> {
     fn fold_children_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
         self.map(|inner| {
             <TsEntityName as FoldWithAstPath<V>>::fold_with_ast_path(inner, visitor, __ast_path)
+        })
+    }
+}
+#[cfg(any(docsrs, feature = "path"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "path")))]
+impl<V: ?Sized + FoldAstPath> FoldWithAstPath<V> for Option<TsImportCallOptions> {
+    #[doc = "Calls [FoldAstPath`::fold_opt_ts_import_call_options`] with `self`. (Extra impl)"]
+    #[inline]
+    fn fold_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
+        <V as FoldAstPath>::fold_opt_ts_import_call_options(visitor, self, __ast_path)
+    }
+
+    #[inline]
+    fn fold_children_with_ast_path(self, visitor: &mut V, __ast_path: &mut AstKindPath) -> Self {
+        self.map(|inner| {
+            <TsImportCallOptions as FoldWithAstPath<V>>::fold_with_ast_path(
+                inner, visitor, __ast_path,
+            )
         })
     }
 }
@@ -138938,6 +139876,21 @@ pub mod fields {
         #[doc = "Represents [`TsGetterSignature::type_ann`]"]
         TypeAnn,
     }
+    impl TsImportCallOptionsField {
+        pub(crate) fn set_index(&mut self, index: usize) {
+            match self {
+                _ => swc_visit::wrong_ast_path(),
+            }
+        }
+    }
+    #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+    #[cfg_attr(feature = "serde-impl", derive(serde::Serialize, serde::Deserialize))]
+    pub enum TsImportCallOptionsField {
+        #[doc = "Represents [`TsImportCallOptions::span`]"]
+        Span,
+        #[doc = "Represents [`TsImportCallOptions::with`]"]
+        With,
+    }
     impl TsImportEqualsDeclField {
         pub(crate) fn set_index(&mut self, index: usize) {
             match self {
@@ -138977,6 +139930,8 @@ pub mod fields {
         Qualifier,
         #[doc = "Represents [`TsImportType::type_args`]"]
         TypeArgs,
+        #[doc = "Represents [`TsImportType::attributes`]"]
+        Attributes,
     }
     impl TsIndexSignatureField {
         pub(crate) fn set_index(&mut self, index: usize) {
@@ -139292,6 +140247,8 @@ pub mod fields {
         Declare,
         #[doc = "Represents [`TsModuleDecl::global`]"]
         Global,
+        #[doc = "Represents [`TsModuleDecl::namespace`]"]
+        Namespace,
         #[doc = "Represents [`TsModuleDecl::id`]"]
         Id,
         #[doc = "Represents [`TsModuleDecl::body`]"]
@@ -140374,6 +141331,7 @@ pub mod fields {
         TsFnParam(TsFnParamField),
         TsFnType(TsFnTypeField),
         TsGetterSignature(TsGetterSignatureField),
+        TsImportCallOptions(TsImportCallOptionsField),
         TsImportEqualsDecl(TsImportEqualsDeclField),
         TsImportType(TsImportTypeField),
         TsIndexSignature(TsIndexSignatureField),
@@ -140614,6 +141572,7 @@ pub mod fields {
                 Self::TsFnParam(v) => v.set_index(index),
                 Self::TsFnType(v) => v.set_index(index),
                 Self::TsGetterSignature(v) => v.set_index(index),
+                Self::TsImportCallOptions(v) => v.set_index(index),
                 Self::TsImportEqualsDecl(v) => v.set_index(index),
                 Self::TsImportType(v) => v.set_index(index),
                 Self::TsIndexSignature(v) => v.set_index(index),
@@ -140860,6 +141819,7 @@ pub mod fields {
         TsFnParam(&'ast TsFnParam, TsFnParamField),
         TsFnType(&'ast TsFnType, TsFnTypeField),
         TsGetterSignature(&'ast TsGetterSignature, TsGetterSignatureField),
+        TsImportCallOptions(&'ast TsImportCallOptions, TsImportCallOptionsField),
         TsImportEqualsDecl(&'ast TsImportEqualsDecl, TsImportEqualsDeclField),
         TsImportType(&'ast TsImportType, TsImportTypeField),
         TsIndexSignature(&'ast TsIndexSignature, TsIndexSignatureField),
@@ -141112,6 +142072,7 @@ pub mod fields {
                 Self::TsFnParam(_, __field_kind) => __field_kind.set_index(index),
                 Self::TsFnType(_, __field_kind) => __field_kind.set_index(index),
                 Self::TsGetterSignature(_, __field_kind) => __field_kind.set_index(index),
+                Self::TsImportCallOptions(_, __field_kind) => __field_kind.set_index(index),
                 Self::TsImportEqualsDecl(_, __field_kind) => __field_kind.set_index(index),
                 Self::TsImportType(_, __field_kind) => __field_kind.set_index(index),
                 Self::TsIndexSignature(_, __field_kind) => __field_kind.set_index(index),
@@ -141432,6 +142393,9 @@ pub mod fields {
                 Self::TsFnType(_, __field_kind) => AstParentKind::TsFnType(*__field_kind),
                 Self::TsGetterSignature(_, __field_kind) => {
                     AstParentKind::TsGetterSignature(*__field_kind)
+                }
+                Self::TsImportCallOptions(_, __field_kind) => {
+                    AstParentKind::TsImportCallOptions(*__field_kind)
                 }
                 Self::TsImportEqualsDecl(_, __field_kind) => {
                     AstParentKind::TsImportEqualsDecl(*__field_kind)
@@ -142408,6 +143372,11 @@ impl<'ast> From<&'ast TsGetterSignature> for NodeRef<'ast> {
         NodeRef::TsGetterSignature(node)
     }
 }
+impl<'ast> From<&'ast TsImportCallOptions> for NodeRef<'ast> {
+    fn from(node: &'ast TsImportCallOptions) -> Self {
+        NodeRef::TsImportCallOptions(node)
+    }
+}
 impl<'ast> From<&'ast TsImportEqualsDecl> for NodeRef<'ast> {
     fn from(node: &'ast TsImportEqualsDecl) -> Self {
         NodeRef::TsImportEqualsDecl(node)
@@ -142909,6 +143878,7 @@ pub enum NodeRef<'ast> {
     TsFnParam(&'ast TsFnParam),
     TsFnType(&'ast TsFnType),
     TsGetterSignature(&'ast TsGetterSignature),
+    TsImportCallOptions(&'ast TsImportCallOptions),
     TsImportEqualsDecl(&'ast TsImportEqualsDecl),
     TsImportType(&'ast TsImportType),
     TsIndexSignature(&'ast TsIndexSignature),
@@ -144676,6 +145646,13 @@ impl<'ast> NodeRef<'ast> {
                     }));
                 Box::new(iterator)
             }
+            NodeRef::TsImportCallOptions(node) => {
+                let iterator = ::std::iter::empty::<NodeRef<'ast>>().chain({
+                    let item = &*node.with;
+                    ::std::iter::once(NodeRef::ObjectLit(&item))
+                });
+                Box::new(iterator)
+            }
             NodeRef::TsImportEqualsDecl(node) => {
                 let iterator = ::std::iter::empty::<NodeRef<'ast>>()
                     .chain(::std::iter::once(NodeRef::Ident(&node.id)))
@@ -144683,17 +145660,21 @@ impl<'ast> NodeRef<'ast> {
                 Box::new(iterator)
             }
             NodeRef::TsImportType(node) => {
-                let iterator = ::std::iter::empty::<NodeRef<'ast>>()
-                    .chain(::std::iter::once(NodeRef::Str(&node.arg)))
-                    .chain(
-                        node.qualifier
-                            .iter()
-                            .flat_map(|item| ::std::iter::once(NodeRef::TsEntityName(&item))),
-                    )
-                    .chain(node.type_args.iter().flat_map(|item| {
-                        let item = &*item;
-                        ::std::iter::once(NodeRef::TsTypeParamInstantiation(&item))
-                    }));
+                let iterator =
+                    ::std::iter::empty::<NodeRef<'ast>>()
+                        .chain(::std::iter::once(NodeRef::Str(&node.arg)))
+                        .chain(
+                            node.qualifier
+                                .iter()
+                                .flat_map(|item| ::std::iter::once(NodeRef::TsEntityName(&item))),
+                        )
+                        .chain(node.type_args.iter().flat_map(|item| {
+                            let item = &*item;
+                            ::std::iter::once(NodeRef::TsTypeParamInstantiation(&item))
+                        }))
+                        .chain(node.attributes.iter().flat_map(|item| {
+                            ::std::iter::once(NodeRef::TsImportCallOptions(&item))
+                        }));
                 Box::new(iterator)
             }
             NodeRef::TsIndexSignature(node) => {

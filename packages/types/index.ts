@@ -843,12 +843,12 @@ export interface TransformConfig {
     optimizer?: OptimizerConfig;
 
     /**
-     * https://swc.rs/docs/configuring-swc.html#jsctransformlegacydecorator
+     * https://swc.rs/docs/configuration/compilation#jsctransformlegacydecorator
      */
     legacyDecorator?: boolean;
 
     /**
-     * https://swc.rs/docs/configuring-swc.html#jsctransformdecoratormetadata
+     * https://swc.rs/docs/configuration/compilation#jsctransformdecoratormetadata
      */
     decoratorMetadata?: boolean;
 
@@ -859,7 +859,15 @@ export interface TransformConfig {
 
     treatConstEnumAsEnum?: boolean;
 
+    /**
+     * https://www.typescriptlang.org/tsconfig#useDefineForClassFields
+     */
     useDefineForClassFields?: boolean;
+
+    /**
+     * https://www.typescriptlang.org/tsconfig#verbatimModuleSyntax
+     */
+    verbatimModuleSyntax?: boolean;
 }
 
 export interface ReactConfig {

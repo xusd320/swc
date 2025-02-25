@@ -6,11 +6,13 @@ use petgraph::{
 use rustc_hash::{FxHashMap, FxHashSet};
 use swc_common::{BytePos, Spanned, SyntaxContext};
 use swc_ecma_ast::{
-    Class, ClassMember, Decl, ExportDecl, ExportDefaultDecl, ExportDefaultExpr, Function, Id,
-    Ident, ModuleExportName, ModuleItem, NamedExport, TsEntityName, TsExportAssignment,
-    TsExprWithTypeArgs, TsPropertySignature, TsTypeElement,
+    Accessibility, Class, ClassMember, Decl, ExportDecl, ExportDefaultDecl, ExportDefaultExpr,
+    Function, Id, Ident, ModuleExportName, ModuleItem, NamedExport, TsEntityName,
+    TsExportAssignment, TsExprWithTypeArgs, TsPropertySignature, TsTypeElement,
 };
 use swc_ecma_visit::{Visit, VisitWith};
+
+use crate::fast_dts::util::ast_ext::ExprExit;
 
 pub struct TypeUsageAnalyzer<'a> {
     graph: DiGraph<Id, ()>,
@@ -99,14 +101,14 @@ impl TypeUsageAnalyzer<'_> {
 
 impl Visit for TypeUsageAnalyzer<'_> {
     fn visit_ts_property_signature(&mut self, node: &TsPropertySignature) {
-        if let Some(ident) = node.key.as_ident() {
+        if let Some(ident) = node.key.get_root_ident() {
             self.add_edge(ident.to_id(), true);
         }
         node.visit_children_with(self);
     }
 
     fn visit_ts_expr_with_type_args(&mut self, node: &TsExprWithTypeArgs) {
-        if let Some(ident) = node.expr.as_ident() {
+        if let Some(ident) = node.expr.get_root_ident() {
             self.add_edge(ident.to_id(), true);
         }
         node.visit_children_with(self);
@@ -238,7 +240,7 @@ impl Visit for TypeUsageAnalyzer<'_> {
 
     fn visit_class(&mut self, node: &Class) {
         if let Some(super_class) = &node.super_class {
-            if let Some(ident) = super_class.as_ident() {
+            if let Some(ident) = super_class.get_root_ident() {
                 self.add_edge(ident.to_id(), true);
             }
         }
@@ -249,6 +251,34 @@ impl Visit for TypeUsageAnalyzer<'_> {
         if self.has_internal_annotation(node.span_lo()) {
             return;
         }
+
+        let is_private = match node {
+            ClassMember::Constructor(constructor) => constructor
+                .accessibility
+                .is_some_and(|accessibility| accessibility == Accessibility::Private),
+            ClassMember::Method(class_method) => class_method
+                .accessibility
+                .is_some_and(|accessibility| accessibility == Accessibility::Private),
+            ClassMember::PrivateMethod(_) => true,
+            ClassMember::ClassProp(class_prop) => class_prop
+                .accessibility
+                .is_some_and(|accessibility| accessibility == Accessibility::Private),
+            ClassMember::PrivateProp(_) => true,
+            ClassMember::TsIndexSignature(_) => false,
+            ClassMember::Empty(_) => false,
+            ClassMember::StaticBlock(_) => false,
+            ClassMember::AutoAccessor(auto_accessor) => {
+                auto_accessor
+                    .accessibility
+                    .is_some_and(|accessibility| accessibility == Accessibility::Private)
+                    || auto_accessor.key.is_private()
+            }
+        };
+
+        if is_private {
+            return;
+        }
+
         node.visit_children_with(self);
     }
 

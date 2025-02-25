@@ -1,4 +1,11 @@
-(function() {
+/**
+ * @license
+ * Lodash <https://lodash.com/>
+ * Copyright OpenJS Foundation and other contributors <https://openjsf.org/>
+ * Released under MIT license <https://lodash.com/license>
+ * Based on Underscore.js 1.8.3 <http://underscorejs.org/LICENSE>
+ * Copyright Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
+ */ (function() {
     /** Error message constants. */ var undefined, FUNC_ERROR_TEXT = 'Expected a function', HASH_UNDEFINED = '__lodash_hash_undefined__', PLACEHOLDER = '__lodash_placeholder__', INFINITY = 1 / 0, NAN = 0 / 0, wrapFlags = [
         [
             'ary',
@@ -1413,7 +1420,7 @@
      * @returns {boolean} Returns `true` if the entry was removed, else `false`.
      */ function(key) {
             var result = this.has(key) && delete this.__data__[key];
-            return this.size -= result ? 1 : 0, result;
+            return this.size -= +!!result, result;
         }, Hash.prototype.get = /**
      * Gets the hash value for `key`.
      *
@@ -1451,7 +1458,7 @@
      * @returns {Object} Returns the hash instance.
      */ function(key, value) {
             var data = this.__data__;
-            return this.size += this.has(key) ? 0 : 1, data[key] = nativeCreate && undefined === value ? HASH_UNDEFINED : value, this;
+            return this.size += +!this.has(key), data[key] = nativeCreate && undefined === value ? HASH_UNDEFINED : value, this;
         }, // Add methods to `ListCache`.
         ListCache.prototype.clear = /**
      * Removes all key-value entries from the list cache.
@@ -1531,7 +1538,7 @@
      * @returns {boolean} Returns `true` if the entry was removed, else `false`.
      */ function(key) {
             var result = getMapData(this, key).delete(key);
-            return this.size -= result ? 1 : 0, result;
+            return this.size -= +!!result, result;
         }, MapCache.prototype.get = /**
      * Gets the map value for `key`.
      *
@@ -1563,7 +1570,7 @@
      * @returns {Object} Returns the map cache instance.
      */ function(key, value) {
             var data = getMapData(this, key), size = data.size;
-            return data.set(key, value), this.size += data.size == size ? 0 : 1, this;
+            return data.set(key, value), this.size += +(data.size != size), this;
         }, // Add methods to `SetCache`.
         SetCache.prototype.add = SetCache.prototype.push = /**
      * Adds `value` to the array cache.
@@ -3097,7 +3104,7 @@
      * @returns {Function} Returns the new relational operation function.
      */ function createRelationalOperation(operator) {
             return function(value, other) {
-                return 'string' == typeof value && 'string' == typeof other || (value = toNumber(value), other = toNumber(other)), operator(value, other);
+                return ('string' != typeof value || 'string' != typeof other) && (value = toNumber(value), other = toNumber(other)), operator(value, other);
             };
         }
         /**
@@ -4258,7 +4265,7 @@
             var length = paths.length, start = length ? paths[0] : 0, value = this.__wrapped__, interceptor = function(object) {
                 return baseAt(object, paths);
             };
-            return !(length > 1) && !this.__actions__.length && value instanceof LazyWrapper && isIndex(start) ? ((value = value.slice(start, +start + (length ? 1 : 0))).__actions__.push({
+            return !(length > 1) && !this.__actions__.length && value instanceof LazyWrapper && isIndex(start) ? ((value = value.slice(start, +start + +!!length)).__actions__.push({
                 func: thru,
                 args: [
                     interceptor
@@ -4449,7 +4456,7 @@
      * _.partition(users, 'active');
      * // => objects for [['fred'], ['barney', 'pebbles']]
      */ var partition = createAggregator(function(result, value, key) {
-            result[key ? 0 : 1].push(value);
+            result[+!key].push(value);
         }, function() {
             return [
                 [],
@@ -9611,7 +9618,7 @@
      * _.map(['6', '08', '10'], _.parseInt);
      * // => [6, 8, 10]
      */ function(string, radix, guard) {
-            return guard || null == radix ? radix = 0 : radix && (radix = +radix), nativeParseInt(toString(string).replace(reTrimStart, ''), radix || 0);
+            return guard || null == radix ? radix = 0 : radix && (radix *= 1), nativeParseInt(toString(string).replace(reTrimStart, ''), radix || 0);
         }, lodash.random = /**
      * Produces a random number between the inclusive `lower` and `upper` bounds.
      * If only one argument is provided a number between `0` and the given number

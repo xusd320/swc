@@ -2376,7 +2376,7 @@ function(global, factory) {
                 var delta = max - min;
                 switch(saturation = lightness <= 0.5 ? delta / (max + min) : delta / (2 - max - min), max){
                     case r:
-                        hue = (g - b) / delta + (g < b ? 6 : 0);
+                        hue = (g - b) / delta + 6 * (g < b);
                         break;
                     case g:
                         hue = (b - r) / delta + 2;
@@ -6108,7 +6108,7 @@ function(global, factory) {
     }
     var nextVersion = 0;
     function shadowCastingLightsFirst(lightA, lightB) {
-        return (lightB.castShadow ? 1 : 0) - (lightA.castShadow ? 1 : 0);
+        return +!!lightB.castShadow - +!!lightA.castShadow;
     }
     function WebGLLights(extensions, capabilities) {
         for(var lights, cache = new UniformsCache(), shadowCache = (lights = {}, {
@@ -7435,12 +7435,12 @@ function(global, factory) {
                 return;
             } else // only rebuild uniform list
             programChange = !1;
-            programChange && (parameters.uniforms = programCache.getUniforms(material), material.onBeforeCompile(parameters, _this), program = programCache.acquireProgram(parameters, programCacheKey), materialProperties.program = program, materialProperties.uniforms = parameters.uniforms, materialProperties.outputEncoding = parameters.outputEncoding);
+            programChange && (parameters.uniforms = programCache.getUniforms(material), material.onBeforeCompile(parameters, _this), materialProperties.program = program = programCache.acquireProgram(parameters, programCacheKey), materialProperties.uniforms = parameters.uniforms, materialProperties.outputEncoding = parameters.outputEncoding);
             var uniforms = materialProperties.uniforms;
             (material.isShaderMaterial || material.isRawShaderMaterial) && !0 !== material.clipping || (materialProperties.numClippingPlanes = clipping.numPlanes, materialProperties.numIntersection = clipping.numIntersection, uniforms.clippingPlanes = clipping.uniform), materialProperties.environment = material.isMeshStandardMaterial ? scene.environment : null, materialProperties.fog = scene.fog, materialProperties.envMap = cubemaps.get(material.envMap || materialProperties.environment), materialProperties.needsLights = material.isMeshLambertMaterial || material.isMeshToonMaterial || material.isMeshPhongMaterial || material.isMeshStandardMaterial || material.isShadowMaterial || material.isShaderMaterial && !0 === material.lights, materialProperties.lightsStateVersion = lightsStateVersion, materialProperties.needsLights && (// wire up the material to this renderer's lighting state
             uniforms.ambientLightColor.value = lights.state.ambient, uniforms.lightProbe.value = lights.state.probe, uniforms.directionalLights.value = lights.state.directional, uniforms.directionalLightShadows.value = lights.state.directionalShadow, uniforms.spotLights.value = lights.state.spot, uniforms.spotLightShadows.value = lights.state.spotShadow, uniforms.rectAreaLights.value = lights.state.rectArea, uniforms.ltc_1.value = lights.state.rectAreaLTC1, uniforms.ltc_2.value = lights.state.rectAreaLTC2, uniforms.pointLights.value = lights.state.point, uniforms.pointLightShadows.value = lights.state.pointShadow, uniforms.hemisphereLights.value = lights.state.hemi, uniforms.directionalShadowMap.value = lights.state.directionalShadowMap, uniforms.directionalShadowMatrix.value = lights.state.directionalShadowMatrix, uniforms.spotShadowMap.value = lights.state.spotShadowMap, uniforms.spotShadowMatrix.value = lights.state.spotShadowMatrix, uniforms.pointShadowMap.value = lights.state.pointShadowMap, uniforms.pointShadowMatrix.value = lights.state.pointShadowMatrix);
-            var progUniforms = materialProperties.program.getUniforms(), uniformsList = WebGLUniforms.seqWithValue(progUniforms.seq, uniforms);
-            materialProperties.uniformsList = uniformsList;
+            var progUniforms = materialProperties.program.getUniforms();
+            materialProperties.uniformsList = WebGLUniforms.seqWithValue(progUniforms.seq, uniforms);
         }
         function setProgram(camera, scene, material, object) {
             !0 !== scene.isScene && (scene = _emptyScene), textures.resetTextureUnits();
@@ -11347,7 +11347,7 @@ function(global, factory) {
                         for(var morphTargetName in morphTargetNames){
                             for(var times = [], values = [], _m = 0; _m !== animationKeys[k].morphTargets.length; ++_m){
                                 var animationKey = animationKeys[k];
-                                times.push(animationKey.time), values.push(animationKey.morphTarget === morphTargetName ? 1 : 0);
+                                times.push(animationKey.time), values.push(+(animationKey.morphTarget === morphTargetName));
                             }
                             tracks.push(new NumberKeyframeTrack('.morphTargetInfluence[' + morphTargetName + ']', times, values));
                         }
@@ -11772,9 +11772,7 @@ function(global, factory) {
         load: function(url, onLoad, onProgress, onError) {
             var texture = new Texture(), loader = new ImageLoader(this.manager);
             return loader.setCrossOrigin(this.crossOrigin), loader.setPath(this.path), loader.load(url, function(image) {
-                texture.image = image;
-                var isJPEG = url.search(/\.jpe?g($|\?)/i) > 0 || 0 === url.search(/^data\:image\/jpeg/);
-                texture.format = isJPEG ? 1022 : 1023, texture.needsUpdate = !0, void 0 !== onLoad && onLoad(texture);
+                texture.image = image, texture.format = url.search(/\.jpe?g($|\?)/i) > 0 || 0 === url.search(/^data\:image\/jpeg/) ? 1022 : 1023, texture.needsUpdate = !0, void 0 !== onLoad && onLoad(texture);
             }, onProgress, onError), texture;
         }
     }), Object.assign(Curve.prototype, {
@@ -11820,9 +11818,7 @@ function(global, factory) {
         },
         // Given u ( 0 .. 1 ), get a t to find p. This gives you points which are equidistant
         getUtoTmapping: function(u, distance) {
-            var arcLengths = this.getLengths(), i = 0, il = arcLengths.length;
-            targetArcLength = distance || u * arcLengths[il - 1]; // binary search for the index with largest value smaller than target u distance
-            for(var targetArcLength, comparison, low = 0, high = il - 1; low <= high;)if ((comparison = arcLengths[i = Math.floor(low + (high - low) / 2)] - targetArcLength) < 0) low = i + 1;
+            for(var comparison, arcLengths = this.getLengths(), i = 0, il = arcLengths.length, targetArcLength = distance || u * arcLengths[il - 1], low = 0, high = il - 1; low <= high;)if ((comparison = arcLengths[i = Math.floor(low + (high - low) / 2)] - targetArcLength) < 0) low = i + 1;
             else if (comparison > 0) high = i - 1;
             else {
                 high = i;
@@ -11955,7 +11951,7 @@ function(global, factory) {
     }
     CatmullRomCurve3.prototype = Object.create(Curve.prototype), CatmullRomCurve3.prototype.constructor = CatmullRomCurve3, CatmullRomCurve3.prototype.isCatmullRomCurve3 = !0, CatmullRomCurve3.prototype.getPoint = function(t, optionalTarget) {
         void 0 === optionalTarget && (optionalTarget = new Vector3());
-        var p0, p3, point = optionalTarget, points = this.points, l = points.length, p = (l - (this.closed ? 0 : 1)) * t, intPoint = Math.floor(p), weight = p - intPoint;
+        var p0, p3, point = optionalTarget, points = this.points, l = points.length, p = (l - +!this.closed) * t, intPoint = Math.floor(p), weight = p - intPoint;
         this.closed ? intPoint += intPoint > 0 ? 0 : (Math.floor(Math.abs(intPoint) / l) + 1) * l : 0 === weight && intPoint === l - 1 && (intPoint = l - 2, weight = 1), this.closed || intPoint > 0 ? p0 = points[(intPoint - 1) % l] : (// extrapolate first point
         tmp.subVectors(points[0], points[1]).add(points[0]), p0 = tmp);
         var p1 = points[intPoint % l], p2 = points[(intPoint + 1) % l];
@@ -13059,8 +13055,7 @@ function(global, factory) {
                     object = new Mesh(geometry = getGeometry(data.geometry), material = getMaterial(data.material));
                     break;
                 case 'InstancedMesh':
-                    geometry = getGeometry(data.geometry), material = getMaterial(data.material);
-                    var object, geometry, material, count = data.count, instanceMatrix = data.instanceMatrix;
+                    var object, geometry = getGeometry(data.geometry), material = getMaterial(data.material), count = data.count, instanceMatrix = data.instanceMatrix;
                     (object = new InstancedMesh(geometry, material, count)).instanceMatrix = new BufferAttribute(new Float32Array(instanceMatrix.array), 16);
                     break;
                 case 'LOD':
@@ -13111,7 +13106,7 @@ function(global, factory) {
                     void 0 === skeleton ? console.warn('THREE.ObjectLoader: No skeleton found with UUID:', child.skeleton) : child.bind(skeleton, child.bindMatrix);
                 }
             });
-        } /* DEPRECATED */ , _proto.setTexturePath = function(value) {
+        }, _proto.setTexturePath = function(value) {
             return console.warn('THREE.ObjectLoader: .setTexturePath() has been renamed to .setResourcePath().'), this.setResourcePath(value);
         }, ObjectLoader;
     }(Loader), TEXTURE_MAPPING = {
@@ -14803,12 +14798,10 @@ function(global, factory) {
                 var p1 = i / 32 * Math.PI * 2, p2 = j / 32 * Math.PI * 2;
                 positions.push(Math.cos(p1), Math.sin(p1), 1, Math.cos(p2), Math.sin(p2), 1);
             }
-            geometry.setAttribute('position', new Float32BufferAttribute(positions, 3));
-            var material = new LineBasicMaterial({
+            return geometry.setAttribute('position', new Float32BufferAttribute(positions, 3)), _this.cone = new LineSegments(geometry, new LineBasicMaterial({
                 fog: !1,
                 toneMapped: !1
-            });
-            return _this.cone = new LineSegments(geometry, material), _this.add(_this.cone), _this.update(), _this;
+            })), _this.add(_this.cone), _this.update(), _this;
         }
         _inheritsLoose(SpotLightHelper, _Object3D);
         var _proto = SpotLightHelper.prototype;
@@ -15201,7 +15194,7 @@ function(global, factory) {
         }
         return _inheritsLoose(PlaneHelper, _Line), PlaneHelper.prototype.updateMatrixWorld = function(force) {
             var scale = -this.plane.constant;
-            1e-8 > Math.abs(scale) && (scale = 1e-8), this.scale.set(0.5 * this.size, 0.5 * this.size, scale), this.children[0].material.side = scale < 0 ? 1 : 0, this.lookAt(this.plane.normal), _Line.prototype.updateMatrixWorld.call(this, force);
+            1e-8 > Math.abs(scale) && (scale = 1e-8), this.scale.set(0.5 * this.size, 0.5 * this.size, scale), this.children[0].material.side = +(scale < 0), this.lookAt(this.plane.normal), _Line.prototype.updateMatrixWorld.call(this, force);
         }, PlaneHelper;
     }(Line), _axis = /*@__PURE__*/ new Vector3(), ArrowHelper = /*#__PURE__*/ function(_Object3D) {
         function ArrowHelper(dir, origin, length, color, headLength, headWidth) {
@@ -15420,33 +15413,15 @@ function(global, factory) {
             void 0 === sigma && (sigma = 0), void 0 === near && (near = 0.1), void 0 === far && (far = 100), _oldTarget = this._renderer.getRenderTarget();
             var cubeUVRenderTarget = this._allocateTargets();
             return this._sceneToCubeUV(scene, near, far, cubeUVRenderTarget), sigma > 0 && this._blur(cubeUVRenderTarget, 0, 0, sigma), this._applyPMREM(cubeUVRenderTarget), this._cleanup(cubeUVRenderTarget), cubeUVRenderTarget;
-        } /**
-		 * Generates a PMREM from an equirectangular texture, which can be either LDR
-		 * (RGBFormat) or HDR (RGBEFormat). The ideal input image size is 1k (1024 x 512),
-		 * as this matches best with the 256 x 256 cubemap output.
-		 */ , _proto.fromEquirectangular = function(equirectangular) {
+        }, _proto.fromEquirectangular = function(equirectangular) {
             return this._fromTexture(equirectangular);
-        } /**
-		 * Generates a PMREM from an cubemap texture, which can be either LDR
-		 * (RGBFormat) or HDR (RGBEFormat). The ideal input cube size is 256 x 256,
-		 * as this matches best with the 256 x 256 cubemap output.
-		 */ , _proto.fromCubemap = function(cubemap) {
+        }, _proto.fromCubemap = function(cubemap) {
             return this._fromTexture(cubemap);
-        } /**
-		 * Pre-compiles the cubemap shader. You can get faster start-up by invoking this method during
-		 * your texture's network fetch for increased concurrency.
-		 */ , _proto.compileCubemapShader = function() {
+        }, _proto.compileCubemapShader = function() {
             null === this._cubemapShader && (this._cubemapShader = _getCubemapShader(), this._compileMaterial(this._cubemapShader));
-        } /**
-		 * Pre-compiles the equirectangular shader. You can get faster start-up by invoking this method during
-		 * your texture's network fetch for increased concurrency.
-		 */ , _proto.compileEquirectangularShader = function() {
+        }, _proto.compileEquirectangularShader = function() {
             null === this._equirectShader && (this._equirectShader = _getEquirectShader(), this._compileMaterial(this._equirectShader));
-        } /**
-		 * Disposes of the PMREMGenerator's internal memory. Note that PMREMGenerator is a static class,
-		 * so you should not need more than one PMREMGenerator object. If you do, calling dispose() on
-		 * one of them will cause any others to also become unusable.
-		 */ , _proto.dispose = function() {
+        }, _proto.dispose = function() {
             this._blurMaterial.dispose(), null !== this._cubemapShader && this._cubemapShader.dispose(), null !== this._equirectShader && this._equirectShader.dispose();
             for(var i = 0; i < _lodPlanes.length; i++)_lodPlanes[i].dispose();
         } // private interface
@@ -15498,7 +15473,7 @@ function(global, factory) {
             }
             for(var i = 0; i < 6; i++){
                 var col = i % 3;
-                0 == col ? (cubeCamera.up.set(0, upSign[i], 0), cubeCamera.lookAt(forwardSign[i], 0, 0)) : 1 == col ? (cubeCamera.up.set(0, 0, upSign[i]), cubeCamera.lookAt(0, forwardSign[i], 0)) : (cubeCamera.up.set(0, upSign[i], 0), cubeCamera.lookAt(0, 0, forwardSign[i])), _setViewport(cubeUVRenderTarget, 256 * col, i > 2 ? 256 : 0, 256, 256), renderer.setRenderTarget(cubeUVRenderTarget), renderer.render(scene, cubeCamera);
+                0 == col ? (cubeCamera.up.set(0, upSign[i], 0), cubeCamera.lookAt(forwardSign[i], 0, 0)) : 1 == col ? (cubeCamera.up.set(0, 0, upSign[i]), cubeCamera.lookAt(0, forwardSign[i], 0)) : (cubeCamera.up.set(0, upSign[i], 0), cubeCamera.lookAt(0, 0, forwardSign[i])), _setViewport(cubeUVRenderTarget, 256 * col, 256 * (i > 2), 256, 256), renderer.setRenderTarget(cubeUVRenderTarget), renderer.render(scene, cubeCamera);
             }
             renderer.toneMapping = toneMapping, renderer.outputEncoding = outputEncoding, renderer.setClearColor(_clearColor, clearAlpha);
         }, _proto._textureToCubeUV = function(texture, cubeUVRenderTarget) {
@@ -15514,13 +15489,7 @@ function(global, factory) {
                 this._blur(cubeUVRenderTarget, i - 1, i, sigma, poleAxis);
             }
             renderer.autoClear = autoClear;
-        } /**
-		 * This is a two-pass Gaussian blur for a cubemap. Normally this is done
-		 * vertically and horizontally, but this breaks down on a cube. Here we apply
-		 * the blur latitudinally (around the poles), and then longitudinally (towards
-		 * the poles) to approximate the orthogonally-separable blur. It is least
-		 * accurate at the poles, but still does a decent job.
-		 */ , _proto._blur = function(cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis) {
+        }, _proto._blur = function(cubeUVRenderTarget, lodIn, lodOut, sigma, poleAxis) {
             var pingPongRenderTarget = this._pingPongRenderTarget;
             this._halfBlur(cubeUVRenderTarget, pingPongRenderTarget, lodIn, lodOut, sigma, 'latitudinal', poleAxis), this._halfBlur(pingPongRenderTarget, cubeUVRenderTarget, lodOut, lodOut, sigma, 'longitudinal', poleAxis);
         }, _proto._halfBlur = function(targetIn, targetOut, lodIn, lodOut, sigmaRadians, direction, poleAxis) {
@@ -15535,7 +15504,7 @@ function(global, factory) {
             for(var _i = 0; _i < weights.length; _i++)weights[_i] = weights[_i] / sum;
             blurUniforms.envMap.value = targetIn.texture, blurUniforms.samples.value = samples, blurUniforms.weights.value = weights, blurUniforms.latitudinal.value = 'latitudinal' === direction, poleAxis && (blurUniforms.poleAxis.value = poleAxis), blurUniforms.dTheta.value = radiansPerPixel, blurUniforms.mipInt.value = 8 - lodIn, blurUniforms.inputEncoding.value = ENCODINGS[targetIn.texture.encoding], blurUniforms.outputEncoding.value = ENCODINGS[targetIn.texture.encoding];
             var outputSize = _sizeLods[lodOut];
-            _setViewport(targetOut, 3 * Math.max(0, 256 - 2 * outputSize), (0 === lodOut ? 0 : 512) + 2 * outputSize * (lodOut > 4 ? lodOut - 8 + 4 : 0), 3 * outputSize, 2 * outputSize), renderer.setRenderTarget(targetOut), renderer.render(blurMesh, _flatCamera);
+            _setViewport(targetOut, 3 * Math.max(0, 256 - 2 * outputSize), 512 * (0 !== lodOut) + 2 * outputSize * (lodOut > 4 ? lodOut - 8 + 4 : 0), 3 * outputSize, 2 * outputSize), renderer.setRenderTarget(targetOut), renderer.render(blurMesh, _flatCamera);
         }, PMREMGenerator;
     }();
     function _createRenderTarget(params) {
@@ -16508,7 +16477,7 @@ function(global, factory) {
             var x = _int32View[0], bits = x >> 16 & 0x8000, m = x >> 12 & 0x07ff, e = x >> 23 & 0xff;
             return(/* Using int is faster here */ /* If zero, or denormal, or exponent underflows too much for a denormal
 				* half, return signed zero. */ e < 103 ? bits : e > 142 ? (bits |= 0x7c00, /* If exponent was 0xff and one mantissa bit was set, it means NaN,
-							* not Inf, so make sure we set one mantissa bit too. */ bits |= (255 == e ? 0 : 1) && 0x007fffff & x) : e < 113 ? (m |= 0x0800, /* Extra rounding may overflow and set mantissa to 0 and exponent
+							* not Inf, so make sure we set one mantissa bit too. */ bits |= +(255 != e) && 0x007fffff & x) : e < 113 ? (m |= 0x0800, /* Extra rounding may overflow and set mantissa to 0 and exponent
 					* to 1, which is OK. */ bits |= (m >> 114 - e) + (m >> 113 - e & 1)) : (bits |= e - 112 << 10 | m >> 1, /* Extra rounding. An overflow will set mantissa to 0 and increment
 				* the exponent, which is OK. */ bits += 1 & m));
         }
