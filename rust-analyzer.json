@@ -1,9 +1,6 @@
 {
-    "rust-analyzer.cargo.allFeatures": true,
+    "rust-analyzer.cargo.allFeatures": false,
     "rust-analyzer.files.excludeDirs": [
-        "./bindings/binding_core_wasm/__tests__",
-        "./bindings/binding_minifier_wasm/__tests__",
-        "./bindings/binding_typescript_wasm/__tests__",
         "./crates/jsdoc/tests",
         "./crates/string_enum/tests",
         "./crates/swc/tests",
@@ -49,13 +46,13 @@
         "./crates/swc_html_minifier/tests",
         "./crates/swc_html_parser/tests",
         "./crates/swc_node_bundler/tests",
+        "./crates/swc_parallel/tests",
         "./crates/swc_plugin_runner/tests",
         "./crates/swc_timer/tests",
         "./crates/swc_typescript/tests",
         "./crates/swc_xml_codegen/tests",
         "./crates/swc_xml_parser/tests",
         "./crates/testing_macros/tests",
-        "./packages/core/__tests__",
         "./packages/core/tests"
     ]
 }
